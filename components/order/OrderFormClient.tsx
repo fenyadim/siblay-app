@@ -15,7 +15,6 @@ import { Step3Params } from "@/components/order/steps/Step3Params"
 import { Step4Files } from "@/components/order/steps/Step4Files"
 import { Step5Comment } from "@/components/order/steps/Step5Comment"
 import { Step6Contacts } from "@/components/order/steps/Step6Contacts"
-import { Button } from "@/components/ui/button"
 
 import {
   fullOrderSchema,
@@ -40,12 +39,7 @@ export function OrderFormClient({ materials }: Props) {
 
   const methods = useForm<OrderFormData>({
     resolver: zodResolver(fullOrderSchema) as Resolver<OrderFormData>,
-    defaultValues: {
-      quantity: 1,
-      infill: 50,
-      hasModel: true,
-      files: [],
-    },
+    defaultValues: { quantity: 1, infill: 50, hasModel: true, files: [] },
     mode: "onBlur",
   })
 
@@ -60,28 +54,21 @@ export function OrderFormClient({ materials }: Props) {
 
   async function handleNext() {
     const schema = STEP_SCHEMAS[step - 1]
-    const values = methods.getValues()
-    const result = schema.safeParse(values)
-
+    const result = schema.safeParse(methods.getValues())
     if (!result.success) {
       result.error.issues.forEach((e) => {
-        const field = e.path[0] as keyof OrderFormData
-        methods.setError(field, { message: e.message })
+        methods.setError(e.path[0] as keyof OrderFormData, { message: e.message })
       })
       return
     }
-
-    if (step < TOTAL_STEPS) {
-      setStep((s) => s + 1)
-      window.scrollTo({ top: 0, behavior: "smooth" })
-    }
+    setStep((s) => s + 1)
+    window.scrollTo({ top: 0, behavior: "smooth" })
   }
 
   async function handleSubmit() {
     setSubmitting(true)
     try {
-      const values = methods.getValues()
-      const result = await createOrder(values)
+      const result = await createOrder(methods.getValues())
       if ("error" in result) {
         toast.error(result.error)
       } else {
@@ -96,11 +83,14 @@ export function OrderFormClient({ materials }: Props) {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--background)] py-8 pb-24 lg:pb-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-[var(--background)] pb-32 lg:pb-12">
+      {/* Top accent line */}
+      <div className="h-0.5 w-full" style={{ background: "linear-gradient(90deg, var(--accent), #7c3aed)" }} />
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Page header */}
         <div className="mb-8">
-          <span className="label-mono">Оформление</span>
+          <span className="label-mono">Оформление заказа</span>
           <h1
             className="mt-2 text-4xl font-black tracking-tight text-[var(--foreground)]"
             style={{ fontFamily: "Syne, sans-serif" }}
@@ -109,61 +99,91 @@ export function OrderFormClient({ materials }: Props) {
           </h1>
         </div>
 
-        {/* Stepper */}
-        <div className="mb-8 p-5 rounded-2xl border border-[var(--border)] bg-[var(--surface)]">
-          <OrderStepper current={step} />
-        </div>
-
-        <div className="lg:grid lg:grid-cols-[1fr_320px] gap-8">
+        <div className="lg:grid lg:grid-cols-[1fr_300px] gap-8 items-start">
           <FormProvider {...methods}>
-            {/* Step content */}
-            <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-6 lg:p-8">
-              {STEP_COMPONENTS[step - 1]}
+            {/* Main card */}
+            <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] overflow-hidden">
+              {/* Stepper header */}
+              <div className="px-6 lg:px-8 pt-6 pb-5 border-b border-[var(--border)] bg-[var(--surface-raised)]">
+                <OrderStepper current={step} />
+              </div>
 
-              {/* Navigation */}
-              <div className="mt-8 flex items-center justify-between border-t border-[var(--border)] pt-6">
-                <Button
+              {/* Step content */}
+              <div className="px-6 lg:px-8 py-8">
+                {STEP_COMPONENTS[step - 1]}
+              </div>
+
+              {/* Navigation footer */}
+              <div className="px-6 lg:px-8 py-5 border-t border-[var(--border)] bg-[var(--surface-raised)] flex items-center justify-between gap-3">
+                <button
                   type="button"
-                  variant="outline"
                   onClick={() => {
                     setStep((s) => s - 1)
                     window.scrollTo({ top: 0, behavior: "smooth" })
                   }}
                   disabled={step === 1}
-                  className="border-[var(--border)] text-[var(--foreground)]"
+                  className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[var(--border)] text-sm font-medium text-[var(--foreground)] hover:border-[var(--accent-border)] hover:text-[var(--accent)] transition-colors disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:border-[var(--border)] disabled:hover:text-[var(--foreground)]"
                 >
-                  ← Назад
-                </Button>
+                  <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 12H5M12 5l-7 7 7 7" />
+                  </svg>
+                  Назад
+                </button>
+
+                {/* Step dots (mobile) */}
+                <div className="sm:hidden flex gap-1">
+                  {Array.from({ length: TOTAL_STEPS }).map((_, i) => (
+                    <div
+                      key={i}
+                      className="rounded-full transition-all duration-300"
+                      style={{
+                        width: i + 1 === step ? 16 : 6,
+                        height: 6,
+                        background: i + 1 <= step ? "var(--accent)" : "var(--border)",
+                      }}
+                    />
+                  ))}
+                </div>
 
                 {step < TOTAL_STEPS ? (
-                  <Button
+                  <button
                     type="button"
                     onClick={handleNext}
-                    className="bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white px-8"
+                    className="flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold text-white transition-opacity hover:opacity-90"
+                    style={{ background: "linear-gradient(135deg, var(--accent), #7c3aed)" }}
                   >
-                    Далее →
-                  </Button>
+                    Далее
+                    <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14M12 5l7 7-7 7" />
+                    </svg>
+                  </button>
                 ) : (
-                  <Button
+                  <button
                     type="button"
                     onClick={handleSubmit}
                     disabled={submitting}
-                    className="bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white px-8"
+                    className="flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-60"
+                    style={{ background: "linear-gradient(135deg, var(--accent), #7c3aed)" }}
                   >
                     {submitting ? (
-                      <span className="flex items-center gap-2">
+                      <>
                         <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                         Отправка...
-                      </span>
+                      </>
                     ) : (
-                      "Отправить заказ ✓"
+                      <>
+                        Отправить заказ
+                        <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                      </>
                     )}
-                  </Button>
+                  </button>
                 )}
               </div>
             </div>
 
-            {/* Summary */}
+            {/* Summary sidebar */}
             <SummaryPanel />
           </FormProvider>
         </div>

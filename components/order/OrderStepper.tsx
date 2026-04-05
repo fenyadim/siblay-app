@@ -14,47 +14,58 @@ interface OrderStepperProps {
 }
 
 export function OrderStepper({ current }: OrderStepperProps) {
+  const progress = ((current - 1) / (STEPS.length - 1)) * 100
+
   return (
-    <div className="w-full">
-      {/* Desktop */}
-      <div className="hidden sm:flex items-center justify-between">
+    <div className="w-full space-y-4">
+      {/* Progress bar */}
+      <div className="h-1 w-full rounded-full bg-[var(--border)] overflow-hidden">
+        <div
+          className="h-full rounded-full transition-all duration-500 ease-out"
+          style={{
+            width: `${progress}%`,
+            background: "linear-gradient(90deg, var(--accent), #7c3aed)",
+          }}
+        />
+      </div>
+
+      {/* Desktop steps */}
+      <div className="hidden sm:flex items-start justify-between">
         {STEPS.map((step, i) => {
           const done = step.num < current
           const active = step.num === current
           return (
-            <div key={step.num} className="flex-1 flex items-center">
-              <div className="flex flex-col items-center gap-1.5">
+            <div key={step.num} className="flex-1 flex items-start">
+              <div className="flex flex-col items-center gap-1.5 flex-1">
                 <div
                   className={cn(
-                    "w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-colors shrink-0",
-                    done && "bg-[var(--accent)] text-white",
-                    active && "bg-[var(--accent)] text-white ring-4 ring-[var(--accent-subtle)]",
+                    "w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300 shrink-0",
+                    done && "bg-[var(--accent)] text-white shadow-sm",
+                    active && "text-white shadow-md ring-4 ring-[var(--accent)]/20",
                     !done && !active && "border-2 border-[var(--border)] text-[var(--muted)] bg-[var(--surface)]",
                   )}
+                  style={active ? { background: "linear-gradient(135deg, var(--accent), #7c3aed)" } : undefined}
                 >
                   {done ? (
-                    <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                    <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                     </svg>
                   ) : (
-                    <span className="font-mono text-xs">{step.num}</span>
+                    <span className="font-mono">{step.num}</span>
                   )}
                 </div>
                 <span
                   className={cn(
-                    "text-xs font-medium whitespace-nowrap",
-                    active ? "text-[var(--accent)]" : "text-[var(--muted)]",
+                    "text-[11px] font-medium whitespace-nowrap text-center",
+                    active ? "text-[var(--accent)]" : done ? "text-[var(--foreground)]" : "text-[var(--muted)]",
                   )}
                 >
                   {step.label}
                 </span>
               </div>
               {i < STEPS.length - 1 && (
-                <div
-                  className={cn(
-                    "flex-1 h-px mx-3 transition-colors",
-                    done ? "bg-[var(--accent)]" : "bg-[var(--border)]",
-                  )}
+                <div className="flex-1 h-px mt-3.5 mx-1 transition-colors duration-300"
+                  style={{ background: done ? "var(--accent)" : "var(--border)" }}
                 />
               )}
             </div>
@@ -63,26 +74,20 @@ export function OrderStepper({ current }: OrderStepperProps) {
       </div>
 
       {/* Mobile */}
-      <div className="sm:hidden flex items-center gap-3">
-        <div className="flex gap-1.5">
-          {STEPS.map((step) => (
-            <div
-              key={step.num}
-              className={cn(
-                "h-1.5 rounded-full transition-all",
-                step.num < current && "bg-[var(--accent)] w-4",
-                step.num === current && "bg-[var(--accent)] w-8",
-                step.num > current && "bg-[var(--border)] w-4",
-              )}
-            />
-          ))}
+      <div className="sm:hidden flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <div
+            className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white shrink-0"
+            style={{ background: "linear-gradient(135deg, var(--accent), #7c3aed)" }}
+          >
+            {current}
+          </div>
+          <div>
+            <p className="text-xs text-[var(--muted)]">Шаг {current} из {STEPS.length}</p>
+            <p className="text-sm font-semibold text-[var(--foreground)]">{STEPS[current - 1]?.label}</p>
+          </div>
         </div>
-        <span className="text-sm text-[var(--muted)]">
-          <span className="font-mono font-medium text-[var(--foreground)]">{current}</span>
-          <span className="mx-1">/</span>
-          {STEPS.length}
-          <span className="ml-2 text-[var(--accent)]">— {STEPS[current - 1]?.label}</span>
-        </span>
+        <span className="text-xs font-mono text-[var(--muted)]">{Math.round(progress)}%</span>
       </div>
     </div>
   )

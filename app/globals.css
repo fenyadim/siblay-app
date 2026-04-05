@@ -95,6 +95,13 @@ html {
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--muted); }
 
+/* ── Dialog / scroll-lock fix for fixed header ─────────────────────── */
+/* When Radix Dialog locks scroll it adds padding-right to body.        */
+/* Fixed header must receive the same offset to avoid layout shift.     */
+body[data-scroll-locked] > * > header {
+  padding-right: var(--removed-body-scroll-bar-size, 0px);
+}
+
 /* ── Modern utilities ───────────────────────────────────────────────── */
 
 .gradient-text {

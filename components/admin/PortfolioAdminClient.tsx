@@ -1,11 +1,12 @@
 "use client"
 
-import { useState, useTransition } from "react"
-import { useForm, type Resolver } from "react-hook-form"
+import { useState, useTransition, useRef, useCallback } from "react"
+import { useForm, useFieldArray, type Resolver } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { portfolioSchema, PORTFOLIO_CATEGORIES, type PortfolioFormData } from "@/lib/validations/portfolio"
 import { createPortfolioItem, updatePortfolioItem, deletePortfolioItem } from "@/actions/portfolio"
 import { Badge } from "@/components/ui/badge"
+import { cn } from "@/lib/utils"
 
 interface PortfolioItem {
   id: string
@@ -24,6 +25,222 @@ interface Props {
   categoryLabels: Record<string, string>
 }
 
+/* ── Image Upload Component ───────────────────────────────────────────── */
+
+interface UploadingFile {
+  id: string
+  name: string
+  progress: number
+  url?: string
+  error?: string
+}
+
+function ImageUploader({
+  images,
+  onChange,
+}: {
+  images: string[]
+  onChange: (urls: string[]) => void
+}) {
+  const [uploading, setUploading] = useState<UploadingFile[]>([])
+  const [dragOver, setDragOver] = useState(false)
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  const uploadFile = useCallback(async (file: File): Promise<string | null> => {
+    const id = Math.random().toString(36).slice(2)
+    setUploading((prev) => [...prev, { id, name: file.name, progress: 30 }])
+
+    try {
+      const formData = new FormData()
+      formData.append("file", file)
+      formData.append("folder", "portfolio")
+
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      })
+
+      if (!res.ok) {
+        const data = await res.json()
+        throw new Error(data.error || "Ошибка загрузки")
+      }
+
+      const { fileUrl } = await res.json()
+
+      setUploading((prev) =>
+        prev.map((f) => (f.id === id ? { ...f, progress: 100, url: fileUrl } : f)),
+      )
+
+      setTimeout(() => {
+        setUploading((prev) => prev.filter((f) => f.id !== id))
+      }, 500)
+
+      return fileUrl
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Ошибка"
+      setUploading((prev) =>
+        prev.map((f) => (f.id === id ? { ...f, error: message } : f)),
+      )
+      return null
+    }
+  }, [])
+
+  const handleFiles = useCallback(
+    async (files: FileList | File[]) => {
+      const imageFiles = Array.from(files).filter((f) =>
+        f.type.startsWith("image/"),
+      )
+      if (imageFiles.length === 0) return
+
+      const results = await Promise.all(imageFiles.map(uploadFile))
+      const newUrls = results.filter((u): u is string => u !== null)
+      if (newUrls.length > 0) {
+        onChange([...images, ...newUrls])
+      }
+    },
+    [images, onChange, uploadFile],
+  )
+
+  const handleDrop = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault()
+      setDragOver(false)
+      handleFiles(e.dataTransfer.files)
+    },
+    [handleFiles],
+  )
+
+  const removeImage = (index: number) => {
+    onChange(images.filter((_, i) => i !== index))
+  }
+
+  const removeUploadError = (id: string) => {
+    setUploading((prev) => prev.filter((f) => f.id !== id))
+  }
+
+  return (
+    <div>
+      <label className="block text-xs text-[var(--muted)] mb-1">
+        Фотографии *
+      </label>
+
+      {/* Current images */}
+      {images.length > 0 && (
+        <div className="flex flex-wrap gap-2 mb-3">
+          {images.map((url, i) => (
+            <div key={i} className="relative group">
+              <img
+                src={url}
+                alt=""
+                className="w-20 h-20 rounded-xl object-cover border border-[var(--border)]"
+              />
+              <button
+                type="button"
+                onClick={() => removeImage(i)}
+                className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-[var(--error)] text-white text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+              >
+                ×
+              </button>
+              {i === 0 && (
+                <span className="absolute bottom-0.5 left-0.5 right-0.5 text-center text-[9px] font-mono bg-black/50 text-white rounded-b-lg py-0.5">
+                  обложка
+                </span>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Uploading files */}
+      {uploading.length > 0 && (
+        <div className="space-y-2 mb-3">
+          {uploading.map((f) => (
+            <div
+              key={f.id}
+              className="flex items-center gap-3 px-3 py-2 rounded-lg border border-[var(--border)] bg-[var(--background)] text-sm"
+            >
+              <span className="text-[var(--foreground)] truncate flex-1">
+                {f.name}
+              </span>
+              {f.error ? (
+                <>
+                  <span className="text-xs text-[var(--error)]">{f.error}</span>
+                  <button
+                    type="button"
+                    onClick={() => removeUploadError(f.id)}
+                    className="text-xs text-[var(--muted)] hover:text-[var(--foreground)]"
+                  >
+                    ×
+                  </button>
+                </>
+              ) : (
+                <div className="w-20 h-1.5 rounded-full bg-[var(--border)] overflow-hidden">
+                  <div
+                    className="h-full bg-[var(--accent)] rounded-full transition-all duration-300"
+                    style={{ width: `${f.progress}%` }}
+                  />
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Drop zone */}
+      <div
+        onDragOver={(e) => {
+          e.preventDefault()
+          setDragOver(true)
+        }}
+        onDragLeave={() => setDragOver(false)}
+        onDrop={handleDrop}
+        onClick={() => inputRef.current?.click()}
+        className={cn(
+          "flex flex-col items-center justify-center gap-2 p-6 rounded-xl border-2 border-dashed cursor-pointer transition-colors",
+          dragOver
+            ? "border-[var(--accent)] bg-[var(--accent-subtle)]"
+            : "border-[var(--border)] bg-[var(--background)] hover:border-[var(--accent-border)]",
+        )}
+      >
+        <svg
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="var(--muted)"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+          <polyline points="17 8 12 3 7 8" />
+          <line x1="12" y1="3" x2="12" y2="15" />
+        </svg>
+        <p className="text-xs text-[var(--muted)]">
+          Перетащите фото или{" "}
+          <span className="text-[var(--accent)] font-medium">выберите файлы</span>
+        </p>
+        <p className="text-[10px] text-[var(--placeholder)]">
+          JPG, PNG, WEBP, HEIC
+        </p>
+        <input
+          ref={inputRef}
+          type="file"
+          accept="image/*"
+          multiple
+          className="hidden"
+          onChange={(e) => {
+            if (e.target.files) handleFiles(e.target.files)
+            e.target.value = ""
+          }}
+        />
+      </div>
+    </div>
+  )
+}
+
+/* ── Portfolio Form ───────────────────────────────────────────────────── */
+
 function PortfolioForm({
   defaultValues,
   onSubmit,
@@ -38,6 +255,8 @@ function PortfolioForm({
   const {
     register,
     handleSubmit,
+    setValue,
+    watch,
     formState: { errors },
   } = useForm<PortfolioFormData>({
     resolver: zodResolver(portfolioSchema) as Resolver<PortfolioFormData>,
@@ -47,6 +266,8 @@ function PortfolioForm({
       ...defaultValues,
     },
   })
+
+  const images = watch("images") ?? []
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -107,26 +328,12 @@ function PortfolioForm({
         />
       </div>
 
-      <div>
-        <label className="block text-xs text-[var(--muted)] mb-1">
-          URL изображений * (по одному на строке)
-        </label>
-        <textarea
-          {...register("images", {
-            setValueAs: (v: string) =>
-              typeof v === "string"
-                ? v
-                    .split("\n")
-                    .map((s) => s.trim())
-                    .filter(Boolean)
-                : v,
-          })}
-          rows={3}
-          placeholder="https://…"
-          className="w-full rounded-lg border border-[var(--border)] bg-[var(--background)] px-3 py-2 text-sm font-mono text-[var(--foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)] resize-none"
-        />
-        {errors.images && <p className="text-xs text-red-500 mt-1">{errors.images.message}</p>}
-      </div>
+      {/* Image uploader */}
+      <ImageUploader
+        images={Array.isArray(images) ? images : []}
+        onChange={(urls) => setValue("images", urls, { shouldValidate: true })}
+      />
+      {errors.images && <p className="text-xs text-red-500 mt-1">{errors.images.message}</p>}
 
       <div className="flex gap-3 pt-2">
         <button
@@ -147,6 +354,8 @@ function PortfolioForm({
     </form>
   )
 }
+
+/* ── Admin Client ─────────────────────────────────────────────────────── */
 
 export function PortfolioAdminClient({ items: initialItems, categoryLabels }: Props) {
   const [items, setItems] = useState(initialItems)
@@ -233,7 +442,7 @@ export function PortfolioAdminClient({ items: initialItems, categoryLabels }: Pr
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b border-[var(--border)] bg-[var(--background)]">
-                      {["Название", "Категория", "Материал", "Статус", ""].map((h) => (
+                      {["Название", "Категория", "Материал", "Фото", "Статус", ""].map((h) => (
                         <th key={h} className="text-left px-4 py-3 label-mono font-normal">
                           {h}
                         </th>
@@ -260,6 +469,11 @@ export function PortfolioAdminClient({ items: initialItems, categoryLabels }: Pr
                         </td>
                         <td className="px-4 py-3 font-mono text-xs text-[var(--foreground)]">
                           {item.material}
+                        </td>
+                        <td className="px-4 py-3">
+                          <span className="text-xs font-mono text-[var(--muted)]">
+                            {item.images.length}
+                          </span>
                         </td>
                         <td className="px-4 py-3">
                           <Badge

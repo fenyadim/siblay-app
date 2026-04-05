@@ -43,18 +43,21 @@ export function Step4Files() {
     setUploading((prev) => ({ ...prev, [file.name]: 0 }))
 
     try {
+      const formData = new FormData()
+      formData.append("file", file)
+      formData.append("folder", "orders")
+
       const res = await fetch("/api/upload", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ fileName: file.name, contentType: file.type }),
+        body: formData,
       })
-      const { url, fileUrl } = await res.json()
 
-      await fetch(url, {
-        method: "PUT",
-        body: file,
-        headers: { "Content-Type": file.type },
-      })
+      if (!res.ok) {
+        const data = await res.json()
+        throw new Error(data.error || "Ошибка загрузки")
+      }
+
+      const { fileUrl } = await res.json()
 
       const newFile: UploadedFile = {
         fileName: file.name,

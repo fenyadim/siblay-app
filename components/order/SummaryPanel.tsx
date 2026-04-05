@@ -6,17 +6,23 @@ import type { OrderFormData } from "@/lib/validations/order"
 import { cn } from "@/lib/utils"
 import { useState } from "react"
 
+function Row({ label, value }: { label: string; value: React.ReactNode }) {
+  return (
+    <div className="flex items-start justify-between gap-2 py-2.5 border-b border-[var(--border)] last:border-0">
+      <span className="text-xs text-[var(--muted)] shrink-0">{label}</span>
+      <span className="text-xs font-medium text-[var(--foreground)] text-right">{value}</span>
+    </div>
+  )
+}
+
 export function SummaryPanel() {
   const { watch } = useFormContext<OrderFormData>()
   const [open, setOpen] = useState(false)
 
   const values = watch()
-  const {
-    material, color, width, height, length,
-    quantity, infill, hasModel, files,
-  } = values
+  const { material, color, width, height, length, quantity, infill, hasModel, files } = values
 
-  const hasAllDims = width > 0 && height > 0 && length > 0
+  const hasAllDims = Number(width) > 0 && Number(height) > 0 && Number(length) > 0
   const price = hasAllDims && material
     ? calculatePrice({
         material,
@@ -30,89 +36,50 @@ export function SummaryPanel() {
     : null
 
   const content = (
-    <div className="space-y-4 text-sm">
-      {/* Material & Color */}
-      <div>
-        <p className="label-mono mb-2">Материал и цвет</p>
-        <div className="flex items-center gap-2">
-          <span className="font-mono font-bold text-[var(--foreground)]">{material || "—"}</span>
-          {color && (
-            <>
-              <span className="text-[var(--muted)]">·</span>
-              <span className="text-[var(--muted)]">{color}</span>
-            </>
-          )}
-        </div>
+    <div>
+      <div className="divide-y divide-[var(--border)] mb-4">
+        {material && <Row label="Материал" value={<span className="font-mono">{material}</span>} />}
+        {color && <Row label="Цвет" value={color} />}
+        {hasAllDims && (
+          <Row
+            label="Размеры"
+            value={<span className="font-mono">{length}×{width}×{height} мм</span>}
+          />
+        )}
+        {(quantity ?? 1) > 0 && (
+          <Row label="Количество" value={<span className="font-mono">{quantity || 1} шт.</span>} />
+        )}
+        {infill && (
+          <Row label="Заполнение" value={<span className="font-mono">{infill}%</span>} />
+        )}
+        {(files?.length ?? 0) > 0 && (
+          <Row label="Файлы" value={`${files.length} шт.`} />
+        )}
+        {hasModel === false && (
+          <Row label="Моделирование" value={<span className="text-amber-600">+50%</span>} />
+        )}
       </div>
 
-      {/* Dimensions */}
-      {hasAllDims && (
-        <div>
-          <p className="label-mono mb-2">Размеры</p>
-          <p className="font-mono text-[var(--foreground)]">
-            {length}×{width}×{height} мм
-          </p>
-        </div>
-      )}
-
-      {/* Qty + Infill */}
-      <div className="grid grid-cols-2 gap-3">
-        <div>
-          <p className="label-mono mb-1">Кол-во</p>
-          <p className="font-mono text-[var(--foreground)]">{quantity || 1} шт.</p>
-        </div>
-        <div>
-          <p className="label-mono mb-1">Infill</p>
-          <p className="font-mono text-[var(--foreground)]">{infill || 50}%</p>
-        </div>
-      </div>
-
-      {/* Files */}
-      {files?.length > 0 && (
-        <div>
-          <p className="label-mono mb-2">Файлы ({files.length})</p>
-          <div className="space-y-1">
-            {files.map((f, i) => (
-              <div key={i} className="flex items-center gap-2 text-xs text-[var(--muted)] truncate">
-                <span className="shrink-0 font-mono text-[var(--accent)]">
-                  {f.fileName.split(".").pop()?.toUpperCase()}
-                </span>
-                <span className="truncate">{f.fileName}</span>
-                <span className="shrink-0">{formatFileSize(f.fileSize)}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* No model warning */}
-      {hasModel === false && (
-        <div className="rounded-lg border border-[var(--warning)]/30 bg-amber-50 dark:bg-amber-900/10 p-2.5">
-          <p className="text-xs text-amber-700 dark:text-amber-400 font-medium">
-            ⚠️ Нужно моделирование (+50%)
-          </p>
-        </div>
-      )}
-
-      {/* Price */}
-      <div className="pt-3 border-t border-[var(--border)]">
-        <p className="label-mono mb-1">Ориентировочная стоимость</p>
+      {/* Price block */}
+      <div
+        className="rounded-xl p-4"
+        style={{ background: "linear-gradient(135deg, var(--accent-subtle), #7c3aed1a)" }}
+      >
+        <p className="text-xs text-[var(--muted)] mb-1">Ориентировочная стоимость</p>
         {price !== null ? (
-          <div>
-            <p className="text-xl font-black text-[var(--accent)]" style={{ fontFamily: "Syne, sans-serif" }}>
+          <>
+            <p
+              className="text-2xl font-black"
+              style={{ fontFamily: "Syne, sans-serif", color: "var(--accent)" }}
+            >
               {formatPrice(price)}
             </p>
-            {!hasModel && hasAllDims && (
-              <p className="text-xs text-[var(--muted)] mt-0.5 font-mono">
-                вкл. моделирование ×1.5
-              </p>
-            )}
-            <p className="text-xs text-[var(--muted)] mt-1">
+            <p className="text-[11px] text-[var(--muted)] mt-1 leading-snug">
               Окончательная цена после согласования
             </p>
-          </div>
+          </>
         ) : (
-          <p className="text-[var(--muted)]">Укажите размеры для расчёта</p>
+          <p className="text-sm text-[var(--muted)]">Укажите размеры для расчёта</p>
         )}
       </div>
     </div>
@@ -122,37 +89,51 @@ export function SummaryPanel() {
     <>
       {/* Desktop sticky sidebar */}
       <aside className="hidden lg:block sticky top-24 self-start">
-        <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5">
-          <h3 className="font-black text-[var(--foreground)] mb-4" style={{ fontFamily: "Syne, sans-serif" }}>
-            Ваш заказ
-          </h3>
-          {content}
+        <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] overflow-hidden">
+          <div className="px-5 py-4 border-b border-[var(--border)] bg-[var(--surface-raised)]">
+            <h3
+              className="font-black text-[var(--foreground)]"
+              style={{ fontFamily: "Syne, sans-serif" }}
+            >
+              Ваш заказ
+            </h3>
+          </div>
+          <div className="p-5">{content}</div>
         </div>
       </aside>
 
-      {/* Mobile bottom sheet toggle */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40">
+      {/* Mobile bottom sheet */}
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 shadow-2xl">
         <button
           type="button"
           onClick={() => setOpen(!open)}
-          className="w-full flex items-center justify-between px-4 py-3 bg-[var(--surface)] border-t border-[var(--border)]"
+          className="w-full flex items-center justify-between px-5 py-3.5 bg-[var(--surface)] border-t border-[var(--border)]"
         >
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2.5">
+            <div
+              className="w-2 h-2 rounded-full"
+              style={{ background: "linear-gradient(135deg, var(--accent), #7c3aed)" }}
+            />
             <span className="text-sm font-semibold text-[var(--foreground)]">Ваш заказ</span>
             {price !== null && (
-              <span className="font-mono font-bold text-[var(--accent)]">{formatPrice(price)}</span>
+              <span
+                className="text-sm font-black"
+                style={{ color: "var(--accent)", fontFamily: "Syne, sans-serif" }}
+              >
+                {formatPrice(price)}
+              </span>
             )}
           </div>
           <svg
             width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"
-            className={cn("text-[var(--muted)] transition-transform", open && "rotate-180")}
+            className={cn("text-[var(--muted)] transition-transform duration-200", open && "rotate-180")}
           >
             <path strokeLinecap="round" strokeLinejoin="round" d="M5 15l7-7 7 7" />
           </svg>
         </button>
 
         {open && (
-          <div className="bg-[var(--surface)] border-t border-[var(--border)] px-4 pt-4 pb-6 max-h-[60vh] overflow-y-auto">
+          <div className="bg-[var(--surface)] border-t border-[var(--border)] px-5 pt-5 pb-6 max-h-[55vh] overflow-y-auto">
             {content}
           </div>
         )}

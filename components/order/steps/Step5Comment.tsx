@@ -4,37 +4,59 @@ import { useFormContext } from "react-hook-form"
 import { Textarea } from "@/components/ui/textarea"
 import type { OrderFormData } from "@/lib/validations/order"
 
+const HINTS = [
+  "Допуски на размеры (например: ±0.2 мм)",
+  "Назначение изделия (прототип, рабочая деталь, декор)",
+  "Требования к поверхности (шлифовка, хим. разглаживание)",
+  "Наличие резьбы, вставок, посадочных мест",
+  "Особые условия эксплуатации (температура, влага, нагрузки)",
+]
+
 export function Step5Comment() {
   const { register, watch } = useFormContext<OrderFormData>()
   const comment = watch("comment") ?? ""
 
   return (
-    <div>
-      <h2 className="text-2xl font-black text-[var(--foreground)] mb-1" style={{ fontFamily: "Syne, sans-serif" }}>
-        Комментарии к заказу
-      </h2>
-      <p className="text-sm text-[var(--muted)] mb-6">Необязательный шаг — пропустите, если нет особых требований</p>
-
-      <Textarea
-        {...register("comment")}
-        rows={6}
-        placeholder="Опишите особые требования: допуски, цель использования, пожелания по качеству поверхности, конкретный цвет RAL, наличие резьбы, вставок и т.д."
-        className="bg-[var(--surface)] border-[var(--border)] text-[var(--foreground)] placeholder:text-[var(--placeholder)] focus:border-[var(--accent)] resize-none"
-      />
-      <div className="mt-1.5 flex justify-end">
-        <span className="text-xs font-mono text-[var(--muted)]">{comment.length} / 2000</span>
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-2xl font-black text-[var(--foreground)] mb-1" style={{ fontFamily: "Syne, sans-serif" }}>
+          Комментарии к заказу
+        </h2>
+        <p className="text-sm text-[var(--muted)]">Необязательный шаг — пропустите, если нет особых требований</p>
       </div>
 
-      <div className="mt-4 p-4 rounded-xl bg-[var(--accent-subtle)] border border-[var(--accent-border)]">
-        <p className="text-xs text-[var(--accent)] font-medium mb-2">Что полезно указать:</p>
-        <ul className="text-xs text-[var(--muted)] space-y-1">
-          <li>· Допуски на размеры (например: ±0.2 мм)</li>
-          <li>· Назначение изделия (прототип, рабочая деталь, декор)</li>
-          <li>· Требования к поверхности (шлифовка, покраска)</li>
-          <li>· Наличие резьбы, вставок, посадочных мест</li>
-          <li>· Особые условия эксплуатации (температура, влага, нагрузки)</li>
+      <div className="relative">
+        <Textarea
+          {...register("comment")}
+          rows={6}
+          placeholder="Опишите особые требования: допуски, цель использования, пожелания по качеству поверхности..."
+          className="bg-[var(--background)] border-[var(--border)] text-[var(--foreground)] placeholder:text-[var(--placeholder)] focus-visible:ring-0 focus-visible:border-[var(--accent)] resize-none transition-colors"
+        />
+        <div className="absolute bottom-3 right-3">
+          <span className={cn(
+            "text-xs font-mono",
+            comment.length > 1800 ? "text-[var(--warning)]" : "text-[var(--muted)]"
+          )}>
+            {comment.length} / 2000
+          </span>
+        </div>
+      </div>
+
+      <div className="rounded-xl border border-[var(--border)] bg-[var(--background)] p-4">
+        <p className="text-xs font-semibold text-[var(--foreground)] mb-3">Что полезно указать:</p>
+        <ul className="space-y-2">
+          {HINTS.map((hint) => (
+            <li key={hint} className="flex items-start gap-2 text-xs text-[var(--muted)]">
+              <span className="mt-0.5 w-1.5 h-1.5 rounded-full bg-[var(--accent)] shrink-0" />
+              {hint}
+            </li>
+          ))}
         </ul>
       </div>
     </div>
   )
+}
+
+function cn(...classes: (string | boolean | undefined)[]) {
+  return classes.filter(Boolean).join(" ")
 }
