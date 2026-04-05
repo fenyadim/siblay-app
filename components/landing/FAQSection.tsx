@@ -12,7 +12,7 @@ const FAQ = [
   },
   {
     q: "Какой максимальный размер изделия?",
-    a: "Для FDM-печати рабочая область — до 300×300×400 мм. Более крупные изделия можно разбить на части и склеить. Для SLA-печати — до 150×85×185 мм, с максимальной точностью деталей.",
+    a: "Рабочая область FDM-принтера — до 256×256×256 мм. Более крупные изделия можно разбить на части и склеить — мы поможем с этим на этапе моделирования.",
   },
   {
     q: "Сколько времени занимает изготовление?",
@@ -48,9 +48,9 @@ export function FAQSection() {
               className="text-5xl font-black tracking-tight leading-tight mb-5"
               style={{ fontFamily: "Syne, sans-serif" }}
             >
-              <span className="text-[var(--foreground)]">Частые</span>
+              Частые
               <br />
-              <span className="gradient-text">вопросы</span>
+              вопросы
             </h2>
             <p className="text-sm text-[var(--muted)] leading-relaxed">
               Не нашли ответ? Напишите нам — ответим в течение часа.

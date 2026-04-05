@@ -34,7 +34,7 @@ export function HeroSection() {
 
             <p className="text-lg text-[var(--muted)] max-w-md leading-relaxed mb-8">
               Профессиональная 3D-печать и моделирование под заказ.
-              PLA, ABS, PETG, Nylon, Resin — от прототипа до серии.
+              PLA, PETG, TPU — от прототипа до серии.
             </p>
 
             <div className="flex flex-wrap gap-3">

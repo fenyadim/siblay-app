@@ -8,7 +8,7 @@ export const metadata: Metadata = {
     template: "%s | Siblay",
   },
   description:
-    "Профессиональные услуги 3D-моделирования и 3D-печати. PLA, ABS, PETG, Nylon, Resin. Прототипы, серийное производство, постобработка.",
+    "Профессиональные услуги 3D-моделирования и 3D-печати. PLA, PETG, TPU. Прототипы, серийное производство, постобработка.",
   keywords: ["3D печать", "3D моделирование", "прототипирование", "FDM", "SLA", "Siblay"],
   openGraph: {
     type: "website",

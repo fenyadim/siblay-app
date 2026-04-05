@@ -10,22 +10,29 @@ const SERVICES = [
     num: "02",
     title: "3D-печать FDM",
     description:
-      "Послойная печать из термопластиков: PLA, ABS, PETG, Nylon. Оптимально для функциональных деталей и прототипов.",
-    tags: ["PLA · ABS · PETG · Nylon", "До 300×300×400 мм"],
+      "Послойная печать из термопластиков: PLA, PETG, TPU. Оптимально для функциональных деталей и прототипов.",
+    tags: ["PLA · PETG · TPU", "До 256×256×256 мм"],
   },
   {
     num: "03",
-    title: "3D-печать SLA/LCD",
+    title: "Постобработка",
     description:
-      "Фотополимерная печать высокого разрешения. Идеально для фигурок, ювелирных моделей и деталей с тонкими элементами.",
-    tags: ["Resin", "Точность 0.05 мм"],
+      "Шлифовка поверхности и химическое разглаживание растворителями для достижения гладкой фактуры без следов слоёв.",
+    tags: ["Шлифовка", "Хим. разглаживание"],
   },
   {
     num: "04",
-    title: "Постобработка",
+    title: "3D-сканирование",
     description:
-      "Шлифовка, грунтовка, покраска, полировка. Готовые изделия с профессиональным внешним видом.",
-    tags: ["Шлифовка", "Покраска", "Полировка"],
+      "Точное сканирование физических объектов для создания цифровой копии. Подходит для документирования, доработки и тиражирования изделий.",
+    tags: ["Физ. объект → 3D", "Высокая точность"],
+  },
+  {
+    num: "05",
+    title: "Реверс-инжиниринг",
+    description:
+      "Восстановление чертежей и 3D-моделей по готовым деталям. Незаменимо для воспроизводства износившихся или снятых с производства компонентов.",
+    tags: ["Восстановление деталей", "CAD по образцу"],
   },
 ]
 
@@ -41,8 +48,7 @@ export function ServicesSection() {
               className="text-5xl lg:text-6xl font-black tracking-tight leading-none"
               style={{ fontFamily: "Syne, sans-serif" }}
             >
-              <span className="text-[var(--foreground)]">Наши</span>{" "}
-              <span className="gradient-text">услуги</span>
+              Наши услуги
             </h2>
           </div>
           <p className="text-[var(--muted)] max-w-xs text-sm leading-relaxed lg:text-right">
@@ -50,7 +56,7 @@ export function ServicesSection() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {SERVICES.map((svc) => (
             <div
               key={svc.title}

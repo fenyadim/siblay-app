@@ -26,6 +26,7 @@ export type MaterialWithColors = {
     materialId: string
     name: string
     hex: string
+    hex2?: string | null
     inStock: boolean
     sortOrder: number
   }[]
@@ -219,7 +220,7 @@ export async function updateMaterial(
 
 export async function updateMaterialColor(
   id: string,
-  data: { name?: string; hex?: string; inStock?: boolean },
+  data: { name?: string; hex?: string; hex2?: string | null; inStock?: boolean },
 ) {
   await requireAdmin()
   await prisma.materialColor.update({ where: { id }, data })
@@ -229,7 +230,7 @@ export async function updateMaterialColor(
 
 export async function addMaterialColor(
   materialId: string,
-  data: { name: string; hex: string; inStock: boolean },
+  data: { name: string; hex: string; hex2?: string; inStock: boolean },
 ) {
   await requireAdmin()
   const last = await prisma.materialColor.findFirst({

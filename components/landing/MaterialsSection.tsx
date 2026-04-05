@@ -48,8 +48,7 @@ export async function MaterialsSection() {
               className="text-5xl lg:text-6xl font-black tracking-tight leading-none"
               style={{ fontFamily: "Syne, sans-serif" }}
             >
-              <span className="text-[var(--foreground)]">Мате</span>
-              <span className="gradient-text">риалы</span>
+              Материалы
             </h2>
           </div>
           <p className="text-[var(--muted)] max-w-xs text-sm leading-relaxed lg:text-right">

@@ -80,6 +80,7 @@ model MaterialColor {
   material   Material @relation(fields: [materialId], references: [id], onDelete: Cascade)
   name       String
   hex        String
+  hex2       String?
   inStock    Boolean  @default(true)
   sortOrder  Int      @default(0)
 }

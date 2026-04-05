@@ -17,8 +17,7 @@ export async function PortfolioPreviewSection() {
               className="text-5xl lg:text-6xl font-black tracking-tight leading-none"
               style={{ fontFamily: "Syne, sans-serif" }}
             >
-              <span className="text-[var(--foreground)]">При</span>
-              <span className="gradient-text">меры</span>
+              Примеры
             </h2>
           </div>
           <Button

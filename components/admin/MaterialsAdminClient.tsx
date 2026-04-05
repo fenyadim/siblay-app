@@ -8,11 +8,15 @@ interface Props {
   materials: MaterialWithColors[]
 }
 
-function ColorDot({ hex }: { hex: string }) {
+function ColorDot({ hex, hex2 }: { hex: string; hex2?: string | null }) {
   return (
     <span
       className="inline-block w-4 h-4 rounded-full border border-black/10 shrink-0"
-      style={{ background: hex }}
+      style={{
+        background: hex2
+          ? `linear-gradient(135deg, ${hex} 50%, ${hex2} 50%)`
+          : hex,
+      }}
     />
   )
 }
@@ -80,16 +84,19 @@ function ColorRow({
   const [isPending, startTransition] = useTransition()
   const [editingHex, setEditingHex] = useState(false)
   const [hexDraft, setHexDraft] = useState(color.hex)
+  const [showHex2, setShowHex2] = useState(!!color.hex2)
+  const [editingHex2, setEditingHex2] = useState(false)
+  const [hex2Draft, setHex2Draft] = useState(color.hex2 ?? "")
 
   function save(data: Parameters<typeof updateMaterialColor>[1]) {
     startTransition(() => updateMaterialColor(color.id, data))
   }
 
   return (
-    <div className="flex items-center gap-3 py-2 border-b border-[var(--border)] last:border-0">
+    <div className="flex items-center gap-3 py-2 border-b border-[var(--border)] last:border-0 flex-wrap">
       {/* Color dot + hex editor */}
       <div className="flex items-center gap-1.5">
-        <ColorDot hex={color.hex} />
+        <ColorDot hex={color.hex} hex2={color.hex2} />
         {editingHex ? (
           <div className="flex items-center gap-1">
             <input
@@ -108,6 +115,43 @@ function ColorRow({
         ) : (
           <button onClick={() => { setHexDraft(color.hex); setEditingHex(true) }} className="font-mono text-xs text-[var(--muted)] hover:text-[var(--accent)] transition-colors">
             {color.hex}
+          </button>
+        )}
+      </div>
+
+      {/* Hex2 editor */}
+      <div className="flex items-center gap-1.5">
+        {showHex2 ? (
+          editingHex2 ? (
+            <div className="flex items-center gap-1">
+              <input
+                autoFocus
+                value={hex2Draft}
+                onChange={(e) => setHex2Draft(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") { save({ hex2: hex2Draft || null }); setEditingHex2(false) }
+                  if (e.key === "Escape") setEditingHex2(false)
+                }}
+                className="font-mono text-xs border border-[var(--accent)] rounded px-1.5 py-0.5 bg-[var(--background)] text-[var(--foreground)] focus:outline-none w-24"
+                placeholder="#hex2"
+              />
+              <button onClick={() => { save({ hex2: hex2Draft || null }); setEditingHex2(false) }} className="text-[var(--accent)] text-xs">✓</button>
+              <button onClick={() => { setShowHex2(false); save({ hex2: null }) }} className="text-red-400 text-xs" title="Убрать цвет 2">✕</button>
+            </div>
+          ) : (
+            <button
+              onClick={() => { setHex2Draft(color.hex2 ?? ""); setEditingHex2(true) }}
+              className="font-mono text-xs text-[var(--muted)] hover:text-[var(--accent)] transition-colors"
+            >
+              {color.hex2 ?? <span className="italic opacity-60">цвет 2</span>}
+            </button>
+          )
+        ) : (
+          <button
+            onClick={() => setShowHex2(true)}
+            className="text-xs text-[var(--accent)] opacity-60 hover:opacity-100 transition-opacity"
+          >
+            ＋ цвет 2
           </button>
         )}
       </div>
@@ -155,14 +199,23 @@ function AddColorForm({ materialId }: { materialId: string }) {
   const [open, setOpen] = useState(false)
   const [name, setName] = useState("")
   const [hex, setHex] = useState("#ffffff")
+  const [isGradient, setIsGradient] = useState(false)
+  const [hex2, setHex2] = useState("#000000")
   const [isPending, startTransition] = useTransition()
 
   function handleAdd() {
     if (!name.trim() || !hex.trim()) return
     startTransition(async () => {
-      await addMaterialColor(materialId, { name: name.trim(), hex: hex.trim(), inStock: true })
+      await addMaterialColor(materialId, {
+        name: name.trim(),
+        hex: hex.trim(),
+        ...(isGradient && hex2.trim() ? { hex2: hex2.trim() } : {}),
+        inStock: true,
+      })
       setName("")
       setHex("#ffffff")
+      setHex2("#000000")
+      setIsGradient(false)
       setOpen(false)
     })
   }
@@ -193,7 +246,24 @@ function AddColorForm({ materialId }: { materialId: string }) {
         placeholder="#hex"
         className="font-mono border border-[var(--border)] rounded px-2 py-1 text-sm bg-[var(--background)] text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)] w-24"
       />
-      <ColorDot hex={hex} />
+      {isGradient && (
+        <input
+          value={hex2}
+          onChange={(e) => setHex2(e.target.value)}
+          placeholder="#hex2"
+          className="font-mono border border-[var(--border)] rounded px-2 py-1 text-sm bg-[var(--background)] text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)] w-24"
+        />
+      )}
+      <ColorDot hex={hex} hex2={isGradient ? hex2 : undefined} />
+      <label className="flex items-center gap-1 text-xs text-[var(--muted)] cursor-pointer select-none">
+        <input
+          type="checkbox"
+          checked={isGradient}
+          onChange={(e) => setIsGradient(e.target.checked)}
+          className="cursor-pointer"
+        />
+        Градиентный
+      </label>
       <button
         disabled={isPending || !name.trim()}
         onClick={handleAdd}
