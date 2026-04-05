@@ -23,55 +23,51 @@ const STEPS = [
 
 export function HowItWorksSection() {
   return (
-    <section id="how-it-works" className="py-20 bg-[var(--surface)] border-y border-[var(--border)]">
+    <section id="how-it-works" className="py-24 bg-[var(--surface)] border-y border-[var(--border)] overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-12">
-          <span className="label-mono">Процесс</span>
+        <div className="text-center mb-16">
+          <span className="label-mono mb-3 block">Процесс</span>
           <h2
-            className="mt-3 text-4xl font-black tracking-tight text-[var(--foreground)]"
+            className="text-5xl font-black tracking-tight text-[var(--foreground)]"
             style={{ fontFamily: "Syne, sans-serif" }}
           >
             Как мы работаем
           </h2>
         </div>
 
-        {/* Desktop: horizontal */}
-        <div className="hidden md:grid grid-cols-4 gap-0">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {STEPS.map((step, i) => (
-            <div key={step.num} className="relative flex flex-col">
-              {/* Connector line */}
+            <div key={step.num} className="relative">
+              {/* Connector line (desktop only) */}
               {i < STEPS.length - 1 && (
-                <div className="absolute top-5 left-[calc(50%+24px)] right-0 h-px bg-[var(--border)]" />
+                <div
+                  className="hidden lg:block absolute top-8 left-[calc(50%+2.5rem)] right-[-1rem] h-px"
+                  style={{
+                    background:
+                      "linear-gradient(90deg, var(--accent-border) 0%, transparent 100%)",
+                  }}
+                />
               )}
-              <div className="flex flex-col items-start pr-8">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 rounded-full border-2 border-[var(--accent)] bg-[var(--accent-subtle)] flex items-center justify-center shrink-0">
-                    <span className="text-xs font-mono font-bold text-[var(--accent)]">{step.num}</span>
+
+              <div className="flex flex-col">
+                {/* Step circle */}
+                <div className="relative w-16 h-16 mb-6">
+                  {/* Soft glow ring */}
+                  <div
+                    className="absolute inset-0 rounded-full opacity-20"
+                    style={{
+                      background: "radial-gradient(circle, var(--accent) 0%, transparent 70%)",
+                    }}
+                  />
+                  <div className="absolute inset-0 rounded-full border border-[var(--accent-border)] bg-[var(--surface)] flex items-center justify-center">
+                    <span className="text-sm font-mono font-bold text-[var(--accent)]">{step.num}</span>
                   </div>
                 </div>
-                <h3 className="font-bold text-[var(--foreground)] mb-2" style={{ fontFamily: "Syne, sans-serif" }}>
-                  {step.title}
-                </h3>
-                <p className="text-sm text-[var(--muted)] leading-relaxed">{step.description}</p>
-              </div>
-            </div>
-          ))}
-        </div>
 
-        {/* Mobile: vertical */}
-        <div className="md:hidden flex flex-col gap-0">
-          {STEPS.map((step, i) => (
-            <div key={step.num} className="flex gap-4">
-              <div className="flex flex-col items-center">
-                <div className="w-9 h-9 rounded-full border-2 border-[var(--accent)] bg-[var(--accent-subtle)] flex items-center justify-center shrink-0">
-                  <span className="text-xs font-mono font-bold text-[var(--accent)]">{step.num}</span>
-                </div>
-                {i < STEPS.length - 1 && (
-                  <div className="w-px flex-1 bg-[var(--border)] my-2" />
-                )}
-              </div>
-              <div className="pb-8">
-                <h3 className="font-bold text-[var(--foreground)] mb-1" style={{ fontFamily: "Syne, sans-serif" }}>
+                <h3
+                  className="text-lg font-bold text-[var(--foreground)] mb-2"
+                  style={{ fontFamily: "Syne, sans-serif" }}
+                >
                   {step.title}
                 </h3>
                 <p className="text-sm text-[var(--muted)] leading-relaxed">{step.description}</p>

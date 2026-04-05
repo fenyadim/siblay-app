@@ -38,34 +38,45 @@ const FAQ = [
 
 export function FAQSection() {
   return (
-    <section className="py-20 bg-[var(--background)]">
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-12">
-          <span className="label-mono">Вопросы и ответы</span>
-          <h2
-            className="mt-3 text-4xl font-black tracking-tight text-[var(--foreground)]"
-            style={{ fontFamily: "Syne, sans-serif" }}
-          >
-            Частые вопросы
-          </h2>
-        </div>
-
-        <Accordion type="single" collapsible className="space-y-2">
-          {FAQ.map((item, i) => (
-            <AccordionItem
-              key={i}
-              value={`item-${i}`}
-              className="border border-[var(--border)] rounded-xl px-5 bg-[var(--surface)] data-[state=open]:border-[var(--accent-border)] transition-colors"
+    <section className="py-24 bg-[var(--background)]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_2fr] gap-12 lg:gap-20">
+          {/* Left: sticky heading */}
+          <div className="lg:sticky lg:top-24 lg:self-start">
+            <span className="label-mono mb-3 block">Вопросы и ответы</span>
+            <h2
+              className="text-5xl font-black tracking-tight leading-tight mb-5"
+              style={{ fontFamily: "Syne, sans-serif" }}
             >
-              <AccordionTrigger className="text-left font-semibold text-[var(--foreground)] hover:no-underline py-5 text-sm">
-                {item.q}
-              </AccordionTrigger>
-              <AccordionContent className="text-sm text-[var(--muted)] leading-relaxed pb-5">
-                {item.a}
-              </AccordionContent>
-            </AccordionItem>
-          ))}
-        </Accordion>
+              <span className="text-[var(--foreground)]">Частые</span>
+              <br />
+              <span className="gradient-text">вопросы</span>
+            </h2>
+            <p className="text-sm text-[var(--muted)] leading-relaxed">
+              Не нашли ответ? Напишите нам — ответим в течение часа.
+            </p>
+          </div>
+
+          {/* Right: accordion */}
+          <div>
+            <Accordion type="single" collapsible className="space-y-2">
+              {FAQ.map((item, i) => (
+                <AccordionItem
+                  key={i}
+                  value={`item-${i}`}
+                  className="border border-[var(--border)] rounded-xl px-5 bg-[var(--surface)] data-[state=open]:border-[var(--accent-border)] data-[state=open]:bg-[var(--accent-subtle)]/40 transition-all duration-200"
+                >
+                  <AccordionTrigger className="text-left font-semibold text-[var(--foreground)] hover:no-underline py-5 text-sm gap-4">
+                    {item.q}
+                  </AccordionTrigger>
+                  <AccordionContent className="text-sm text-[var(--muted)] leading-relaxed pb-5">
+                    {item.a}
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          </div>
+        </div>
       </div>
     </section>
   )

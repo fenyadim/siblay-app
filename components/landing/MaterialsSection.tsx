@@ -38,16 +38,23 @@ export async function MaterialsSection() {
   const materials = await getMaterialsWithColors()
 
   return (
-    <section className="py-20 bg-[var(--surface)] border-y border-[var(--border)]">
+    <section className="py-24 bg-[var(--surface)] border-y border-[var(--border)] overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-12">
-          <span className="label-mono">Чем печатаем</span>
-          <h2
-            className="mt-3 text-4xl font-black tracking-tight text-[var(--foreground)]"
-            style={{ fontFamily: "Syne, sans-serif" }}
-          >
-            Материалы
-          </h2>
+        {/* Asymmetric header */}
+        <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-16">
+          <div>
+            <span className="label-mono mb-3 block">Чем печатаем</span>
+            <h2
+              className="text-5xl lg:text-6xl font-black tracking-tight leading-none"
+              style={{ fontFamily: "Syne, sans-serif" }}
+            >
+              <span className="text-[var(--foreground)]">Мате</span>
+              <span className="gradient-text">риалы</span>
+            </h2>
+          </div>
+          <p className="text-[var(--muted)] max-w-xs text-sm leading-relaxed lg:text-right">
+            Подбираем материал под ваши задачи — от гибких прокладок до жёстких инженерных деталей.
+          </p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-6 gap-4">
@@ -58,8 +65,14 @@ export async function MaterialsSection() {
             return (
               <div
                 key={mat.name}
-                className="relative card-hover p-5 rounded-2xl border border-[var(--border)] bg-[var(--surface-raised)] flex flex-col"
+                className="group relative card-hover p-5 rounded-2xl border border-[var(--border)] bg-[var(--surface-raised)] flex flex-col hover:border-[var(--accent-border)] transition-all duration-300 overflow-hidden"
               >
+                {/* Color glow background */}
+                <div
+                  className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl pointer-events-none"
+                  style={{ background: `radial-gradient(ellipse at top left, ${mat.color}18 0%, transparent 60%)` }}
+                />
+
                 {/* "Скоро" badge */}
                 {!mat.available && (
                   <span className="absolute top-3 right-3 text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full bg-slate-400 text-white">
@@ -67,7 +80,7 @@ export async function MaterialsSection() {
                   </span>
                 )}
 
-                <div className="flex items-center gap-3 mb-3">
+                <div className="flex items-center gap-3 mb-3 relative">
                   <div
                     className="w-3 h-3 rounded-full shrink-0"
                     style={{ background: mat.color, boxShadow: `0 0 8px ${mat.color}66` }}
@@ -79,9 +92,9 @@ export async function MaterialsSection() {
                     {mat.name}
                   </span>
                 </div>
-                <p className="text-xs text-[var(--muted)] font-mono mb-3 leading-snug">{details.full}</p>
-                <p className="text-xs text-[var(--muted)] leading-relaxed flex-1">{details.desc}</p>
-                <div className="mt-4 space-y-1">
+                <p className="text-xs text-[var(--muted)] font-mono mb-3 leading-snug relative">{details.full}</p>
+                <p className="text-xs text-[var(--muted)] leading-relaxed flex-1 relative">{details.desc}</p>
+                <div className="mt-4 space-y-1 relative">
                   {details.props.map((p) => (
                     <div key={p} className="flex items-center gap-1.5 text-xs text-[var(--muted)]">
                       <span className="text-[var(--accent)]">·</span>
@@ -89,7 +102,7 @@ export async function MaterialsSection() {
                     </div>
                   ))}
                 </div>
-                <div className="mt-4 pt-3 border-t border-[var(--border)]">
+                <div className="mt-4 pt-3 border-t border-[var(--border)] relative">
                   <span className="text-sm font-mono font-medium text-[var(--accent)]">{mat.price}</span>
                 </div>
               </div>

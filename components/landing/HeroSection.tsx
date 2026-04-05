@@ -27,7 +27,7 @@ export function HeroSection() {
             >
               Точность
               <br />
-              <span className="text-[var(--accent)]">в каждом</span>
+              <span className="gradient-text">в каждом</span>
               <br />
               слое
             </h1>
