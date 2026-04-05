@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Printer Variants</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: #F5F4F0;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  color: #1a1a1a;
+  padding: 32px;
+}
+h1 { font-size: 13px; text-transform: uppercase; letter-spacing: .1em; color: #78716c; margin-bottom: 24px; font-weight: 600; }
+.grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.card {
+  background: #FDFCF8;
+  border: 1px solid #e8e5df;
+  border-radius: 16px;
+  padding: 20px 16px 14px;
+  display: flex; flex-direction: column; align-items: center;
+}
+.card-label { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: #78716c; font-weight: 600; margin-top: 14px; }
+.card-title { font-size: 13px; font-weight: 700; color: #1a1a1a; margin-top: 3px; text-align: center; }
+.stage { width: 240px; height: 240px; display: flex; align-items: center; justify-content: center; position: relative; }
+
+/* ─── VARIANT A: Детальный SVG-принтер с нитью и катушкой ─── */
+.va-wrap { position: relative; width: 200px; height: 200px; }
+.va-glow {
+  position: absolute; width: 160px; height: 80px;
+  bottom: 20px; left: 20px;
+  background: radial-gradient(ellipse, rgba(37,99,235,.15) 0%, transparent 70%);
+  pointer-events: none;
+}
+/* frame */
+.va-frame {
+  position: absolute; left: 30px; right: 10px; top: 10px; bottom: 30px;
+  border: 2px solid rgba(37,99,235,.35);
+  border-radius: 3px;
+}
+/* vertical rod */
+.va-vrod { position: absolute; left: 30px; top: 10px; width: 2px; bottom: 30px; background: rgba(37,99,235,.4); }
+/* horizontal rod (moves up/down) */
+.va-hrod {
+  position: absolute; left: 30px; right: 10px; height: 2px;
+  background: rgba(37,99,235,.5);
+  animation: va-hrod-move 4s ease-in-out infinite;
+  top: 30px;
+}
+@keyframes va-hrod-move {
+  0%,100% { top: 30px; }
+  60% { top: 110px; }
+}
+/* extruder head */
+.va-head {
+  position: absolute; width: 18px; height: 12px;
+  background: #2563EB; border-radius: 3px;
+  left: 80px;
+  animation: va-hrod-move 4s ease-in-out infinite, va-head-x 2s ease-in-out infinite alternate;
+  top: 24px;
+  z-index: 2;
+}
+@keyframes va-head-x {
+  0% { left: 50px; }
+  100% { left: 130px; }
+}
+.va-head::after {
+  content: '';
+  position: absolute; bottom: -5px; left: 50%; transform: translateX(-50%);
+  width: 3px; height: 5px; background: #1d4ed8; border-radius: 0 0 2px 2px;
+}
+/* filament line from head to part */
+.va-filament {
+  position: absolute; left: 89px; width: 2px;
+  background: linear-gradient(to bottom, rgba(37,99,235,.8), rgba(37,99,235,.2));
+  border-radius: 1px;
+  animation: va-filament-anim 4s ease-in-out infinite, va-head-x-fil 2s ease-in-out infinite alternate;
+  top: 36px;
+}
+@keyframes va-filament-anim {
+  0%,100% { height: 4px; top: 36px; }
+  60% { height: 4px; top: 116px; }
+}
+@keyframes va-head-x-fil {
+  0% { left: 58px; }
+  100% { left: 138px; }
+}
+/* build platform */
+.va-platform {
+  position: absolute; left: 40px; right: 20px; bottom: 30px;
+  height: 5px; background: rgba(37,99,235,.3); border-radius: 2px;
+}
+/* printed layers */
+.va-layers {
+  position: absolute; left: 52px; right: 32px; bottom: 35px;
+  display: flex; flex-direction: column-reverse; gap: 1.5px;
+}
+.va-layer {
+  height: 5px; border-radius: 1px;
+  background: rgba(37,99,235,.18);
+  border-top: 1px solid rgba(37,99,235,.35);
+  transform-origin: left;
+  animation: va-layer-grow 4s ease-in-out infinite;
+}
+.va-layer:nth-child(1) { animation-delay: 0s; }
+.va-layer:nth-child(2) { animation-delay: .4s; }
+.va-layer:nth-child(3) { animation-delay: .8s; }
+.va-layer:nth-child(4) { animation-delay: 1.2s; }
+.va-layer:nth-child(5) { animation-delay: 1.6s; }
+.va-layer:nth-child(6) { animation-delay: 2.0s; }
+.va-layer:nth-child(7) { animation-delay: 2.4s; }
+/* top layer glows while being printed */
+.va-layer:last-child { background: rgba(37,99,235,.4); border-top-color: #2563EB; }
+@keyframes va-layer-grow {
+  0%,10% { transform: scaleX(0); opacity: 0; }
+  25%,80% { transform: scaleX(1); opacity: 1; }
+  95%,100% { transform: scaleX(0); opacity: 0; }
+}
+/* spool on the left */
+.va-spool {
+  position: absolute; left: 0; top: 20px;
+  width: 26px; height: 26px;
+  border: 3px solid rgba(37,99,235,.5);
+  border-radius: 50%;
+  animation: va-spool-spin 3s linear infinite;
+}
+.va-spool::after {
+  content: '';
+  position: absolute; inset: 5px;
+  border-radius: 50%;
+  background: rgba(37,99,235,.15);
+}
+@keyframes va-spool-spin { from { transform: rotate(0); } to { transform: rotate(360deg); } }
+/* wire from spool to head */
+.va-wire {
+  position: absolute; left: 13px; top: 30px;
+  width: 38px; height: 2px;
+  background: linear-gradient(to right, rgba(37,99,235,.5), rgba(37,99,235,.2));
+  transform-origin: left center;
+  transform: rotate(-10deg);
+}
+
+
+/* ─── VARIANT B: Изометрический 3D-принтер ─── */
+.vb-wrap {
+  width: 200px; height: 200px;
+  position: relative;
+  display: flex; align-items: center; justify-content: center;
+}
+.vb-iso {
+  transform: rotateX(54deg) rotateZ(45deg);
+  transform-style: preserve-3d;
+  width: 100px; height: 100px;
+  position: relative;
+}
+/* isometric base */
+.vb-base {
+  position: absolute; width: 100px; height: 100px;
+  background: rgba(37,99,235,.06);
+  border: 2px solid rgba(37,99,235,.3);
+}
+/* left face */
+.vb-left {
+  position: absolute; width: 100px; height: 60px;
+  background: rgba(37,99,235,.04);
+  border: 2px solid rgba(37,99,235,.2);
+  transform: rotateX(-90deg) translateZ(-60px);
+  transform-origin: top;
+}
+/* right face */
+.vb-right {
+  position: absolute; width: 60px; height: 100px;
+  background: rgba(37,99,235,.08);
+  border: 2px solid rgba(37,99,235,.25);
+  transform: rotateY(90deg) translateZ(-100px);
+  transform-origin: right;
+}
+/* printed object on base */
+.vb-obj {
+  position: absolute; width: 60px; height: 60px;
+  left: 20px; top: 20px;
+  background: rgba(37,99,235,.12);
+  border: 2px solid rgba(37,99,235,.5);
+  animation: vb-obj-rise 3s ease-in-out infinite;
+}
+@keyframes vb-obj-rise {
+  0%,15% { height: 5px; top: 75px; }
+  70%,85% { height: 60px; top: 20px; }
+  100% { height: 5px; top: 75px; }
+}
+/* head on top */
+.vb-head {
+  position: absolute; width: 30px; height: 8px;
+  background: #2563EB; border-radius: 2px;
+  left: 35px; z-index: 3;
+  animation: vb-head-anim 3s ease-in-out infinite;
+}
+@keyframes vb-head-anim {
+  0%,15% { top: -12px; }
+  70%,85% { top: -62px; }
+  100% { top: -12px; }
+}
+/* z-rod */
+.vb-zrod {
+  position: absolute; width: 2px; background: rgba(37,99,235,.4);
+  left: 10px; top: -80px; height: 80px;
+}
+/* scene perspective wrapper */
+.vb-scene {
+  perspective: 600px;
+  width: 200px; height: 200px;
+  display: flex; align-items: center; justify-content: center;
+}
+.vb-iso-inner {
+  transform-style: preserve-3d;
+  transform: rotateX(55deg) rotateZ(45deg);
+  width: 100px; height: 100px;
+  position: relative;
+}
+
+
+/* ─── VARIANT C: Принтер с HUD / экраном ─── */
+.vc-wrap {
+  width: 220px; height: 200px;
+  background: #0f172a;
+  border-radius: 12px;
+  padding: 12px;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(37,99,235,.3);
+  box-shadow: 0 0 30px rgba(37,99,235,.08);
+}
+.vc-scanline {
+  position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0px, transparent 2px,
+    rgba(0,0,0,.15) 2px, rgba(0,0,0,.15) 4px
+  );
+  pointer-events: none; z-index: 10;
+}
+.vc-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 10px;
+}
+.vc-logo { font-size: 9px; letter-spacing: .12em; color: #2563EB; font-weight: 700; text-transform: uppercase; }
+.vc-dot { width: 6px; height: 6px; border-radius: 50%; background: #22c55e; animation: blink 1.2s ease-in-out infinite; }
+@keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: .3; } }
+.vc-preview {
+  width: 100%; height: 90px;
+  border: 1px solid rgba(37,99,235,.25);
+  border-radius: 6px;
+  position: relative;
+  overflow: hidden;
+  background: #0a1628;
+  margin-bottom: 10px;
+}
+/* mini printer inside preview */
+.vc-mini-frame {
+  position: absolute; inset: 8px;
+  border: 1px solid rgba(37,99,235,.3);
+  border-radius: 2px;
+}
+.vc-mini-head {
+  position: absolute; left: 20px; top: 12px;
+  width: 14px; height: 6px; background: #2563EB; border-radius: 2px;
+  animation: vc-head-x 2s ease-in-out infinite alternate, vc-head-y 4s ease-in-out infinite;
+}
+@keyframes vc-head-x { from { left: 15px; } to { left: 55px; } }
+@keyframes vc-head-y {
+  0%,100% { top: 12px; }
+  60% { top: 45px; }
+}
+.vc-mini-beam {
+  position: absolute; left: 27px; width: 1.5px;
+  background: linear-gradient(to bottom, #2563EB, transparent);
+  top: 18px; height: 8px;
+  animation: vc-head-x-b 2s ease-in-out infinite alternate, vc-head-y-b 4s ease-in-out infinite;
+}
+@keyframes vc-head-x-b { from { left: 22px; } to { left: 62px; } }
+@keyframes vc-head-y-b { 0%,100% { top: 18px; height: 8px; } 60% { top: 51px; height: 8px; } }
+.vc-mini-layers {
+  position: absolute; left: 15px; right: 15px; bottom: 8px;
+  display: flex; flex-direction: column-reverse; gap: 1px;
+}
+.vc-ml {
+  height: 3px; border-radius: 1px;
+  background: rgba(37,99,235,.35);
+  transform-origin: left;
+  animation: vc-ml-anim 4s ease-in-out infinite;
+}
+.vc-ml:nth-child(1) { animation-delay: 0s; }
+.vc-ml:nth-child(2) { animation-delay: .4s; }
+.vc-ml:nth-child(3) { animation-delay: .8s; }
+.vc-ml:nth-child(4) { animation-delay: 1.2s; }
+.vc-ml:nth-child(5) { animation-delay: 1.6s; }
+@keyframes vc-ml-anim {
+  0%,5% { transform: scaleX(0); opacity: 0; }
+  20%,80% { transform: scaleX(1); opacity: 1; }
+  95%,100% { transform: scaleX(0); opacity: 0; }
+}
+/* stats grid */
+.vc-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.vc-stat {
+  background: rgba(37,99,235,.08);
+  border: 1px solid rgba(37,99,235,.15);
+  border-radius: 4px;
+  padding: 5px 7px;
+}
+.vc-stat-label { font-size: 8px; color: rgba(96,165,250,.7); letter-spacing: .08em; text-transform: uppercase; }
+.vc-stat-value { font-size: 13px; font-weight: 700; color: #60a5fa; font-family: 'Courier New', monospace; margin-top: 1px; }
+/* progress bar */
+.vc-progress-wrap { margin-top: 8px; }
+.vc-progress-label { font-size: 8px; color: rgba(96,165,250,.6); letter-spacing: .08em; display: flex; justify-content: space-between; margin-bottom: 4px; }
+.vc-progress-track { height: 4px; background: rgba(37,99,235,.15); border-radius: 2px; overflow: hidden; }
+.vc-progress-fill {
+  height: 100%; background: #2563EB; border-radius: 2px;
+  animation: vc-progress 6s ease-in-out infinite;
+}
+@keyframes vc-progress {
+  0% { width: 0%; }
+  80% { width: 73%; }
+  85% { width: 73%; }
+  100% { width: 0%; }
+}
+.vc-pct {
+  font-size: 8px; color: #60a5fa; font-family: monospace;
+  animation: vc-pct-count 6s ease-in-out infinite;
+}
+@keyframes vc-pct-count { 0% { opacity: 0; } 10% { opacity: 1; } }
+
+
+/* ─── VARIANT D: Принтер с частицами-нитью ─── */
+.vd-wrap { position: relative; width: 200px; height: 200px; }
+/* frame */
+.vd-frame {
+  position: absolute;
+  left: 30px; top: 10px; right: 20px; bottom: 25px;
+  border: 2px solid rgba(37,99,235,.3);
+  border-radius: 4px;
+}
+/* X rod */
+.vd-xrod {
+  position: absolute; left: 30px; right: 20px;
+  height: 2px; background: rgba(37,99,235,.4);
+  animation: vd-xrod-move 5s ease-in-out infinite;
+}
+@keyframes vd-xrod-move {
+  0%,100% { top: 30px; }
+  55% { top: 120px; }
+}
+/* head */
+.vd-head {
+  position: absolute; width: 20px; height: 13px;
+  background: #2563EB; border-radius: 3px;
+  z-index: 3;
+  animation: vd-head-x 2.5s ease-in-out infinite alternate,
+             vd-xrod-move 5s ease-in-out infinite;
+}
+@keyframes vd-head-x { from { left: 40px; } to { left: 110px; } }
+.vd-head::after {
+  content: '';
+  position: absolute; bottom: -7px; left: 8px;
+  width: 4px; height: 7px; background: #60a5fa; border-radius: 2px;
+}
+/* platform */
+.vd-plat {
+  position: absolute; bottom: 25px; left: 40px; right: 30px;
+  height: 5px; background: rgba(37,99,235,.4); border-radius: 2px;
+}
+/* layers with glow on top */
+.vd-layers {
+  position: absolute; left: 50px; right: 40px; bottom: 30px;
+  display: flex; flex-direction: column-reverse; gap: 2px;
+}
+.vd-layer {
+  height: 5px; border-radius: 1.5px;
+  background: rgba(37,99,235,.2);
+  animation: vd-layer-anim 5s ease-in-out infinite;
+  transform-origin: left;
+}
+.vd-layer:last-child {
+  background: rgba(37,99,235,.5);
+  box-shadow: 0 0 6px rgba(37,99,235,.6);
+}
+.vd-layer:nth-child(1) { animation-delay: 0s; }
+.vd-layer:nth-child(2) { animation-delay: .5s; }
+.vd-layer:nth-child(3) { animation-delay: 1s; }
+.vd-layer:nth-child(4) { animation-delay: 1.5s; }
+.vd-layer:nth-child(5) { animation-delay: 2s; }
+.vd-layer:nth-child(6) { animation-delay: 2.5s; }
+.vd-layer:nth-child(7) { animation-delay: 3s; }
+@keyframes vd-layer-anim {
+  0%,8% { transform: scaleX(0); opacity: 0; }
+  20%,78% { transform: scaleX(1); opacity: 1; }
+  92%,100% { transform: scaleX(0); opacity: 0; }
+}
+/* particles flowing from head */
+.vd-particle {
+  position: absolute;
+  width: 3px; height: 3px;
+  border-radius: 50%;
+  background: #60a5fa;
+  opacity: 0;
+  animation: vd-particle-fall 1.5s ease-in infinite;
+}
+.vd-particle:nth-child(1) { animation-delay: 0s; }
+.vd-particle:nth-child(2) { animation-delay: .5s; }
+.vd-particle:nth-child(3) { animation-delay: 1s; }
+@keyframes vd-particle-fall {
+  0% { transform: translateY(0); opacity: .8; }
+  100% { transform: translateY(12px); opacity: 0; }
+}
+/* z-axis rods */
+.vd-zrod-l { position: absolute; left: 30px; top: 10px; width: 2px; bottom: 25px; background: rgba(37,99,235,.25); }
+.vd-zrod-r { position: absolute; right: 20px; top: 10px; width: 2px; bottom: 25px; background: rgba(37,99,235,.25); }
+/* corner details */
+.vd-corner {
+  position: absolute; width: 8px; height: 8px;
+  border: 2px solid rgba(37,99,235,.6);
+}
+.vd-corner-tl { top: 8px; left: 28px; border-right: none; border-bottom: none; }
+.vd-corner-tr { top: 8px; right: 18px; border-left: none; border-bottom: none; }
+.vd-corner-bl { bottom: 23px; left: 28px; border-right: none; border-top: none; }
+.vd-corner-br { bottom: 23px; right: 18px; border-left: none; border-top: none; }
+
+
+/* ─── VARIANT E: Неоновый принтер (тёмный фон) ─── */
+.ve-card { background: #0f172a !important; border-color: rgba(37,99,235,.2) !important; }
+.ve-wrap {
+  position: relative; width: 200px; height: 200px;
+}
+.ve-glow-bg {
+  position: absolute; width: 200px; height: 200px; top: 0; left: 0;
+  background: radial-gradient(ellipse at 50% 60%, rgba(37,99,235,.12) 0%, transparent 65%);
+}
+/* frame neon */
+.ve-frame {
+  position: absolute; left: 25px; top: 15px; right: 15px; bottom: 20px;
+  border: 1.5px solid rgba(37,99,235,.4);
+  border-radius: 4px;
+  box-shadow: inset 0 0 20px rgba(37,99,235,.04), 0 0 12px rgba(37,99,235,.06);
+}
+.ve-vrod-l { position: absolute; left: 25px; top: 15px; width: 1.5px; bottom: 20px; background: rgba(37,99,235,.5); box-shadow: 0 0 4px rgba(37,99,235,.4); }
+.ve-vrod-r { position: absolute; right: 15px; top: 15px; width: 1.5px; bottom: 20px; background: rgba(37,99,235,.3); }
+.ve-xrod {
+  position: absolute; left: 25px; right: 15px; height: 1.5px;
+  background: rgba(96,165,250,.7);
+  box-shadow: 0 0 6px rgba(96,165,250,.5);
+  animation: ve-xrod-move 4s ease-in-out infinite;
+}
+@keyframes ve-xrod-move { 0%,100% { top: 30px; } 60% { top: 120px; } }
+/* neon head */
+.ve-head {
+  position: absolute; width: 22px; height: 12px;
+  background: #2563EB;
+  border-radius: 3px;
+  box-shadow: 0 0 10px rgba(37,99,235,.9), 0 0 20px rgba(37,99,235,.4);
+  animation: ve-xrod-move 4s ease-in-out infinite, ve-head-x 2.2s ease-in-out infinite alternate;
+  z-index: 3;
+}
+@keyframes ve-head-x { from { left: 35px; } to { left: 115px; } }
+.ve-head::after {
+  content: '';
+  position: absolute; bottom: -5px; left: 9px;
+  width: 4px; height: 5px;
+  background: #93c5fd;
+  box-shadow: 0 0 6px #60a5fa, 0 4px 8px rgba(96,165,250,.6);
+  border-radius: 0 0 2px 2px;
+}
+/* neon platform */
+.ve-plat {
+  position: absolute; bottom: 20px; left: 35px; right: 25px;
+  height: 3px;
+  background: rgba(37,99,235,.5);
+  box-shadow: 0 0 8px rgba(37,99,235,.5);
+  border-radius: 2px;
+}
+/* glowing layers */
+.ve-layers {
+  position: absolute; left: 45px; right: 35px; bottom: 23px;
+  display: flex; flex-direction: column-reverse; gap: 1.5px;
+}
+.ve-layer {
+  height: 5px; border-radius: 1px;
+  animation: ve-layer-anim 4s ease-in-out infinite;
+  transform-origin: left;
+}
+.ve-layer:nth-child(1) { background: rgba(37,99,235,.25); animation-delay: 0s; }
+.ve-layer:nth-child(2) { background: rgba(37,99,235,.28); animation-delay: .4s; }
+.ve-layer:nth-child(3) { background: rgba(37,99,235,.32); animation-delay: .8s; }
+.ve-layer:nth-child(4) { background: rgba(37,99,235,.38); animation-delay: 1.2s; }
+.ve-layer:nth-child(5) { background: rgba(37,99,235,.45); animation-delay: 1.6s; }
+.ve-layer:nth-child(6) { background: rgba(96,165,250,.55); animation-delay: 2.0s; }
+/* top layer: glowing */
+.ve-layer:last-child {
+  background: #60a5fa;
+  box-shadow: 0 0 8px rgba(96,165,250,.8), 0 0 16px rgba(96,165,250,.4);
+}
+@keyframes ve-layer-anim {
+  0%,8% { transform: scaleX(0); opacity: 0; }
+  22%,78% { transform: scaleX(1); opacity: 1; }
+  92%,100% { transform: scaleX(0); opacity: 0; }
+}
+.ve-label { color: rgba(96,165,250,.7) !important; }
+.ve-title { color: #e2e8f0 !important; }
+
+
+/* ─── VARIANT F: Принтер + разрез (wireframe объект) ─── */
+.vf-wrap { position: relative; width: 210px; height: 200px; }
+/* printer left side */
+.vf-printer {
+  position: absolute; left: 0; top: 0; width: 110px; height: 190px;
+}
+.vf-frame { position: absolute; inset: 0; border: 2px solid rgba(37,99,235,.3); border-radius: 4px; }
+.vf-vrod { position: absolute; left: 0; top: 0; bottom: 0; width: 2px; background: rgba(37,99,235,.35); }
+.vf-hrod {
+  position: absolute; left: 0; right: 0; height: 2px;
+  background: rgba(37,99,235,.45);
+  animation: vf-hrod 4s ease-in-out infinite;
+}
+@keyframes vf-hrod { 0%,100% { top: 25px; } 55% { top: 110px; } }
+.vf-head {
+  position: absolute; width: 16px; height: 10px;
+  background: #2563EB; border-radius: 2px;
+  z-index: 2;
+  animation: vf-hrod 4s ease-in-out infinite, vf-head-x 2s ease-in-out infinite alternate;
+  top: 20px;
+}
+@keyframes vf-head-x { from { left: 8px; } to { left: 72px; } }
+.vf-plat { position: absolute; bottom: 15px; left: 10px; right: 10px; height: 4px; background: rgba(37,99,235,.35); border-radius: 2px; }
+.vf-layers {
+  position: absolute; left: 18px; right: 18px; bottom: 19px;
+  display: flex; flex-direction: column-reverse; gap: 1.5px;
+}
+.vf-layer {
+  height: 4px; border-radius: 1px; background: rgba(37,99,235,.2);
+  transform-origin: left;
+  animation: vf-layer-a 4s ease-in-out infinite;
+}
+.vf-layer:nth-child(1){animation-delay:.0s}
+.vf-layer:nth-child(2){animation-delay:.4s}
+.vf-layer:nth-child(3){animation-delay:.8s}
+.vf-layer:nth-child(4){animation-delay:1.2s}
+.vf-layer:nth-child(5){animation-delay:1.6s}
+@keyframes vf-layer-a {
+  0%,8%{transform:scaleX(0);opacity:0}
+  22%,78%{transform:scaleX(1);opacity:1}
+  92%,100%{transform:scaleX(0);opacity:0}
+}
+/* divider */
+.vf-divider {
+  position: absolute; left: 112px; top: 20px; bottom: 20px;
+  width: 1px; background: rgba(37,99,235,.2);
+  border-left: 1px dashed rgba(37,99,235,.25);
+}
+/* wireframe object right side */
+.vf-obj-scene {
+  position: absolute; right: 0; top: 20px;
+  width: 90px; height: 160px;
+  display: flex; align-items: center; justify-content: center;
+  perspective: 300px;
+}
+.vf-obj {
+  transform-style: preserve-3d;
+  animation: vf-obj-spin 8s linear infinite;
+  width: 60px; height: 60px; position: relative;
+}
+@keyframes vf-obj-spin {
+  from { transform: rotateX(15deg) rotateY(0); }
+  to   { transform: rotateX(15deg) rotateY(360deg); }
+}
+.vf-f { position: absolute; width: 60px; height: 60px; border: 1.5px solid rgba(37,99,235,.6); background: rgba(37,99,235,.04); }
+.vf-f.front  { transform: translateZ(30px); }
+.vf-f.back   { transform: rotateY(180deg) translateZ(30px); }
+.vf-f.left   { transform: rotateY(-90deg) translateZ(30px); }
+.vf-f.right  { transform: rotateY(90deg)  translateZ(30px); }
+.vf-f.top    { transform: rotateX(90deg)  translateZ(30px); }
+.vf-f.bottom { transform: rotateX(-90deg) translateZ(30px); }
+</style>
+</head>
+<body>
+<h1>Вариант 1 — Принтер в работе: улучшения</h1>
+<div class="grid">
+
+  <!-- A: Детальный с катушкой и нитью -->
+  <div class="card">
+    <div class="stage">
+      <div class="va-glow"></div>
+      <div class="va-wrap">
+        <div class="va-spool"></div>
+        <div class="va-wire"></div>
+        <div class="va-frame"></div>
+        <div class="va-vrod"></div>
+        <div class="va-hrod"></div>
+        <div class="va-head"></div>
+        <div class="va-filament"></div>
+        <div class="va-layers">
+          <div class="va-layer"></div>
+          <div class="va-layer"></div>
+          <div class="va-layer"></div>
+          <div class="va-layer"></div>
+          <div class="va-layer"></div>
+          <div class="va-layer"></div>
+          <div class="va-layer"></div>
+        </div>
+        <div class="va-platform"></div>
+      </div>
+    </div>
+    <span class="card-label">Вариант A</span>
+    <span class="card-title">С катушкой и нитью</span>
+  </div>
+
+  <!-- B: Изометрический -->
+  <div class="card">
+    <div class="stage">
+      <div class="vb-scene">
+        <div class="vb-iso-inner">
+          <div class="vb-base"></div>
+          <div class="vb-left"></div>
+          <div class="vb-right"></div>
+          <div class="vb-obj"></div>
+          <div class="vb-zrod"></div>
+          <div class="vb-head"></div>
+        </div>
+      </div>
+    </div>
+    <span class="card-label">Вариант B</span>
+    <span class="card-title">Изометрический вид</span>
+  </div>
+
+  <!-- C: HUD / экран -->
+  <div class="card">
+    <div class="stage">
+      <div class="vc-wrap">
+        <div class="vc-scanline"></div>
+        <div class="vc-header">
+          <span class="vc-logo">Siblay Print</span>
+          <div style="display:flex;align-items:center;gap:5px;">
+            <span style="font-size:8px;color:rgba(96,165,250,.6);font-family:monospace;">ONLINE</span>
+            <div class="vc-dot"></div>
+          </div>
+        </div>
+        <div class="vc-preview">
+          <div class="vc-mini-frame"></div>
+          <div class="vc-mini-head"></div>
+          <div class="vc-mini-beam"></div>
+          <div class="vc-mini-layers">
+            <div class="vc-ml"></div>
+            <div class="vc-ml"></div>
+            <div class="vc-ml"></div>
+            <div class="vc-ml"></div>
+            <div class="vc-ml"></div>
+          </div>
+        </div>
+        <div class="vc-stats">
+          <div class="vc-stat">
+            <div class="vc-stat-label">Темп.</div>
+            <div class="vc-stat-value">200°C</div>
+          </div>
+          <div class="vc-stat">
+            <div class="vc-stat-label">Слой</div>
+            <div class="vc-stat-value">0.2mm</div>
+          </div>
+        </div>
+        <div class="vc-progress-wrap">
+          <div class="vc-progress-label">
+            <span>Печать</span>
+            <span class="vc-pct">73%</span>
+          </div>
+          <div class="vc-progress-track">
+            <div class="vc-progress-fill"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <span class="card-label">Вариант C</span>
+    <span class="card-title">Экран управления (HUD)</span>
+  </div>
+
+  <!-- D: Детализированный с угловыми акцентами -->
+  <div class="card">
+    <div class="stage">
+      <div style="position:absolute;width:160px;height:100px;bottom:60px;left:40px;background:radial-gradient(ellipse,rgba(37,99,235,.1) 0%,transparent 70%);"></div>
+      <div class="vd-wrap">
+        <div class="vd-corner vd-corner-tl"></div>
+        <div class="vd-corner vd-corner-tr"></div>
+        <div class="vd-corner vd-corner-bl"></div>
+        <div class="vd-corner vd-corner-br"></div>
+        <div class="vd-zrod-l"></div>
+        <div class="vd-zrod-r"></div>
+        <div class="vd-xrod"></div>
+        <div class="vd-head">
+          <div class="vd-particle" style="left:8px;top:13px;"></div>
+          <div class="vd-particle" style="left:10px;top:13px;animation-delay:.5s"></div>
+          <div class="vd-particle" style="left:6px;top:13px;animation-delay:1s"></div>
+        </div>
+        <div class="vd-layers">
+          <div class="vd-layer"></div>
+          <div class="vd-layer"></div>
+          <div class="vd-layer"></div>
+          <div class="vd-layer"></div>
+          <div class="vd-layer"></div>
+          <div class="vd-layer"></div>
+          <div class="vd-layer"></div>
+        </div>
+        <div class="vd-plat"></div>
+      </div>
+    </div>
+    <span class="card-label">Вариант D</span>
+    <span class="card-title">С угловыми акцентами</span>
+  </div>
+
+  <!-- E: Неон / тёмный -->
+  <div class="card ve-card">
+    <div class="stage">
+      <div class="ve-wrap">
+        <div class="ve-glow-bg"></div>
+        <div class="ve-frame"></div>
+        <div class="ve-vrod-l"></div>
+        <div class="ve-vrod-r"></div>
+        <div class="ve-xrod"></div>
+        <div class="ve-head"></div>
+        <div class="ve-layers">
+          <div class="ve-layer"></div>
+          <div class="ve-layer"></div>
+          <div class="ve-layer"></div>
+          <div class="ve-layer"></div>
+          <div class="ve-layer"></div>
+          <div class="ve-layer"></div>
+        </div>
+        <div class="ve-plat"></div>
+      </div>
+    </div>
+    <span class="card-label ve-label">Вариант E</span>
+    <span class="card-title ve-title">Неоновый (тёмный фон)</span>
+  </div>
+
+  <!-- F: Принтер + wireframe объект -->
+  <div class="card">
+    <div class="stage">
+      <div style="position:absolute;width:160px;height:100px;bottom:50px;left:25px;background:radial-gradient(ellipse,rgba(37,99,235,.08) 0%,transparent 70%);"></div>
+      <div class="vf-wrap">
+        <div class="vf-printer">
+          <div class="vf-frame"></div>
+          <div class="vf-vrod"></div>
+          <div class="vf-hrod"></div>
+          <div class="vf-head"></div>
+          <div class="vf-layers">
+            <div class="vf-layer"></div>
+            <div class="vf-layer"></div>
+            <div class="vf-layer"></div>
+            <div class="vf-layer"></div>
+            <div class="vf-layer"></div>
+          </div>
+          <div class="vf-plat"></div>
+        </div>
+        <div class="vf-divider"></div>
+        <div class="vf-obj-scene">
+          <div class="vf-obj">
+            <div class="vf-f front"></div>
+            <div class="vf-f back"></div>
+            <div class="vf-f left"></div>
+            <div class="vf-f right"></div>
+            <div class="vf-f top"></div>
+            <div class="vf-f bottom"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <span class="card-label">Вариант F</span>
+    <span class="card-title">Принтер + готовый объект</span>
+  </div>
+
+</div>
+</body>
+</html>

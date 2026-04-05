@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zigzag Variants</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: #F5F4F0;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  color: #1a1a1a;
+  padding: 32px;
+}
+h1 { font-size: 13px; text-transform: uppercase; letter-spacing: .1em; color: #78716c; margin-bottom: 24px; font-weight: 600; }
+.grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.card {
+  background: #FDFCF8;
+  border: 1px solid #e8e5df;
+  border-radius: 16px;
+  padding: 20px 16px 14px;
+  display: flex; flex-direction: column; align-items: center;
+}
+.card-label { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: #78716c; font-weight: 600; margin-top: 14px; }
+.card-title { font-size: 13px; font-weight: 700; color: #1a1a1a; margin-top: 3px; text-align: center; }
+.stage { width: 240px; height: 240px; display: flex; align-items: center; justify-content: center; position: relative; }
+
+/* ─── SHARED BASE (Variant D style) ─── */
+.printer {
+  position: relative; width: 200px; height: 200px;
+}
+.corner {
+  position: absolute; width: 9px; height: 9px;
+  border: 2px solid rgba(37,99,235,.65);
+}
+.corner.tl { top: 8px;  left: 28px;  border-right: none; border-bottom: none; }
+.corner.tr { top: 8px;  right: 18px; border-left: none;  border-bottom: none; }
+.corner.bl { bottom: 22px; left: 28px;  border-right: none; border-top: none; }
+.corner.br { bottom: 22px; right: 18px; border-left: none;  border-top: none; }
+.vrod-l { position: absolute; left: 30px;  top: 10px; width: 2px; bottom: 24px; background: rgba(37,99,235,.3); }
+.vrod-r { position: absolute; right: 20px; top: 10px; width: 2px; bottom: 24px; background: rgba(37,99,235,.3); }
+.platform { position: absolute; bottom: 24px; left: 40px; right: 30px; height: 4px; background: rgba(37,99,235,.4); border-radius: 2px; }
+.layers-wrap { position: absolute; left: 48px; right: 38px; bottom: 28px; display: flex; flex-direction: column-reverse; gap: 2px; }
+.layer { height: 5px; border-radius: 1.5px; background: rgba(37,99,235,.2); transform-origin: left; }
+.layer.top { background: rgba(37,99,235,.5); box-shadow: 0 0 5px rgba(37,99,235,.4); }
+/* glow */
+.bg-glow {
+  position: absolute; border-radius: 50%;
+  background: #2563EB; opacity: .09; filter: blur(28px);
+  width: 160px; height: 80px; bottom: 30px; left: 20px;
+  pointer-events: none;
+}
+/* head shared */
+.head {
+  position: absolute;
+  width: 20px; height: 13px;
+  background: #2563EB; border-radius: 3px; z-index: 4;
+}
+.head::after {
+  content: '';
+  position: absolute; bottom: -7px; left: 7px;
+  width: 4px; height: 7px;
+  background: #60a5fa; border-radius: 2px;
+}
+/* x-rod follows head vertically */
+.xrod {
+  position: absolute; left: 30px; right: 20px; height: 2px;
+  background: rgba(37,99,235,.45);
+  z-index: 3;
+}
+
+/* trail dot on canvas */
+.trail { position: absolute; border-radius: 50%; background: rgba(37,99,235,.15); pointer-events: none; }
+
+/* ══════════════════════════════════════════════════
+   VARIANT 1 — Классический зигзаг (горизонтальные проходы)
+   Голова: ← → ← → ← → постепенно опускаясь
+══════════════════════════════════════════════════ */
+.v1-head {
+  animation: v1-x 1.6s linear infinite alternate,
+             v1-y 9.6s linear infinite;
+}
+@keyframes v1-x {
+  from { left: 38px; }
+  to   { left: 122px; }
+}
+@keyframes v1-y {
+  0%        { top: 22px; }
+  16.66%    { top: 38px; }
+  33.33%    { top: 54px; }
+  50%       { top: 70px; }
+  66.66%    { top: 86px; }
+  83.33%    { top: 102px; }
+  100%      { top: 22px; }
+}
+.v1-xrod { animation: v1-y 9.6s linear infinite; top: 28px; }
+
+/* zigzag trail SVG overlay */
+.v1-trail-svg {
+  position: absolute; left: 30px; top: 10px; pointer-events: none;
+  animation: v1-trail-fade 9.6s linear infinite;
+}
+@keyframes v1-trail-fade { 0%,2% { opacity: 0; } 10%,90% { opacity: 1; } 98%,100% { opacity: 0; } }
+
+/* layer reveal sync */
+.v1-l { animation: v1-layer 9.6s linear infinite; }
+.v1-l:nth-child(1) { animation-delay: 0s; }
+.v1-l:nth-child(2) { animation-delay: 1.6s; }
+.v1-l:nth-child(3) { animation-delay: 3.2s; }
+.v1-l:nth-child(4) { animation-delay: 4.8s; }
+.v1-l:nth-child(5) { animation-delay: 6.4s; }
+.v1-l:nth-child(6) { animation-delay: 8.0s; }
+@keyframes v1-layer {
+  0%,1% { transform: scaleX(0); opacity: 0; }
+  8%,88% { transform: scaleX(1); opacity: 1; }
+  96%,100% { transform: scaleX(0); opacity: 0; }
+}
+
+
+/* ══════════════════════════════════════════════════
+   VARIANT 2 — Диагональный зигзаг (45°)
+   Голова: по диагонали ↗ затем ↘ ↗ ↘
+══════════════════════════════════════════════════ */
+.v2-head {
+  animation: v2-move 8s linear infinite;
+}
+@keyframes v2-move {
+  0%   { left: 38px;  top: 22px; }
+  12%  { left: 122px; top: 50px; }
+  25%  { left: 38px;  top: 78px; }
+  37%  { left: 122px; top: 106px; }
+  50%  { left: 38px;  top: 106px; }
+  52%  { left: 38px;  top: 22px; }
+  100% { left: 38px;  top: 22px; }
+}
+.v2-xrod { animation: v2-xrod 8s linear infinite; top: 28px; }
+@keyframes v2-xrod {
+  0%   { top: 28px; }
+  12%  { top: 56px; }
+  25%  { top: 84px; }
+  37%  { top: 112px; }
+  50%  { top: 112px; }
+  52%  { top: 28px; }
+  100% { top: 28px; }
+}
+.v2-l { animation: v2-layer 8s linear infinite; }
+.v2-l:nth-child(1) { animation-delay: 0s; }
+.v2-l:nth-child(2) { animation-delay: 1s; }
+.v2-l:nth-child(3) { animation-delay: 2s; }
+.v2-l:nth-child(4) { animation-delay: 3s; }
+.v2-l:nth-child(5) { animation-delay: 4s; }
+.v2-l:nth-child(6) { animation-delay: 5s; }
+@keyframes v2-layer {
+  0%,2% { transform: scaleX(0); opacity: 0; }
+  14%,82% { transform: scaleX(1); opacity: 1; }
+  96%,100% { transform: scaleX(0); opacity: 0; }
+}
+
+
+/* ══════════════════════════════════════════════════
+   VARIANT 3 — Контур + заливка
+   Сначала обходит периметр, потом заполняет
+══════════════════════════════════════════════════ */
+.v3-head {
+  animation: v3-move 10s ease-in-out infinite;
+}
+@keyframes v3-move {
+  /* периметр */
+  0%   { left: 38px;  top: 22px; }
+  8%   { left: 122px; top: 22px; }
+  16%  { left: 122px; top: 108px; }
+  24%  { left: 38px;  top: 108px; }
+  32%  { left: 38px;  top: 22px; }
+  /* заливка зигзагом */
+  36%  { left: 48px;  top: 32px; }
+  42%  { left: 112px; top: 32px; }
+  44%  { left: 112px; top: 46px; }
+  50%  { left: 48px;  top: 46px; }
+  52%  { left: 48px;  top: 60px; }
+  58%  { left: 112px; top: 60px; }
+  60%  { left: 112px; top: 74px; }
+  66%  { left: 48px;  top: 74px; }
+  68%  { left: 48px;  top: 88px; }
+  74%  { left: 112px; top: 88px; }
+  /* reset */
+  82%  { left: 38px;  top: 22px; }
+  100% { left: 38px;  top: 22px; }
+}
+.v3-xrod { animation: v3-xrod 10s ease-in-out infinite; }
+@keyframes v3-xrod {
+  0%   { top: 28px; }
+  8%   { top: 28px; }
+  16%  { top: 114px; }
+  24%  { top: 114px; }
+  32%  { top: 28px; }
+  36%  { top: 38px; }
+  42%  { top: 38px; }
+  44%  { top: 52px; }
+  50%  { top: 52px; }
+  52%  { top: 66px; }
+  58%  { top: 66px; }
+  60%  { top: 80px; }
+  66%  { top: 80px; }
+  68%  { top: 94px; }
+  74%  { top: 94px; }
+  82%  { top: 28px; }
+  100% { top: 28px; }
+}
+.v3-l { animation: v3-layer 10s ease-in-out infinite; }
+.v3-l:nth-child(1) { animation-delay: 0s; }
+.v3-l:nth-child(2) { animation-delay: 1.2s; }
+.v3-l:nth-child(3) { animation-delay: 2.4s; }
+.v3-l:nth-child(4) { animation-delay: 3.6s; }
+.v3-l:nth-child(5) { animation-delay: 4.8s; }
+.v3-l:nth-child(6) { animation-delay: 6.0s; }
+@keyframes v3-layer {
+  0%,2% { transform: scaleX(0); opacity: 0; }
+  12%,80% { transform: scaleX(1); opacity: 1; }
+  95%,100% { transform: scaleX(0); opacity: 0; }
+}
+
+/* ══════════════════════════════════════════════════
+   VARIANT 4 — Быстрый зигзаг с трейлом (SVG путь)
+   Голова быстро мечется, за ней остаётся светящийся след
+══════════════════════════════════════════════════ */
+.v4-head {
+  animation: v4-x 0.7s linear infinite alternate,
+             v4-y 5.6s linear infinite;
+}
+@keyframes v4-x {
+  from { left: 38px; }
+  to   { left: 122px; }
+}
+@keyframes v4-y {
+  0%     { top: 22px; }
+  14.28% { top: 36px; }
+  28.57% { top: 50px; }
+  42.85% { top: 64px; }
+  57.14% { top: 78px; }
+  71.42% { top: 92px; }
+  85.71% { top: 106px; }
+  100%   { top: 22px; }
+}
+.v4-xrod { animation: v4-y 5.6s linear infinite; top: 28px; }
+
+/* glowing trail effect via box-shadow on layers */
+.v4-l {
+  animation: v4-layer 5.6s linear infinite;
+  border-top: 1px solid rgba(37,99,235,.5);
+}
+.v4-l:last-child { box-shadow: 0 0 8px rgba(37,99,235,.6); }
+.v4-l:nth-child(1) { animation-delay: 0s; }
+.v4-l:nth-child(2) { animation-delay: 0.8s; }
+.v4-l:nth-child(3) { animation-delay: 1.6s; }
+.v4-l:nth-child(4) { animation-delay: 2.4s; }
+.v4-l:nth-child(5) { animation-delay: 3.2s; }
+.v4-l:nth-child(6) { animation-delay: 4.0s; }
+.v4-l:nth-child(7) { animation-delay: 4.8s; }
+@keyframes v4-layer {
+  0%,1% { transform: scaleX(0); opacity: 0; }
+  10%,84% { transform: scaleX(1); opacity: 1; }
+  96%,100% { transform: scaleX(0); opacity: 0; }
+}
+/* animated zigzag path drawn on canvas */
+.v4-path-svg {
+  position: absolute; left: 30px; top: 10px; pointer-events: none; z-index: 2; opacity: .45;
+}
+.v4-path { stroke-dasharray: 400; stroke-dashoffset: 400; animation: v4-draw 5.6s linear infinite; }
+@keyframes v4-draw { 0% { stroke-dashoffset: 400; } 80% { stroke-dashoffset: 0; } 100% { stroke-dashoffset: 0; } }
+
+
+/* ══════════════════════════════════════════════════
+   VARIANT 5 — Концентрический зигзаг (спираль от края к центру)
+══════════════════════════════════════════════════ */
+.v5-head {
+  animation: v5-move 12s linear infinite;
+}
+@keyframes v5-move {
+  0%   { left: 38px;  top: 22px; }
+  /* outer perimeter CW */
+  6%   { left: 122px; top: 22px; }
+  12%  { left: 122px; top: 108px; }
+  18%  { left: 38px;  top: 108px; }
+  24%  { left: 38px;  top: 22px; }
+  /* inner 1 */
+  26%  { left: 52px;  top: 36px; }
+  31%  { left: 108px; top: 36px; }
+  36%  { left: 108px; top: 94px; }
+  41%  { left: 52px;  top: 94px; }
+  46%  { left: 52px;  top: 36px; }
+  /* inner 2 */
+  48%  { left: 66px;  top: 50px; }
+  52%  { left: 94px;  top: 50px; }
+  56%  { left: 94px;  top: 80px; }
+  60%  { left: 66px;  top: 80px; }
+  64%  { left: 66px;  top: 50px; }
+  /* center dot */
+  66%  { left: 76px;  top: 62px; }
+  72%  { left: 84px;  top: 62px; }
+  74%  { left: 84px;  top: 68px; }
+  78%  { left: 76px;  top: 68px; }
+  /* reset */
+  88%  { left: 38px;  top: 22px; }
+  100% { left: 38px;  top: 22px; }
+}
+.v5-xrod { animation: v5-xrod 12s linear infinite; }
+@keyframes v5-xrod {
+  0%,24%  { top: 28px; }
+  26%     { top: 42px; }
+  46%     { top: 42px; }
+  48%     { top: 56px; }
+  64%     { top: 56px; }
+  66%     { top: 68px; }
+  78%     { top: 74px; }
+  88%     { top: 28px; }
+  100%    { top: 28px; }
+}
+.v5-l { animation: v5-layer 12s linear infinite; }
+.v5-l:nth-child(1) { animation-delay: 0s; }
+.v5-l:nth-child(2) { animation-delay: 1.5s; }
+.v5-l:nth-child(3) { animation-delay: 3s; }
+.v5-l:nth-child(4) { animation-delay: 4.5s; }
+.v5-l:nth-child(5) { animation-delay: 6s; }
+.v5-l:nth-child(6) { animation-delay: 7.5s; }
+@keyframes v5-layer {
+  0%,1% { transform: scaleX(0); opacity: 0; }
+  10%,80% { transform: scaleX(1); opacity: 1; }
+  95%,100% { transform: scaleX(0); opacity: 0; }
+}
+
+
+/* ══════════════════════════════════════════════════
+   VARIANT 6 — Зигзаг волной (синусоида)
+══════════════════════════════════════════════════ */
+.v6-head {
+  animation: v6-move 8s linear infinite;
+}
+@keyframes v6-move {
+  0%   { left: 38px;  top: 22px; }
+  5%   { left: 60px;  top: 30px; }
+  10%  { left: 80px;  top: 22px; }
+  15%  { left: 100px; top: 30px; }
+  20%  { left: 122px; top: 22px; }
+  25%  { left: 100px; top: 44px; }
+  30%  { left: 80px;  top: 36px; }
+  35%  { left: 60px;  top: 44px; }
+  40%  { left: 38px;  top: 36px; }
+  45%  { left: 60px;  top: 58px; }
+  50%  { left: 80px;  top: 50px; }
+  55%  { left: 100px; top: 58px; }
+  60%  { left: 122px; top: 50px; }
+  65%  { left: 100px; top: 72px; }
+  70%  { left: 80px;  top: 64px; }
+  75%  { left: 60px;  top: 72px; }
+  80%  { left: 38px;  top: 64px; }
+  90%  { left: 38px;  top: 22px; }
+  100% { left: 38px;  top: 22px; }
+}
+.v6-xrod { animation: v6-xrod 8s linear infinite; }
+@keyframes v6-xrod {
+  0%   { top: 28px; }
+  20%  { top: 28px; }
+  40%  { top: 42px; }
+  60%  { top: 56px; }
+  80%  { top: 70px; }
+  90%  { top: 28px; }
+  100% { top: 28px; }
+}
+.v6-l { animation: v6-layer 8s linear infinite; }
+.v6-l:nth-child(1) { animation-delay: 0s; }
+.v6-l:nth-child(2) { animation-delay: 1.6s; }
+.v6-l:nth-child(3) { animation-delay: 3.2s; }
+.v6-l:nth-child(4) { animation-delay: 4.8s; }
+.v6-l:nth-child(5) { animation-delay: 6.4s; }
+@keyframes v6-layer {
+  0%,2% { transform: scaleX(0); opacity: 0; }
+  15%,78% { transform: scaleX(1); opacity: 1; }
+  93%,100% { transform: scaleX(0); opacity: 0; }
+}
+
+</style>
+</head>
+<body>
+<h1>Вариант D — паттерны движения головы</h1>
+<div class="grid">
+
+  <!-- 1: Классический горизонтальный зигзаг -->
+  <div class="card">
+    <div class="stage">
+      <div class="printer">
+        <div class="bg-glow"></div>
+        <div class="corner tl"></div><div class="corner tr"></div>
+        <div class="corner bl"></div><div class="corner br"></div>
+        <div class="vrod-l"></div><div class="vrod-r"></div>
+
+        <!-- SVG zigzag trail -->
+        <svg class="v1-trail-svg" width="120" height="130" viewBox="0 0 120 130">
+          <polyline
+            points="8,12 92,12 92,26 8,26 8,40 92,40 92,54 8,54 8,68 92,68 92,82 8,82"
+            fill="none" stroke="rgba(37,99,235,.18)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"
+          />
+        </svg>
+
+        <div class="xrod v1-xrod"></div>
+        <div class="head v1-head"></div>
+        <div class="layers-wrap">
+          <div class="layer v1-l"></div>
+          <div class="layer v1-l"></div>
+          <div class="layer v1-l"></div>
+          <div class="layer v1-l"></div>
+          <div class="layer v1-l"></div>
+          <div class="layer v1-l top"></div>
+        </div>
+        <div class="platform"></div>
+      </div>
+    </div>
+    <span class="card-label">Вариант 1</span>
+    <span class="card-title">Классический зигзаг</span>
+  </div>
+
+  <!-- 2: Диагональный зигзаг -->
+  <div class="card">
+    <div class="stage">
+      <div class="printer">
+        <div class="bg-glow"></div>
+        <div class="corner tl"></div><div class="corner tr"></div>
+        <div class="corner bl"></div><div class="corner br"></div>
+        <div class="vrod-l"></div><div class="vrod-r"></div>
+
+        <svg style="position:absolute;left:30px;top:10px;pointer-events:none;opacity:.22;" width="120" height="130">
+          <polyline
+            points="8,12 92,40 8,68 92,96"
+            fill="none" stroke="#2563EB" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"
+          />
+        </svg>
+
+        <div class="xrod v2-xrod"></div>
+        <div class="head v2-head"></div>
+        <div class="layers-wrap">
+          <div class="layer v2-l"></div>
+          <div class="layer v2-l"></div>
+          <div class="layer v2-l"></div>
+          <div class="layer v2-l"></div>
+          <div class="layer v2-l"></div>
+          <div class="layer v2-l top"></div>
+        </div>
+        <div class="platform"></div>
+      </div>
+    </div>
+    <span class="card-label">Вариант 2</span>
+    <span class="card-title">Диагональный зигзаг</span>
+  </div>
+
+  <!-- 3: Контур + заливка -->
+  <div class="card">
+    <div class="stage">
+      <div class="printer">
+        <div class="bg-glow"></div>
+        <div class="corner tl"></div><div class="corner tr"></div>
+        <div class="corner bl"></div><div class="corner br"></div>
+        <div class="vrod-l"></div><div class="vrod-r"></div>
+
+        <!-- perimeter rect hint -->
+        <svg style="position:absolute;left:30px;top:10px;pointer-events:none;opacity:.15;" width="120" height="130">
+          <rect x="8" y="12" width="84" height="96" fill="none" stroke="#2563EB" stroke-width="2" stroke-dasharray="4 3"/>
+          <polyline
+            points="18,26 82,26 82,40 18,40 18,54 82,54 82,68 18,68"
+            fill="none" stroke="#2563EB" stroke-width="2" stroke-linecap="round"
+          />
+        </svg>
+
+        <div class="xrod v3-xrod"></div>
+        <div class="head v3-head"></div>
+        <div class="layers-wrap">
+          <div class="layer v3-l"></div>
+          <div class="layer v3-l"></div>
+          <div class="layer v3-l"></div>
+          <div class="layer v3-l"></div>
+          <div class="layer v3-l"></div>
+          <div class="layer v3-l top"></div>
+        </div>
+        <div class="platform"></div>
+      </div>
+    </div>
+    <span class="card-label">Вариант 3</span>
+    <span class="card-title">Контур → заливка</span>
+  </div>
+
+  <!-- 4: Быстрый зигзаг со светящимся трейлом -->
+  <div class="card">
+    <div class="stage">
+      <div class="printer">
+        <div class="bg-glow"></div>
+        <div class="corner tl"></div><div class="corner tr"></div>
+        <div class="corner bl"></div><div class="corner br"></div>
+        <div class="vrod-l"></div><div class="vrod-r"></div>
+
+        <!-- animated drawing path -->
+        <svg class="v4-path-svg" width="120" height="130">
+          <polyline class="v4-path"
+            points="8,12 92,12 92,26 8,26 8,40 92,40 92,54 8,54 8,68 92,68 92,82 8,82 8,96 92,96"
+            fill="none" stroke="#2563EB" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
+          />
+        </svg>
+
+        <div class="xrod v4-xrod"></div>
+        <div class="head v4-head"></div>
+        <div class="layers-wrap">
+          <div class="layer v4-l"></div>
+          <div class="layer v4-l"></div>
+          <div class="layer v4-l"></div>
+          <div class="layer v4-l"></div>
+          <div class="layer v4-l"></div>
+          <div class="layer v4-l"></div>
+          <div class="layer v4-l top"></div>
+        </div>
+        <div class="platform"></div>
+      </div>
+    </div>
+    <span class="card-label">Вариант 4</span>
+    <span class="card-title">Быстрый + рисующий путь</span>
+  </div>
+
+  <!-- 5: Концентрический (снаружи внутрь) -->
+  <div class="card">
+    <div class="stage">
+      <div class="printer">
+        <div class="bg-glow"></div>
+        <div class="corner tl"></div><div class="corner tr"></div>
+        <div class="corner bl"></div><div class="corner br"></div>
+        <div class="vrod-l"></div><div class="vrod-r"></div>
+
+        <svg style="position:absolute;left:30px;top:10px;pointer-events:none;opacity:.15;" width="120" height="130">
+          <rect x="8"  y="12" width="84" height="96" fill="none" stroke="#2563EB" stroke-width="1.5"/>
+          <rect x="22" y="26" width="56" height="68" fill="none" stroke="#2563EB" stroke-width="1.5"/>
+          <rect x="36" y="40" width="28" height="40" fill="none" stroke="#2563EB" stroke-width="1.5"/>
+          <rect x="46" y="52" width="8"  height="16" fill="none" stroke="#2563EB" stroke-width="1.5"/>
+        </svg>
+
+        <div class="xrod v5-xrod"></div>
+        <div class="head v5-head"></div>
+        <div class="layers-wrap">
+          <div class="layer v5-l"></div>
+          <div class="layer v5-l"></div>
+          <div class="layer v5-l"></div>
+          <div class="layer v5-l"></div>
+          <div class="layer v5-l"></div>
+          <div class="layer v5-l top"></div>
+        </div>
+        <div class="platform"></div>
+      </div>
+    </div>
+    <span class="card-label">Вариант 5</span>
+    <span class="card-title">Концентрический (снаружи→центр)</span>
+  </div>
+
+  <!-- 6: Волновой зигзаг -->
+  <div class="card">
+    <div class="stage">
+      <div class="printer">
+        <div class="bg-glow"></div>
+        <div class="corner tl"></div><div class="corner tr"></div>
+        <div class="corner bl"></div><div class="corner br"></div>
+        <div class="vrod-l"></div><div class="vrod-r"></div>
+
+        <svg style="position:absolute;left:30px;top:10px;pointer-events:none;opacity:.2;" width="120" height="130">
+          <path d="M8,12 Q30,24 50,12 Q70,0 92,12 Q70,36 50,26 Q30,16 8,36 Q30,56 50,46 Q70,36 92,50 Q70,72 50,62 Q30,52 8,64"
+            fill="none" stroke="#2563EB" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+
+        <div class="xrod v6-xrod"></div>
+        <div class="head v6-head"></div>
+        <div class="layers-wrap">
+          <div class="layer v6-l"></div>
+          <div class="layer v6-l"></div>
+          <div class="layer v6-l"></div>
+          <div class="layer v6-l"></div>
+          <div class="layer v6-l"></div>
+          <div class="layer v6-l top"></div>
+        </div>
+        <div class="platform"></div>
+      </div>
+    </div>
+    <span class="card-label">Вариант 6</span>
+    <span class="card-title">Волновой зигзаг</span>
+  </div>
+
+</div>
+</body>
+</html>

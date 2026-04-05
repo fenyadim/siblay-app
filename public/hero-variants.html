@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hero Variants</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #F5F4F0;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    color: #1a1a1a;
+    padding: 32px;
+  }
+  h1 { font-size: 14px; text-transform: uppercase; letter-spacing: .1em; color: #78716c; margin-bottom: 24px; font-weight: 600; }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+  .card {
+    background: #FDFCF8;
+    border: 1px solid #e8e5df;
+    border-radius: 16px;
+    padding: 16px 16px 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .card-label {
+    font-size: 11px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: #78716c;
+    font-weight: 600;
+    margin-top: 12px;
+  }
+  .card-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-top: 4px;
+  }
+  .stage {
+    width: 220px;
+    height: 220px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+
+  /* ── V1: FDM Printer ── */
+  .printer { position: relative; width: 140px; height: 160px; }
+  .printer-frame {
+    position: absolute; inset: 0;
+    border: 2px solid rgba(37,99,235,.5);
+    border-radius: 4px;
+    background: rgba(37,99,235,.02);
+  }
+  .printer-rod {
+    position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+    width: 2px; height: 100%; background: rgba(37,99,235,.3);
+  }
+  .printer-head {
+    position: absolute; left: 50%; transform: translateX(-50%);
+    width: 28px; height: 10px;
+    background: #2563EB;
+    border-radius: 3px;
+    animation: head-move 3s ease-in-out infinite;
+    top: 20px;
+  }
+  .printer-head::after {
+    content: '';
+    position: absolute; bottom: -6px; left: 50%; transform: translateX(-50%);
+    width: 3px; height: 6px;
+    background: #2563EB;
+    border-radius: 0 0 2px 2px;
+  }
+  .printer-platform {
+    position: absolute; bottom: 20px; left: 10px; right: 10px;
+    height: 4px; background: rgba(37,99,235,.4); border-radius: 2px;
+  }
+  .printer-layers {
+    position: absolute; bottom: 24px; left: 22px; right: 22px;
+    display: flex; flex-direction: column-reverse; gap: 2px;
+    animation: layers-grow 3s ease-in-out infinite;
+    transform-origin: bottom;
+  }
+  .printer-layer {
+    height: 4px; background: rgba(37,99,235,.25); border-radius: 1px;
+  }
+  .printer-layer:nth-child(1) { animation: layer-appear 3s .0s ease-in-out infinite; }
+  .printer-layer:nth-child(2) { animation: layer-appear 3s .3s ease-in-out infinite; }
+  .printer-layer:nth-child(3) { animation: layer-appear 3s .6s ease-in-out infinite; }
+  .printer-layer:nth-child(4) { animation: layer-appear 3s .9s ease-in-out infinite; }
+  .printer-layer:nth-child(5) { animation: layer-appear 3s 1.2s ease-in-out infinite; }
+  .printer-layer:nth-child(6) { animation: layer-appear 3s 1.5s ease-in-out infinite; }
+  .printer-layer:nth-child(7) { animation: layer-appear 3s 1.8s ease-in-out infinite; }
+  @keyframes head-move {
+    0%,100% { left: 20%; }
+    50% { left: 80%; }
+  }
+  @keyframes layer-appear {
+    0%,15% { opacity: 0; transform: scaleX(0); }
+    30%,85% { opacity: 1; transform: scaleX(1); }
+    100% { opacity: 0; transform: scaleX(0); }
+  }
+
+  /* ── V2: Layer Spiral ── */
+  .spiral-scene {
+    perspective: 400px;
+    width: 140px; height: 140px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .spiral-stack {
+    transform-style: preserve-3d;
+    animation: spiral-rotate 8s linear infinite;
+    position: relative;
+    width: 100px; height: 100px;
+  }
+  @keyframes spiral-rotate {
+    from { transform: rotateX(60deg) rotateZ(0deg); }
+    to   { transform: rotateX(60deg) rotateZ(360deg); }
+  }
+  .spiral-disk {
+    position: absolute;
+    left: 50%; top: 50%;
+    border-radius: 50%;
+    border: 2px solid rgba(37,99,235,.7);
+    transform-style: preserve-3d;
+  }
+  /* 12 disks stacked along Z */
+  .spiral-disk:nth-child(1)  { width:100px;height:100px;margin:-50px 0 0 -50px;transform:translateZ(-55px);border-color:rgba(37,99,235,.15); }
+  .spiral-disk:nth-child(2)  { width: 96px;height: 96px;margin:-48px 0 0 -48px;transform:translateZ(-45px);border-color:rgba(37,99,235,.2); }
+  .spiral-disk:nth-child(3)  { width: 92px;height: 92px;margin:-46px 0 0 -46px;transform:translateZ(-35px);border-color:rgba(37,99,235,.28); }
+  .spiral-disk:nth-child(4)  { width: 88px;height: 88px;margin:-44px 0 0 -44px;transform:translateZ(-25px);border-color:rgba(37,99,235,.35); }
+  .spiral-disk:nth-child(5)  { width: 84px;height: 84px;margin:-42px 0 0 -42px;transform:translateZ(-15px);border-color:rgba(37,99,235,.42); }
+  .spiral-disk:nth-child(6)  { width: 80px;height: 80px;margin:-40px 0 0 -40px;transform:translateZ( -5px);border-color:rgba(37,99,235,.5); background:rgba(37,99,235,.04); }
+  .spiral-disk:nth-child(7)  { width: 76px;height: 76px;margin:-38px 0 0 -38px;transform:translateZ(  5px);border-color:rgba(37,99,235,.58); }
+  .spiral-disk:nth-child(8)  { width: 72px;height: 72px;margin:-36px 0 0 -36px;transform:translateZ( 15px);border-color:rgba(37,99,235,.65); }
+  .spiral-disk:nth-child(9)  { width: 68px;height: 68px;margin:-34px 0 0 -34px;transform:translateZ( 25px);border-color:rgba(37,99,235,.72); }
+  .spiral-disk:nth-child(10) { width: 64px;height: 64px;margin:-32px 0 0 -32px;transform:translateZ( 35px);border-color:rgba(37,99,235,.8); }
+  .spiral-disk:nth-child(11) { width: 60px;height: 60px;margin:-30px 0 0 -30px;transform:translateZ( 45px);border-color:rgba(37,99,235,.88); }
+  .spiral-disk:nth-child(12) { width: 56px;height: 56px;margin:-28px 0 0 -28px;transform:translateZ( 55px);border-color:#2563EB; background:rgba(37,99,235,.08); }
+
+  /* ── V3: Octahedron ── */
+  .octa-scene {
+    perspective: 500px;
+    width: 160px; height: 160px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .octa {
+    transform-style: preserve-3d;
+    animation: octa-spin 10s linear infinite;
+    width: 0; height: 0; position: relative;
+  }
+  @keyframes octa-spin {
+    from { transform: rotateX(20deg) rotateY(0); }
+    to   { transform: rotateX(20deg) rotateY(360deg); }
+  }
+  .octa-face {
+    position: absolute;
+    width: 0; height: 0;
+    border-style: solid;
+    transform-origin: 50% 50%;
+    transform-style: preserve-3d;
+  }
+  /* SVG octahedron instead of CSS triangles for clarity */
+  .octa-svg { animation: octa-spin2 10s linear infinite; }
+  @keyframes octa-spin2 {
+    0%   { transform: rotateY(0deg)   rotateX(20deg); }
+    100% { transform: rotateY(360deg) rotateX(20deg); }
+  }
+  .octa-wrap {
+    perspective: 500px;
+    width: 160px; height: 160px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .octa-inner {
+    transform-style: preserve-3d;
+    animation: octa-spin2 10s linear infinite;
+    position: relative; width: 120px; height: 120px;
+  }
+  .tri {
+    position: absolute;
+    top: 0; left: 0; width: 120px; height: 120px;
+    transform-style: preserve-3d;
+  }
+  .tri svg { position: absolute; top: 0; left: 0; }
+
+  /* ── V4: Object Carousel ── */
+  .carousel-wrap {
+    width: 160px; height: 160px;
+    position: relative; overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .carousel-item {
+    position: absolute;
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    animation: carousel-cycle 9s linear infinite;
+    opacity: 0;
+  }
+  .carousel-item:nth-child(1) { animation-delay: 0s; }
+  .carousel-item:nth-child(2) { animation-delay: 3s; }
+  .carousel-item:nth-child(3) { animation-delay: 6s; }
+  @keyframes carousel-cycle {
+    0%   { opacity: 0; transform: translateY(20px) scale(.9); }
+    5%   { opacity: 1; transform: translateY(0)    scale(1); }
+    28%  { opacity: 1; transform: translateY(0)    scale(1); }
+    33%  { opacity: 0; transform: translateY(-20px) scale(.9); }
+    100% { opacity: 0; transform: translateY(-20px) scale(.9); }
+  }
+  .carousel-label {
+    font-size: 10px; letter-spacing: .08em; text-transform: uppercase;
+    color: #2563EB; font-weight: 600;
+  }
+
+  /* ── V5: Build Animation ── */
+  .build-scene {
+    perspective: 500px;
+    width: 160px; height: 160px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .build-cube {
+    transform-style: preserve-3d;
+    transform: rotateX(20deg) rotateY(25deg);
+    width: 100px; height: 100px;
+    position: relative;
+  }
+  .build-face {
+    position: absolute;
+    width: 100px; height: 100px;
+    border: 2px solid rgba(37,99,235,.7);
+  }
+  .build-face--front  { transform: translateZ(50px); }
+  .build-face--back   { transform: rotateY(180deg) translateZ(50px); }
+  .build-face--left   { transform: rotateY(-90deg) translateZ(50px); }
+  .build-face--right  { transform: rotateY(90deg)  translateZ(50px); }
+  .build-face--top    { transform: rotateX(90deg)  translateZ(50px); }
+  .build-face--bottom { transform: rotateX(-90deg) translateZ(50px); }
+  /* Layers inside cube */
+  .build-layers {
+    position: absolute; inset: 0;
+    transform-style: preserve-3d;
+    transform: translateZ(50px);
+    display: flex; flex-direction: column; justify-content: flex-end;
+    overflow: hidden;
+  }
+  .build-layer {
+    width: 100%; height: 12px;
+    background: rgba(37,99,235,.2);
+    border-top: 1px solid rgba(37,99,235,.4);
+    animation: build-rise 3s ease-in-out infinite;
+  }
+  .build-layer:nth-child(1) { animation-delay: 0s; }
+  .build-layer:nth-child(2) { animation-delay: .4s; }
+  .build-layer:nth-child(3) { animation-delay: .8s; }
+  .build-layer:nth-child(4) { animation-delay: 1.2s; }
+  .build-layer:nth-child(5) { animation-delay: 1.6s; }
+  @keyframes build-rise {
+    0%,20% { transform: scaleY(0); transform-origin: bottom; opacity: 0; }
+    40%,80% { transform: scaleY(1); opacity: 1; }
+    100% { transform: scaleY(0); transform-origin: bottom; opacity: 0; }
+  }
+
+  /* ── V6: G-code Stream ── */
+  .gcode-wrap {
+    width: 200px; height: 180px;
+    display: flex; gap: 12px;
+    align-items: center;
+  }
+  .gcode-lines {
+    flex: 1;
+    font-family: 'Courier New', monospace;
+    font-size: 9px;
+    line-height: 1.7;
+    color: rgba(37,99,235,.5);
+    overflow: hidden;
+    height: 100%;
+    position: relative;
+  }
+  .gcode-stream {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    animation: gcode-scroll 6s linear infinite;
+  }
+  .gcode-line { white-space: nowrap; }
+  .gcode-line.hi { color: #2563EB; font-weight: 700; }
+  @keyframes gcode-scroll {
+    from { transform: translateY(0); }
+    to   { transform: translateY(-50%); }
+  }
+  .gcode-obj {
+    width: 80px; height: 80px;
+    flex-shrink: 0;
+    perspective: 300px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .gcode-cube {
+    width: 60px; height: 60px;
+    transform-style: preserve-3d;
+    animation: rotate-cube 8s linear infinite;
+    position: relative;
+  }
+  @keyframes rotate-cube {
+    from { transform: rotateX(15deg) rotateY(0); }
+    to   { transform: rotateX(15deg) rotateY(360deg); }
+  }
+  .gf { position: absolute; width: 60px; height: 60px; border: 1.5px solid rgba(37,99,235,.6); background: rgba(37,99,235,.04); }
+  .gf.front  { transform: translateZ(30px); }
+  .gf.back   { transform: rotateY(180deg) translateZ(30px); }
+  .gf.left   { transform: rotateY(-90deg) translateZ(30px); }
+  .gf.right  { transform: rotateY(90deg)  translateZ(30px); }
+  .gf.top    { transform: rotateX(90deg)  translateZ(30px); }
+  .gf.bottom { transform: rotateX(-90deg) translateZ(30px); }
+
+  /* glow helper */
+  .glow {
+    position: absolute; border-radius: 50%;
+    background: #2563EB; opacity: .08; filter: blur(24px);
+    pointer-events: none;
+  }
+</style>
+</head>
+<body>
+<h1>Hero Visual — варианты</h1>
+<div class="grid">
+
+  <!-- V1 -->
+  <div class="card">
+    <div class="stage">
+      <div class="glow" style="width:120px;height:120px;top:50px;left:50px;"></div>
+      <div class="printer">
+        <div class="printer-frame"></div>
+        <div class="printer-rod"></div>
+        <div class="printer-head"></div>
+        <div class="printer-layers">
+          <div class="printer-layer"></div>
+          <div class="printer-layer"></div>
+          <div class="printer-layer"></div>
+          <div class="printer-layer"></div>
+          <div class="printer-layer"></div>
+          <div class="printer-layer"></div>
+          <div class="printer-layer"></div>
+        </div>
+        <div class="printer-platform"></div>
+      </div>
+    </div>
+    <span class="card-label">Вариант 1</span>
+    <span class="card-title">Принтер в работе</span>
+  </div>
+
+  <!-- V2 -->
+  <div class="card">
+    <div class="stage">
+      <div class="glow" style="width:130px;height:130px;top:45px;left:45px;"></div>
+      <div class="spiral-scene">
+        <div class="spiral-stack">
+          <div class="spiral-disk"></div>
+          <div class="spiral-disk"></div>
+          <div class="spiral-disk"></div>
+          <div class="spiral-disk"></div>
+          <div class="spiral-disk"></div>
+          <div class="spiral-disk"></div>
+          <div class="spiral-disk"></div>
+          <div class="spiral-disk"></div>
+          <div class="spiral-disk"></div>
+          <div class="spiral-disk"></div>
+          <div class="spiral-disk"></div>
+          <div class="spiral-disk"></div>
+        </div>
+      </div>
+    </div>
+    <span class="card-label">Вариант 2</span>
+    <span class="card-title">Спираль из слоёв</span>
+  </div>
+
+  <!-- V3: Octahedron via SVG paths in 3D -->
+  <div class="card">
+    <div class="stage">
+      <div class="glow" style="width:130px;height:130px;top:45px;left:45px;"></div>
+      <div style="perspective:500px;width:160px;height:160px;display:flex;align-items:center;justify-content:center;">
+        <div style="transform-style:preserve-3d;animation:octa-spin2 10s linear infinite;width:120px;height:120px;position:relative;">
+          <!-- SVG octahedron drawn as rotated faces -->
+          <svg viewBox="-70 -70 140 140" width="120" height="120" style="position:absolute;top:0;left:0;transform-style:preserve-3d;">
+            <g stroke="#2563EB" stroke-width="1.5" fill="rgba(37,99,235,0.06)" stroke-linejoin="round">
+              <!-- top cap faces -->
+              <polygon points="0,-60  52,20  0,0"   opacity=".9"/>
+              <polygon points="0,-60  0,0  -52,20"  opacity=".7"/>
+              <polygon points="0,-60  -52,20  0,40" opacity=".5"/>
+              <polygon points="0,-60  0,40   52,20" opacity=".8"/>
+              <!-- bottom cap -->
+              <polygon points="0,60   52,20  0,0"   opacity=".4"/>
+              <polygon points="0,60   0,0  -52,20"  opacity=".3"/>
+              <polygon points="0,60  -52,20  0,40"  opacity=".2"/>
+              <polygon points="0,60   0,40   52,20" opacity=".35"/>
+            </g>
+          </svg>
+        </div>
+      </div>
+    </div>
+    <span class="card-label">Вариант 3</span>
+    <span class="card-title">Октаэдр (wireframe)</span>
+  </div>
+
+  <!-- V4 -->
+  <div class="card">
+    <div class="stage">
+      <div class="glow" style="width:120px;height:120px;top:50px;left:50px;"></div>
+      <div class="carousel-wrap">
+
+        <div class="carousel-item">
+          <svg width="90" height="90" viewBox="0 0 90 90" fill="none">
+            <!-- Gear -->
+            <circle cx="45" cy="45" r="18" stroke="#2563EB" stroke-width="2" fill="rgba(37,99,235,.06)"/>
+            <circle cx="45" cy="45" r="8" stroke="#2563EB" stroke-width="1.5" fill="none"/>
+            <g stroke="#2563EB" stroke-width="2" fill="rgba(37,99,235,.15)">
+              <rect x="41" y="20" width="8" height="10" rx="2"/>
+              <rect x="41" y="60" width="8" height="10" rx="2"/>
+              <rect x="20" y="41" width="10" height="8" rx="2"/>
+              <rect x="60" y="41" width="10" height="8" rx="2"/>
+              <rect x="27" y="27" width="8" height="8" rx="2" transform="rotate(45 31 31)"/>
+              <rect x="55" y="27" width="8" height="8" rx="2" transform="rotate(45 59 31)"/>
+              <rect x="27" y="55" width="8" height="8" rx="2" transform="rotate(45 31 59)"/>
+              <rect x="55" y="55" width="8" height="8" rx="2" transform="rotate(45 59 59)"/>
+            </g>
+          </svg>
+          <span class="carousel-label">Шестерёнка</span>
+        </div>
+
+        <div class="carousel-item">
+          <svg width="90" height="90" viewBox="0 0 90 90" fill="none">
+            <!-- Box/enclosure -->
+            <rect x="15" y="25" width="60" height="50" rx="4" stroke="#2563EB" stroke-width="2" fill="rgba(37,99,235,.06)"/>
+            <rect x="25" y="15" width="40" height="15" rx="3" stroke="#2563EB" stroke-width="1.5" fill="rgba(37,99,235,.1)"/>
+            <circle cx="45" cy="52" r="8" stroke="#2563EB" stroke-width="1.5" fill="rgba(37,99,235,.08)"/>
+            <line x1="25" y1="40" x2="65" y2="40" stroke="#2563EB" stroke-width="1" opacity=".4"/>
+            <line x1="25" y1="65" x2="65" y2="65" stroke="#2563EB" stroke-width="1" opacity=".4"/>
+          </svg>
+          <span class="carousel-label">Корпус</span>
+        </div>
+
+        <div class="carousel-item">
+          <svg width="90" height="90" viewBox="0 0 90 90" fill="none">
+            <!-- Figure/bust -->
+            <ellipse cx="45" cy="30" rx="15" ry="17" stroke="#2563EB" stroke-width="2" fill="rgba(37,99,235,.06)"/>
+            <path d="M28 55 Q30 42 45 42 Q60 42 62 55 L65 75 H25 Z" stroke="#2563EB" stroke-width="2" fill="rgba(37,99,235,.06)"/>
+            <line x1="35" y1="55" x2="33" y2="75" stroke="#2563EB" stroke-width="1.5" opacity=".5"/>
+            <line x1="55" y1="55" x2="57" y2="75" stroke="#2563EB" stroke-width="1.5" opacity=".5"/>
+          </svg>
+          <span class="carousel-label">Фигурка</span>
+        </div>
+
+      </div>
+    </div>
+    <span class="card-label">Вариант 4</span>
+    <span class="card-title">Карусель объектов</span>
+  </div>
+
+  <!-- V5 -->
+  <div class="card">
+    <div class="stage">
+      <div class="glow" style="width:120px;height:120px;top:50px;left:50px;"></div>
+      <div class="build-scene">
+        <div style="transform-style:preserve-3d;transform:rotateX(20deg) rotateY(30deg);width:100px;height:100px;position:relative;animation:build-rotate 12s linear infinite;">
+          <div class="build-face build-face--front" style="overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;gap:2px;padding:2px;background:rgba(37,99,235,.02);">
+            <div style="height:12px;background:rgba(37,99,235,.3);border-radius:1px;animation:build-rise 3s 1.6s ease-in-out infinite;transform-origin:bottom;"></div>
+            <div style="height:12px;background:rgba(37,99,235,.3);border-radius:1px;animation:build-rise 3s 1.2s ease-in-out infinite;transform-origin:bottom;"></div>
+            <div style="height:12px;background:rgba(37,99,235,.3);border-radius:1px;animation:build-rise 3s .8s ease-in-out infinite;transform-origin:bottom;"></div>
+            <div style="height:12px;background:rgba(37,99,235,.3);border-radius:1px;animation:build-rise 3s .4s ease-in-out infinite;transform-origin:bottom;"></div>
+            <div style="height:12px;background:rgba(37,99,235,.3);border-radius:1px;animation:build-rise 3s 0s ease-in-out infinite;transform-origin:bottom;"></div>
+          </div>
+          <div class="build-face build-face--back"   style="background:rgba(37,99,235,.02);"></div>
+          <div class="build-face build-face--left"   style="background:rgba(37,99,235,.02);"></div>
+          <div class="build-face build-face--right"  style="background:rgba(37,99,235,.02);"></div>
+          <div class="build-face build-face--top"    style="background:rgba(37,99,235,.05);"></div>
+          <div class="build-face build-face--bottom" style="background:rgba(37,99,235,.02);"></div>
+        </div>
+      </div>
+    </div>
+    <span class="card-label">Вариант 5</span>
+    <span class="card-title">Сборка по слоям</span>
+  </div>
+
+  <!-- V6 -->
+  <div class="card">
+    <div class="stage">
+      <div class="glow" style="width:120px;height:120px;top:50px;left:50px;"></div>
+      <div class="gcode-wrap">
+        <div class="gcode-lines">
+          <div class="gcode-stream" id="gs">
+            <div class="gcode-line hi">G28 ; home</div>
+            <div class="gcode-line">M104 S200</div>
+            <div class="gcode-line hi">G1 X12.3 Y5.6</div>
+            <div class="gcode-line">G1 Z0.2 F600</div>
+            <div class="gcode-line">E1.2 F1800</div>
+            <div class="gcode-line hi">G1 X45.0 Y5.6</div>
+            <div class="gcode-line">G1 X45.0 Y44</div>
+            <div class="gcode-line">G1 X12.3 Y44</div>
+            <div class="gcode-line hi">G1 Z0.4</div>
+            <div class="gcode-line">M106 S255</div>
+            <div class="gcode-line">G1 X20 Y15</div>
+            <div class="gcode-line hi">G1 X38 Y15</div>
+            <div class="gcode-line">G1 X38 Y35</div>
+            <div class="gcode-line">G1 X20 Y35</div>
+            <div class="gcode-line hi">G1 Z0.6</div>
+            <div class="gcode-line">M140 S60</div>
+            <div class="gcode-line">G1 X12.3 Y5.6</div>
+            <!-- repeat -->
+            <div class="gcode-line hi">G28 ; home</div>
+            <div class="gcode-line">M104 S200</div>
+            <div class="gcode-line hi">G1 X12.3 Y5.6</div>
+            <div class="gcode-line">G1 Z0.2 F600</div>
+            <div class="gcode-line">E1.2 F1800</div>
+            <div class="gcode-line hi">G1 X45.0 Y5.6</div>
+            <div class="gcode-line">G1 X45.0 Y44</div>
+            <div class="gcode-line">G1 X12.3 Y44</div>
+            <div class="gcode-line hi">G1 Z0.4</div>
+            <div class="gcode-line">M106 S255</div>
+            <div class="gcode-line">G1 X20 Y15</div>
+            <div class="gcode-line hi">G1 X38 Y15</div>
+            <div class="gcode-line">G1 X38 Y35</div>
+            <div class="gcode-line">G1 X20 Y35</div>
+            <div class="gcode-line hi">G1 Z0.6</div>
+            <div class="gcode-line">M140 S60</div>
+            <div class="gcode-line">G1 X12.3 Y5.6</div>
+          </div>
+        </div>
+        <div class="gcode-obj">
+          <div class="gcode-cube">
+            <div class="gf front"></div>
+            <div class="gf back"></div>
+            <div class="gf left"></div>
+            <div class="gf right"></div>
+            <div class="gf top"></div>
+            <div class="gf bottom"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <span class="card-label">Вариант 6</span>
+    <span class="card-title">G-code + объект</span>
+  </div>
+
+</div>
+
+<style>
+@keyframes build-rotate {
+  from { transform: rotateX(20deg) rotateY(0); }
+  to   { transform: rotateX(20deg) rotateY(360deg); }
+}
+</style>
+</body>
+</html>
