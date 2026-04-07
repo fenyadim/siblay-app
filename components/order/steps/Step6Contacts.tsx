@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useFormContext } from "react-hook-form"
 import { Input } from "@/components/ui/input"
@@ -27,17 +27,17 @@ function Field({
 }) {
   return (
     <div>
-      <Label className="text-sm font-medium text-[var(--foreground)] mb-1.5 block">
+      <Label className="text-sm font-medium text-foreground mb-1.5 block">
         {label}
-        {required && <span className="text-[var(--error)] ml-0.5">*</span>}
+        {required && <span className="text-destructive ml-0.5">*</span>}
       </Label>
       {children}
-      {error && <p className="text-xs text-[var(--error)] mt-1">{error}</p>}
+      {error && <p className="text-xs text-destructive mt-1">{error}</p>}
     </div>
   )
 }
 
-const inputClass = "bg-[var(--background)] border-[var(--border)] text-[var(--foreground)] focus-visible:ring-0 focus-visible:border-[var(--accent)] transition-colors"
+const inputClass = "bg-background border-border text-foreground focus-visible:ring-0 focus-visible:border-accent transition-colors"
 
 export function Step6Contacts() {
   const { register, watch, setValue, formState: { errors } } = useFormContext<OrderFormData>()
@@ -46,10 +46,10 @@ export function Step6Contacts() {
   return (
     <div className="space-y-8">
       <div>
-        <h2 className="text-2xl font-black text-[var(--foreground)] mb-1" style={{ fontFamily: "Syne, sans-serif" }}>
+        <h2 className="text-2xl font-black text-foreground mb-1" style={{ fontFamily: "Syne, sans-serif" }}>
           Контактные данные
         </h2>
-        <p className="text-sm text-[var(--muted)]">Для связи и доставки готового заказа</p>
+        <p className="text-sm text-muted">Для связи и доставки готового заказа</p>
       </div>
 
       <div className="space-y-4">
@@ -83,7 +83,7 @@ export function Step6Contacts() {
 
       {/* Delivery */}
       <div>
-        <p className="label-mono mb-3">Способ доставки <span className="text-[var(--error)]">*</span></p>
+        <p className="label-mono mb-3">Способ доставки <span className="text-destructive">*</span></p>
         <div className="grid grid-cols-2 gap-2">
           {DELIVERY_OPTIONS.map((opt) => (
             <button
@@ -93,21 +93,21 @@ export function Step6Contacts() {
               className={cn(
                 "flex items-center gap-3 p-3.5 rounded-xl border text-left transition-all duration-150",
                 delivery === opt.value
-                  ? "border-[var(--accent)] bg-[var(--accent-subtle)]"
-                  : "border-[var(--border)] bg-[var(--background)] hover:border-[var(--accent-border)]",
+                  ? "border-accent bg-(--accent-subtle)"
+                  : "border-border bg-background hover:border-(--accent-border)",
               )}
             >
               <span className="text-xl leading-none">{opt.icon}</span>
               <span className={cn(
                 "text-sm font-medium",
-                delivery === opt.value ? "text-[var(--accent)]" : "text-[var(--foreground)]",
+                delivery === opt.value ? "text-accent" : "text-foreground",
               )}>
                 {opt.label}
               </span>
             </button>
           ))}
         </div>
-        {errors.delivery && <p className="text-xs text-[var(--error)] mt-2">{errors.delivery.message}</p>}
+        {errors.delivery && <p className="text-xs text-destructive mt-2">{errors.delivery.message}</p>}
       </div>
 
       {/* Address */}
@@ -117,7 +117,7 @@ export function Step6Contacts() {
             {...register("address")}
             placeholder="Город, улица, дом, квартира / индекс (для Почты России)"
             rows={3}
-            className={cn(inputClass, "resize-none placeholder:text-[var(--placeholder)]")}
+            className={cn(inputClass, "resize-none placeholder:text-(--placeholder)")}
           />
         </Field>
       )}

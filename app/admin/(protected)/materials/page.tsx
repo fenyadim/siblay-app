@@ -1,4 +1,4 @@
-import { getMaterialsWithColors } from "@/actions/materials"
+﻿import { getMaterialsWithColors } from "@/actions/materials"
 import { MaterialsAdminClient } from "@/components/admin/MaterialsAdminClient"
 
 export default async function AdminMaterialsPage() {
@@ -8,12 +8,12 @@ export default async function AdminMaterialsPage() {
     <div>
       <div className="mb-6">
         <h1
-          className="text-3xl font-black text-[var(--foreground)]"
+          className="text-3xl font-black text-foreground"
           style={{ fontFamily: "Syne, sans-serif" }}
         >
           Материалы
         </h1>
-        <p className="text-sm text-[var(--muted)] mt-1">
+        <p className="text-sm text-muted mt-1">
           Управляйте доступностью материалов и цветов для заказов
         </p>
       </div>

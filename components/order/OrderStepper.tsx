@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils"
+﻿import { cn } from "@/lib/utils"
 
 const STEPS = [
   { num: 1, label: "Материал" },
@@ -19,7 +19,7 @@ export function OrderStepper({ current }: OrderStepperProps) {
   return (
     <div className="w-full space-y-4">
       {/* Progress bar */}
-      <div className="h-1 w-full rounded-full bg-[var(--border)] overflow-hidden">
+      <div className="h-1 w-full rounded-full bg-border overflow-hidden">
         <div
           className="h-full rounded-full transition-all duration-500 ease-out"
           style={{
@@ -40,9 +40,9 @@ export function OrderStepper({ current }: OrderStepperProps) {
                 <div
                   className={cn(
                     "w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300 shrink-0",
-                    done && "bg-[var(--accent)] text-white shadow-sm",
-                    active && "text-white shadow-md ring-4 ring-[var(--accent)]/20",
-                    !done && !active && "border-2 border-[var(--border)] text-[var(--muted)] bg-[var(--surface)]",
+                    done && "bg-accent text-white shadow-sm",
+                    active && "text-white shadow-md ring-4 ring-accent/20",
+                    !done && !active && "border-2 border-border text-muted bg-surface",
                   )}
                   style={active ? { background: "linear-gradient(135deg, var(--accent), #7c3aed)" } : undefined}
                 >
@@ -57,7 +57,7 @@ export function OrderStepper({ current }: OrderStepperProps) {
                 <span
                   className={cn(
                     "text-[11px] font-medium whitespace-nowrap text-center",
-                    active ? "text-[var(--accent)]" : done ? "text-[var(--foreground)]" : "text-[var(--muted)]",
+                    active ? "text-accent" : done ? "text-foreground" : "text-muted",
                   )}
                 >
                   {step.label}
@@ -83,11 +83,11 @@ export function OrderStepper({ current }: OrderStepperProps) {
             {current}
           </div>
           <div>
-            <p className="text-xs text-[var(--muted)]">Шаг {current} из {STEPS.length}</p>
-            <p className="text-sm font-semibold text-[var(--foreground)]">{STEPS[current - 1]?.label}</p>
+            <p className="text-xs text-muted">Шаг {current} из {STEPS.length}</p>
+            <p className="text-sm font-semibold text-foreground">{STEPS[current - 1]?.label}</p>
           </div>
         </div>
-        <span className="text-xs font-mono text-[var(--muted)]">{Math.round(progress)}%</span>
+        <span className="text-xs font-mono text-muted">{Math.round(progress)}%</span>
       </div>
     </div>
   )

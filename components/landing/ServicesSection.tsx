@@ -1,4 +1,4 @@
-const SERVICES = [
+﻿const SERVICES = [
   {
     num: "01",
     title: "3D-моделирование",
@@ -38,7 +38,7 @@ const SERVICES = [
 
 export function ServicesSection() {
   return (
-    <section id="services" className="py-24 bg-[var(--background)] overflow-hidden">
+    <section id="services" className="py-24 bg-background overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Asymmetric header */}
         <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-16">
@@ -51,7 +51,7 @@ export function ServicesSection() {
               Наши услуги
             </h2>
           </div>
-          <p className="text-[var(--muted)] max-w-xs text-sm leading-relaxed lg:text-right">
+          <p className="text-muted max-w-xs text-sm leading-relaxed lg:text-right">
             Полный цикл от идеи до готового изделия — моделирование, печать и финишная обработка.
           </p>
         </div>
@@ -60,11 +60,11 @@ export function ServicesSection() {
           {SERVICES.map((svc) => (
             <div
               key={svc.title}
-              className="group relative p-7 rounded-2xl border border-[var(--border)] bg-[var(--surface)] hover:border-[var(--accent-border)] transition-all duration-300 overflow-hidden"
+              className="group relative p-7 rounded-2xl border border-border bg-surface hover:border-(--accent-border) transition-all duration-300 overflow-hidden"
             >
               {/* Ghost number background */}
               <div
-                className="absolute -top-3 -right-1 text-9xl font-black text-[var(--accent)] opacity-[0.04] select-none pointer-events-none leading-none"
+                className="absolute -top-3 -right-1 text-9xl font-black text-accent opacity-[0.04] select-none pointer-events-none leading-none"
                 style={{ fontFamily: "Syne, sans-serif" }}
               >
                 {svc.num}
@@ -74,21 +74,21 @@ export function ServicesSection() {
               <div className="absolute inset-0 bg-gradient-to-br from-[var(--accent-subtle)] via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl" />
 
               <div className="relative">
-                <span className="text-xs font-mono font-semibold text-[var(--accent)] mb-5 block tracking-widest">
+                <span className="text-xs font-mono font-semibold text-accent mb-5 block tracking-widest">
                   {svc.num}
                 </span>
                 <h3
-                  className="text-xl font-bold text-[var(--foreground)] mb-3"
+                  className="text-xl font-bold text-foreground mb-3"
                   style={{ fontFamily: "Syne, sans-serif" }}
                 >
                   {svc.title}
                 </h3>
-                <p className="text-sm text-[var(--muted)] leading-relaxed mb-5">{svc.description}</p>
+                <p className="text-sm text-muted leading-relaxed mb-5">{svc.description}</p>
                 <div className="flex flex-wrap gap-1.5">
                   {svc.tags.map((tag) => (
                     <span
                       key={tag}
-                      className="px-2.5 py-1 rounded-lg text-xs font-mono bg-[var(--background)] text-[var(--muted)] border border-[var(--border)]"
+                      className="px-2.5 py-1 rounded-lg text-xs font-mono bg-background text-muted border border-border"
                     >
                       {tag}
                     </span>

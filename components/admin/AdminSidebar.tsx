@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { signOut } from "@/lib/auth-client"
 import { cn } from "@/lib/utils"
@@ -22,16 +22,16 @@ export function AdminSidebar() {
   }
 
   return (
-    <aside className="w-56 shrink-0 border-r border-[var(--border)] bg-[var(--surface)] flex flex-col min-h-screen">
+    <aside className="w-56 shrink-0 border-r border-border bg-surface flex flex-col min-h-screen">
       {/* Logo */}
-      <div className="h-16 flex items-center px-5 border-b border-[var(--border)]">
+      <div className="h-16 flex items-center px-5 border-b border-border">
         <Link href="/admin" className="flex items-center gap-2">
-          <div className="w-6 h-6 rounded-md bg-[var(--accent)] flex items-center justify-center">
+          <div className="w-6 h-6 rounded-md bg-accent flex items-center justify-center">
             <svg width="12" height="12" fill="none" viewBox="0 0 24 24">
               <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </div>
-          <span className="font-black text-sm text-[var(--foreground)]" style={{ fontFamily: "Syne, sans-serif" }}>
+          <span className="font-black text-sm text-foreground" style={{ fontFamily: "Syne, sans-serif" }}>
             Siblay
           </span>
         </Link>
@@ -50,8 +50,8 @@ export function AdminSidebar() {
               className={cn(
                 "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
                 active
-                  ? "bg-[var(--accent-subtle)] text-[var(--accent)]"
-                  : "text-[var(--muted)] hover:text-[var(--foreground)] hover:bg-[var(--background)]",
+                  ? "bg-(--accent-subtle) text-accent"
+                  : "text-muted hover:text-foreground hover:bg-background",
               )}
             >
               <span className="text-base">{item.icon}</span>
@@ -62,16 +62,16 @@ export function AdminSidebar() {
       </nav>
 
       {/* Bottom */}
-      <div className="px-3 pb-4 border-t border-[var(--border)] pt-3">
+      <div className="px-3 pb-4 border-t border-border pt-3">
         <Link
           href="/"
-          className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-[var(--muted)] hover:text-[var(--foreground)] hover:bg-[var(--background)] transition-colors"
+          className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-muted hover:text-foreground hover:bg-background transition-colors"
         >
           <span>↗</span> На сайт
         </Link>
         <button
           onClick={handleSignOut}
-          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-[var(--muted)] hover:text-[var(--error)] hover:bg-[var(--background)] transition-colors"
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-muted hover:text-destructive hover:bg-background transition-colors"
         >
           <span>⏻</span> Выйти
         </button>

@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { Toaster as Sonner, type ToasterProps } from "sonner"
 
@@ -10,10 +10,10 @@ const Toaster = ({ ...props }: ToasterProps) => {
       toastOptions={{
         classNames: {
           toast:
-            "group toast group-[.toaster]:bg-[var(--surface)] group-[.toaster]:text-[var(--foreground)] group-[.toaster]:border-[var(--border)] group-[.toaster]:shadow-lg",
-          description: "group-[.toast]:text-[var(--muted)]",
-          actionButton: "group-[.toast]:bg-[var(--accent)] group-[.toast]:text-white",
-          cancelButton: "group-[.toast]:bg-[var(--surface)] group-[.toast]:text-[var(--muted)]",
+            "group toast group-[.toaster]:bg-surface group-[.toaster]:text-foreground group-[.toaster]:border-border group-[.toaster]:shadow-lg",
+          description: "group-[.toast]:text-muted",
+          actionButton: "group-[.toast]:bg-accent group-[.toast]:text-white",
+          cancelButton: "group-[.toast]:bg-surface group-[.toast]:text-muted",
         },
       }}
       {...props}

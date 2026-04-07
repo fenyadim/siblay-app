@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useFormContext } from "react-hook-form"
 import { Textarea } from "@/components/ui/textarea"
@@ -19,10 +19,10 @@ export function Step5Comment() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-black text-[var(--foreground)] mb-1" style={{ fontFamily: "Syne, sans-serif" }}>
+        <h2 className="text-2xl font-black text-foreground mb-1" style={{ fontFamily: "Syne, sans-serif" }}>
           Комментарии к заказу
         </h2>
-        <p className="text-sm text-[var(--muted)]">Необязательный шаг — пропустите, если нет особых требований</p>
+        <p className="text-sm text-muted">Необязательный шаг — пропустите, если нет особых требований</p>
       </div>
 
       <div className="relative">
@@ -30,24 +30,24 @@ export function Step5Comment() {
           {...register("comment")}
           rows={6}
           placeholder="Опишите особые требования: допуски, цель использования, пожелания по качеству поверхности..."
-          className="bg-[var(--background)] border-[var(--border)] text-[var(--foreground)] placeholder:text-[var(--placeholder)] focus-visible:ring-0 focus-visible:border-[var(--accent)] resize-none transition-colors"
+          className="bg-background border-border text-foreground placeholder:text-(--placeholder) focus-visible:ring-0 focus-visible:border-accent resize-none transition-colors"
         />
         <div className="absolute bottom-3 right-3">
           <span className={cn(
             "text-xs font-mono",
-            comment.length > 1800 ? "text-[var(--warning)]" : "text-[var(--muted)]"
+            comment.length > 1800 ? "text-(--warning)" : "text-muted"
           )}>
             {comment.length} / 2000
           </span>
         </div>
       </div>
 
-      <div className="rounded-xl border border-[var(--border)] bg-[var(--background)] p-4">
-        <p className="text-xs font-semibold text-[var(--foreground)] mb-3">Что полезно указать:</p>
+      <div className="rounded-xl border border-border bg-background p-4">
+        <p className="text-xs font-semibold text-foreground mb-3">Что полезно указать:</p>
         <ul className="space-y-2">
           {HINTS.map((hint) => (
-            <li key={hint} className="flex items-start gap-2 text-xs text-[var(--muted)]">
-              <span className="mt-0.5 w-1.5 h-1.5 rounded-full bg-[var(--accent)] shrink-0" />
+            <li key={hint} className="flex items-start gap-2 text-xs text-muted">
+              <span className="mt-0.5 w-1.5 h-1.5 rounded-full bg-accent shrink-0" />
               {hint}
             </li>
           ))}

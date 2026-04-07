@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useState } from "react"
 import { useForm, FormProvider } from "react-hook-form"
@@ -83,7 +83,7 @@ export function OrderFormClient({ materials }: Props) {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--background)] pb-32 lg:pb-12">
+    <div className="min-h-screen bg-background pb-32 lg:pb-12">
       {/* Top accent line */}
       <div className="h-0.5 w-full" style={{ background: "linear-gradient(90deg, var(--accent), #7c3aed)" }} />
 
@@ -92,7 +92,7 @@ export function OrderFormClient({ materials }: Props) {
         <div className="mb-8">
           <span className="label-mono">Оформление заказа</span>
           <h1
-            className="mt-2 text-4xl font-black tracking-tight text-[var(--foreground)]"
+            className="mt-2 text-4xl font-black tracking-tight text-foreground"
             style={{ fontFamily: "Syne, sans-serif" }}
           >
             Новый заказ
@@ -102,9 +102,9 @@ export function OrderFormClient({ materials }: Props) {
         <div className="lg:grid lg:grid-cols-[1fr_300px] gap-8 items-start">
           <FormProvider {...methods}>
             {/* Main card */}
-            <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] overflow-hidden">
+            <div className="rounded-2xl border border-border bg-surface overflow-hidden">
               {/* Stepper header */}
-              <div className="px-6 lg:px-8 pt-6 pb-5 border-b border-[var(--border)] bg-[var(--surface-raised)]">
+              <div className="px-6 lg:px-8 pt-6 pb-5 border-b border-border bg-surface-raised">
                 <OrderStepper current={step} />
               </div>
 
@@ -114,7 +114,7 @@ export function OrderFormClient({ materials }: Props) {
               </div>
 
               {/* Navigation footer */}
-              <div className="px-6 lg:px-8 py-5 border-t border-[var(--border)] bg-[var(--surface-raised)] flex items-center justify-between gap-3">
+              <div className="px-6 lg:px-8 py-5 border-t border-border bg-surface-raised flex items-center justify-between gap-3">
                 <button
                   type="button"
                   onClick={() => {
@@ -122,7 +122,7 @@ export function OrderFormClient({ materials }: Props) {
                     window.scrollTo({ top: 0, behavior: "smooth" })
                   }}
                   disabled={step === 1}
-                  className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[var(--border)] text-sm font-medium text-[var(--foreground)] hover:border-[var(--accent-border)] hover:text-[var(--accent)] transition-colors disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:border-[var(--border)] disabled:hover:text-[var(--foreground)]"
+                  className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-border text-sm font-medium text-foreground hover:border-(--accent-border) hover:text-accent transition-colors disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:border-border disabled:hover:text-foreground"
                 >
                   <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M19 12H5M12 5l-7 7 7 7" />

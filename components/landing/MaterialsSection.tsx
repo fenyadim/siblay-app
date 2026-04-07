@@ -1,4 +1,4 @@
-import { getMaterialsWithColors } from "@/actions/materials"
+﻿import { getMaterialsWithColors } from "@/actions/materials"
 
 // Rich details shown on the landing page — separate from the order form data
 const MATERIAL_DETAILS: Record<string, { full: string; props: string[]; desc: string }> = {
@@ -38,7 +38,7 @@ export async function MaterialsSection() {
   const materials = await getMaterialsWithColors()
 
   return (
-    <section className="py-24 bg-[var(--surface)] border-y border-[var(--border)] overflow-hidden">
+    <section className="py-24 bg-surface border-y border-border overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Asymmetric header */}
         <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-16">
@@ -51,7 +51,7 @@ export async function MaterialsSection() {
               Материалы
             </h2>
           </div>
-          <p className="text-[var(--muted)] max-w-xs text-sm leading-relaxed lg:text-right">
+          <p className="text-muted max-w-xs text-sm leading-relaxed lg:text-right">
             Подбираем материал под ваши задачи — от гибких прокладок до жёстких инженерных деталей.
           </p>
         </div>
@@ -64,7 +64,7 @@ export async function MaterialsSection() {
             return (
               <div
                 key={mat.name}
-                className="group relative card-hover p-5 rounded-2xl border border-[var(--border)] bg-[var(--surface-raised)] flex flex-col hover:border-[var(--accent-border)] transition-all duration-300 overflow-hidden"
+                className="group relative card-hover p-5 rounded-2xl border border-border bg-surface-raised flex flex-col hover:border-(--accent-border) transition-all duration-300 overflow-hidden"
               >
                 {/* Color glow background */}
                 <div
@@ -85,24 +85,24 @@ export async function MaterialsSection() {
                     style={{ background: mat.color, boxShadow: `0 0 8px ${mat.color}66` }}
                   />
                   <span
-                    className="text-xl font-black text-[var(--foreground)]"
+                    className="text-xl font-black text-foreground"
                     style={{ fontFamily: "Syne, sans-serif" }}
                   >
                     {mat.name}
                   </span>
                 </div>
-                <p className="text-xs text-[var(--muted)] font-mono mb-3 leading-snug relative">{details.full}</p>
-                <p className="text-xs text-[var(--muted)] leading-relaxed flex-1 relative">{details.desc}</p>
+                <p className="text-xs text-muted font-mono mb-3 leading-snug relative">{details.full}</p>
+                <p className="text-xs text-muted leading-relaxed flex-1 relative">{details.desc}</p>
                 <div className="mt-4 space-y-1 relative">
                   {details.props.map((p) => (
-                    <div key={p} className="flex items-center gap-1.5 text-xs text-[var(--muted)]">
-                      <span className="text-[var(--accent)]">·</span>
+                    <div key={p} className="flex items-center gap-1.5 text-xs text-muted">
+                      <span className="text-accent">·</span>
                       {p}
                     </div>
                   ))}
                 </div>
-                <div className="mt-4 pt-3 border-t border-[var(--border)] relative">
-                  <span className="text-sm font-mono font-medium text-[var(--accent)]">{mat.price}</span>
+                <div className="mt-4 pt-3 border-t border-border relative">
+                  <span className="text-sm font-mono font-medium text-accent">{mat.price}</span>
                 </div>
               </div>
             )

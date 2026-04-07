@@ -1,4 +1,4 @@
-const STEPS = [
+﻿const STEPS = [
   {
     num: "01",
     title: "Заявка",
@@ -23,12 +23,12 @@ const STEPS = [
 
 export function HowItWorksSection() {
   return (
-    <section id="how-it-works" className="py-24 bg-[var(--surface)] border-y border-[var(--border)] overflow-hidden">
+    <section id="how-it-works" className="py-24 bg-surface border-y border-border overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <span className="label-mono mb-3 block">Процесс</span>
           <h2
-            className="text-5xl font-black tracking-tight text-[var(--foreground)]"
+            className="text-5xl font-black tracking-tight text-foreground"
             style={{ fontFamily: "Syne, sans-serif" }}
           >
             Как мы работаем
@@ -59,18 +59,18 @@ export function HowItWorksSection() {
                       background: "radial-gradient(circle, var(--accent) 0%, transparent 70%)",
                     }}
                   />
-                  <div className="absolute inset-0 rounded-full border border-[var(--accent-border)] bg-[var(--surface)] flex items-center justify-center">
-                    <span className="text-sm font-mono font-bold text-[var(--accent)]">{step.num}</span>
+                  <div className="absolute inset-0 rounded-full border border-(--accent-border) bg-surface flex items-center justify-center">
+                    <span className="text-sm font-mono font-bold text-accent">{step.num}</span>
                   </div>
                 </div>
 
                 <h3
-                  className="text-lg font-bold text-[var(--foreground)] mb-2"
+                  className="text-lg font-bold text-foreground mb-2"
                   style={{ fontFamily: "Syne, sans-serif" }}
                 >
                   {step.title}
                 </h3>
-                <p className="text-sm text-[var(--muted)] leading-relaxed">{step.description}</p>
+                <p className="text-sm text-muted leading-relaxed">{step.description}</p>
               </div>
             </div>
           ))}

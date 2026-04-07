@@ -1,4 +1,4 @@
-import {
+﻿import {
   Accordion,
   AccordionContent,
   AccordionItem,
@@ -38,7 +38,7 @@ const FAQ = [
 
 export function FAQSection() {
   return (
-    <section className="py-24 bg-[var(--background)]">
+    <section className="py-24 bg-background">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_2fr] gap-12 lg:gap-20">
           {/* Left: sticky heading */}
@@ -52,7 +52,7 @@ export function FAQSection() {
               <br />
               вопросы
             </h2>
-            <p className="text-sm text-[var(--muted)] leading-relaxed">
+            <p className="text-sm text-muted leading-relaxed">
               Не нашли ответ? Напишите нам — ответим в течение часа.
             </p>
           </div>
@@ -64,12 +64,12 @@ export function FAQSection() {
                 <AccordionItem
                   key={i}
                   value={`item-${i}`}
-                  className="border border-[var(--border)] rounded-xl px-5 bg-[var(--surface)] data-[state=open]:border-[var(--accent-border)] data-[state=open]:bg-[var(--accent-subtle)]/40 transition-all duration-200"
+                  className="border border-border rounded-xl px-5 bg-surface data-[state=open]:border-(--accent-border) data-[state=open]:bg-(--accent-subtle)/40 transition-all duration-200"
                 >
-                  <AccordionTrigger className="text-left font-semibold text-[var(--foreground)] hover:no-underline py-5 text-sm gap-4">
+                  <AccordionTrigger className="text-left font-semibold text-foreground hover:no-underline py-5 text-sm gap-4">
                     {item.q}
                   </AccordionTrigger>
-                  <AccordionContent className="text-sm text-[var(--muted)] leading-relaxed pb-5">
+                  <AccordionContent className="text-sm text-muted leading-relaxed pb-5">
                     {item.a}
                   </AccordionContent>
                 </AccordionItem>

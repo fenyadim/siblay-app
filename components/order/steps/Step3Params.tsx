@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useFormContext } from "react-hook-form"
 import { Input } from "@/components/ui/input"
@@ -27,10 +27,10 @@ export function Step3Params() {
   return (
     <div className="space-y-8">
       <div>
-        <h2 className="text-2xl font-black text-[var(--foreground)] mb-1" style={{ fontFamily: "Syne, sans-serif" }}>
+        <h2 className="text-2xl font-black text-foreground mb-1" style={{ fontFamily: "Syne, sans-serif" }}>
           Параметры печати
         </h2>
-        <p className="text-sm text-[var(--muted)]">Укажите размеры изделия и желаемые параметры</p>
+        <p className="text-sm text-muted">Укажите размеры изделия и желаемые параметры</p>
       </div>
 
       {/* Dimensions */}
@@ -39,7 +39,7 @@ export function Step3Params() {
         <div className="grid grid-cols-3 gap-3">
           {DIMS.map(({ key, label }) => (
             <div key={key}>
-              <Label className="text-xs text-[var(--muted)] mb-1.5 block">{label}</Label>
+              <Label className="text-xs text-muted mb-1.5 block">{label}</Label>
               <Input
                 type="number"
                 min={1}
@@ -47,25 +47,25 @@ export function Step3Params() {
                 step={0.1}
                 placeholder="0"
                 {...register(key)}
-                className="bg-[var(--background)] border-[var(--border)] text-[var(--foreground)] focus-visible:ring-0 focus-visible:border-[var(--accent)] transition-colors"
+                className="bg-background border-border text-foreground focus-visible:ring-0 focus-visible:border-accent transition-colors"
               />
               {errors[key] && (
-                <p className="text-xs text-[var(--error)] mt-1">{errors[key]?.message}</p>
+                <p className="text-xs text-destructive mt-1">{errors[key]?.message}</p>
               )}
             </div>
           ))}
         </div>
-        <p className="text-xs text-[var(--muted)] mt-2 font-mono">Максимум: 256×256×256 мм</p>
+        <p className="text-xs text-muted mt-2 font-mono">Максимум: 256×256×256 мм</p>
       </div>
 
       {/* Quantity */}
       <div>
         <p className="label-mono mb-3">Количество</p>
-        <div className="inline-flex items-center rounded-xl border border-[var(--border)] bg-[var(--background)] overflow-hidden">
+        <div className="inline-flex items-center rounded-xl border border-border bg-background overflow-hidden">
           <button
             type="button"
             onClick={() => setValue("quantity", Math.max(1, quantity - 1), { shouldValidate: true })}
-            className="w-10 h-10 flex items-center justify-center text-lg text-[var(--muted)] hover:text-[var(--foreground)] hover:bg-[var(--border)] transition-colors"
+            className="w-10 h-10 flex items-center justify-center text-lg text-muted hover:text-foreground hover:bg-border transition-colors"
           >
             −
           </button>
@@ -74,18 +74,18 @@ export function Step3Params() {
             min={1}
             max={1000}
             {...register("quantity")}
-            className="w-16 h-10 text-center text-sm font-mono font-bold text-[var(--foreground)] bg-transparent focus:outline-none"
+            className="w-16 h-10 text-center text-sm font-mono font-bold text-foreground bg-transparent focus:outline-none"
           />
           <button
             type="button"
             onClick={() => setValue("quantity", Math.min(1000, quantity + 1), { shouldValidate: true })}
-            className="w-10 h-10 flex items-center justify-center text-lg text-[var(--muted)] hover:text-[var(--foreground)] hover:bg-[var(--border)] transition-colors"
+            className="w-10 h-10 flex items-center justify-center text-lg text-muted hover:text-foreground hover:bg-border transition-colors"
           >
             +
           </button>
         </div>
         {errors.quantity && (
-          <p className="text-xs text-[var(--error)] mt-1">{errors.quantity.message}</p>
+          <p className="text-xs text-destructive mt-1">{errors.quantity.message}</p>
         )}
       </div>
 
@@ -110,20 +110,20 @@ export function Step3Params() {
               className={cn(
                 "py-3 px-2 rounded-xl border text-center transition-all duration-150",
                 infill === p.value
-                  ? "border-[var(--accent)] bg-[var(--accent-subtle)]"
-                  : "border-[var(--border)] bg-[var(--background)] hover:border-[var(--accent-border)]",
+                  ? "border-accent bg-(--accent-subtle)"
+                  : "border-border bg-background hover:border-(--accent-border)",
               )}
             >
               <div className={cn(
                 "text-base font-black mb-0.5",
-                infill === p.value ? "text-[var(--accent)]" : "text-[var(--foreground)]",
+                infill === p.value ? "text-accent" : "text-foreground",
               )}
                 style={{ fontFamily: "Syne, sans-serif" }}
               >
                 {p.value}%
               </div>
-              <div className="text-[11px] font-medium text-[var(--muted)]">{p.label}</div>
-              <div className="text-[10px] text-[var(--muted)] mt-0.5">{p.desc}</div>
+              <div className="text-[11px] font-medium text-muted">{p.label}</div>
+              <div className="text-[10px] text-muted mt-0.5">{p.desc}</div>
             </button>
           ))}
         </div>
@@ -137,8 +137,8 @@ export function Step3Params() {
           className="w-full"
         />
         <div className="flex justify-between mt-1.5">
-          <span className="text-xs text-[var(--muted)] font-mono">10%</span>
-          <span className="text-xs text-[var(--muted)] font-mono">100%</span>
+          <span className="text-xs text-muted font-mono">10%</span>
+          <span className="text-xs text-muted font-mono">100%</span>
         </div>
       </div>
     </div>

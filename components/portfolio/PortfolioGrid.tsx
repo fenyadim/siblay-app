@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useState } from "react"
 import { PortfolioCard } from "./PortfolioCard"
@@ -35,8 +35,8 @@ export function PortfolioGrid({ items }: PortfolioGridProps) {
             className={cn(
               "px-4 py-1.5 rounded-full text-sm font-medium border transition-all",
               activeCategory === cat.value
-                ? "bg-[var(--accent)] border-[var(--accent)] text-white"
-                : "border-[var(--border)] text-[var(--muted)] hover:border-[var(--accent-border)] hover:text-[var(--foreground)]",
+                ? "bg-accent border-accent text-white"
+                : "border-border text-muted hover:border-(--accent-border) hover:text-foreground",
             )}
           >
             {cat.label}
@@ -47,7 +47,7 @@ export function PortfolioGrid({ items }: PortfolioGridProps) {
       {filtered.length === 0 ? (
         <div className="text-center py-24">
           <p className="text-4xl mb-3 opacity-20">◈</p>
-          <p className="text-[var(--muted)]">Работ в этой категории пока нет</p>
+          <p className="text-muted">Работ в этой категории пока нет</p>
         </div>
       ) : (
         <div className="columns-1 sm:columns-2 lg:columns-3 gap-4 space-y-4">

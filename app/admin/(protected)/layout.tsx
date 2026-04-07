@@ -1,4 +1,4 @@
-import { redirect } from "next/navigation"
+﻿import { redirect } from "next/navigation"
 import { headers } from "next/headers"
 import { auth } from "@/lib/auth"
 import { AdminSidebar } from "@/components/admin/AdminSidebar"
@@ -15,7 +15,7 @@ export default async function AdminProtectedLayout({
   }
 
   return (
-    <div className="min-h-screen bg-[var(--background)] flex">
+    <div className="min-h-screen bg-background flex">
       <AdminSidebar />
       <main className="flex-1 min-w-0 p-6 lg:p-8">{children}</main>
     </div>

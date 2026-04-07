@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useState } from "react"
 import { useFormContext } from "react-hook-form"
@@ -57,12 +57,12 @@ export function Step1Material({ materials }: Props) {
   return (
     <div>
       <h2
-        className="text-2xl font-black text-[var(--foreground)] mb-1"
+        className="text-2xl font-black text-foreground mb-1"
         style={{ fontFamily: "Syne, sans-serif" }}
       >
         Выберите материал
       </h2>
-      <p className="text-sm text-[var(--muted)] mb-6">
+      <p className="text-sm text-muted mb-6">
         От материала зависит прочность, внешний вид и цена изделия
       </p>
 
@@ -94,10 +94,10 @@ export function Step1Material({ materials }: Props) {
                 "text-left p-4 rounded-xl border-2 transition-all relative select-none",
                 !mat.available && "opacity-60 cursor-not-allowed",
                 mat.available && isSelected
-                  ? "border-[var(--accent)] bg-[var(--accent-subtle)]"
+                  ? "border-accent bg-(--accent-subtle)"
                   : mat.available
-                  ? "border-[var(--border)] bg-[var(--surface)] hover:border-[var(--accent-border)] cursor-pointer"
-                  : "border-[var(--border)] bg-[var(--surface)]",
+                  ? "border-border bg-surface hover:border-(--accent-border) cursor-pointer"
+                  : "border-border bg-surface",
               )}
             >
               <div className="flex items-center gap-3 mb-3">
@@ -106,7 +106,7 @@ export function Step1Material({ materials }: Props) {
                   style={{ background: mat.color, boxShadow: `0 0 8px ${mat.color}66` }}
                 />
                 <span
-                  className="font-black text-lg text-[var(--foreground)]"
+                  className="font-black text-lg text-foreground"
                   style={{ fontFamily: "Syne, sans-serif" }}
                 >
                   {mat.name}
@@ -114,12 +114,12 @@ export function Step1Material({ materials }: Props) {
                 <div className="ml-auto flex items-center gap-1.5 shrink-0">
                   {info && <MaterialInfo mat={mat} info={info} />}
                   {!mat.available && (
-                    <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full bg-[var(--border)] text-[var(--muted)]">
+                    <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full bg-border text-muted">
                       Скоро
                     </span>
                   )}
                   {isSelected && (
-                    <div className="w-5 h-5 rounded-full bg-[var(--accent)] flex items-center justify-center">
+                    <div className="w-5 h-5 rounded-full bg-accent flex items-center justify-center">
                       <svg width="10" height="10" fill="none" stroke="white" strokeWidth="2.5" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                       </svg>
@@ -127,18 +127,18 @@ export function Step1Material({ materials }: Props) {
                   )}
                 </div>
               </div>
-              <p className="text-sm text-[var(--muted)] mb-2">{mat.description}</p>
-              <p className="text-xs font-mono text-[var(--muted)] mb-1">
+              <p className="text-sm text-muted mb-2">{mat.description}</p>
+              <p className="text-xs font-mono text-muted mb-1">
                 Лучше всего для: {mat.best}
               </p>
-              <p className="text-sm font-mono font-semibold text-[var(--accent)]">{mat.price}</p>
+              <p className="text-sm font-mono font-semibold text-accent">{mat.price}</p>
             </div>
           )
         })}
       </div>
 
       {errors.material && (
-        <p className="mt-3 text-sm text-[var(--error)]">{errors.material.message}</p>
+        <p className="mt-3 text-sm text-destructive">{errors.material.message}</p>
       )}
     </div>
   )
@@ -167,8 +167,8 @@ function MaterialInfo({
             "text-[10px] font-bold font-mono leading-none",
             "border transition-colors duration-150 z-10",
             open
-              ? "bg-[var(--accent)] border-[var(--accent)] text-white"
-              : "bg-[var(--background)] border-[var(--border)] text-[var(--muted)] hover:border-[var(--accent)] hover:text-[var(--accent)]",
+              ? "bg-accent border-accent text-white"
+              : "bg-background border-border text-muted hover:border-accent hover:text-accent",
           )}
           aria-label={`Подробнее о ${mat.name}`}
         >
@@ -185,7 +185,7 @@ function MaterialInfo({
           onOpenAutoFocus={(e) => e.preventDefault()}
           onClick={(e) => e.stopPropagation()}
           className={cn(
-            "z-50 w-64 rounded-xl border border-[var(--border)] bg-[var(--surface-raised)] shadow-xl",
+            "z-50 w-64 rounded-xl border border-border bg-surface-raised shadow-xl",
             "p-4 text-sm",
             "animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95",
             "data-[side=bottom]:slide-in-from-top-2 data-[side=top]:slide-in-from-bottom-2",
@@ -198,33 +198,33 @@ function MaterialInfo({
               style={{ background: mat.color }}
             />
             <div>
-              <p className="font-bold text-[var(--foreground)]" style={{ fontFamily: "Syne, sans-serif" }}>
+              <p className="font-bold text-foreground" style={{ fontFamily: "Syne, sans-serif" }}>
                 {mat.name}
               </p>
-              <p className="text-[11px] text-[var(--muted)] font-mono">{info.full}</p>
+              <p className="text-[11px] text-muted font-mono">{info.full}</p>
             </div>
           </div>
 
           {/* Stats */}
           <div className="grid grid-cols-2 gap-2 mb-3">
-            <div className="rounded-lg bg-[var(--background)] px-3 py-2">
-              <p className="text-[10px] text-[var(--muted)] font-mono uppercase tracking-wide mb-0.5">
+            <div className="rounded-lg bg-background px-3 py-2">
+              <p className="text-[10px] text-muted font-mono uppercase tracking-wide mb-0.5">
                 Темп.
               </p>
-              <p className="text-xs font-semibold text-[var(--foreground)]">{info.temp}</p>
+              <p className="text-xs font-semibold text-foreground">{info.temp}</p>
             </div>
-            <div className="rounded-lg bg-[var(--background)] px-3 py-2">
-              <p className="text-[10px] text-[var(--muted)] font-mono uppercase tracking-wide mb-0.5">
+            <div className="rounded-lg bg-background px-3 py-2">
+              <p className="text-[10px] text-muted font-mono uppercase tracking-wide mb-0.5">
                 Прочность
               </p>
-              <p className="text-xs font-semibold text-[var(--foreground)]">{info.strength}</p>
+              <p className="text-xs font-semibold text-foreground">{info.strength}</p>
             </div>
           </div>
 
           {/* Note */}
-          <p className="text-xs text-[var(--muted)] leading-relaxed">{info.note}</p>
+          <p className="text-xs text-muted leading-relaxed">{info.note}</p>
 
-          <Popover.Arrow className="fill-[var(--border)]" width={12} height={6} />
+          <Popover.Arrow className="fill-border" width={12} height={6} />
         </Popover.Content>
       </Popover.Portal>
     </Popover.Root>

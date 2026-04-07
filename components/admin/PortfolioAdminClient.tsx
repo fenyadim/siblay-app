@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useState, useTransition, useRef, useCallback } from "react"
 import { useForm, useFieldArray, type Resolver } from "react-hook-form"
@@ -120,7 +120,7 @@ function ImageUploader({
 
   return (
     <div>
-      <label className="block text-xs text-[var(--muted)] mb-1">
+      <label className="block text-xs text-muted mb-1">
         Фотографии *
       </label>
 
@@ -132,12 +132,12 @@ function ImageUploader({
               <img
                 src={url}
                 alt=""
-                className="w-20 h-20 rounded-xl object-cover border border-[var(--border)]"
+                className="w-20 h-20 rounded-xl object-cover border border-border"
               />
               <button
                 type="button"
                 onClick={() => removeImage(i)}
-                className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-[var(--error)] text-white text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-destructive text-white text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
               >
                 ×
               </button>
@@ -157,26 +157,26 @@ function ImageUploader({
           {uploading.map((f) => (
             <div
               key={f.id}
-              className="flex items-center gap-3 px-3 py-2 rounded-lg border border-[var(--border)] bg-[var(--background)] text-sm"
+              className="flex items-center gap-3 px-3 py-2 rounded-lg border border-border bg-background text-sm"
             >
-              <span className="text-[var(--foreground)] truncate flex-1">
+              <span className="text-foreground truncate flex-1">
                 {f.name}
               </span>
               {f.error ? (
                 <>
-                  <span className="text-xs text-[var(--error)]">{f.error}</span>
+                  <span className="text-xs text-destructive">{f.error}</span>
                   <button
                     type="button"
                     onClick={() => removeUploadError(f.id)}
-                    className="text-xs text-[var(--muted)] hover:text-[var(--foreground)]"
+                    className="text-xs text-muted hover:text-foreground"
                   >
                     ×
                   </button>
                 </>
               ) : (
-                <div className="w-20 h-1.5 rounded-full bg-[var(--border)] overflow-hidden">
+                <div className="w-20 h-1.5 rounded-full bg-border overflow-hidden">
                   <div
-                    className="h-full bg-[var(--accent)] rounded-full transition-all duration-300"
+                    className="h-full bg-accent rounded-full transition-all duration-300"
                     style={{ width: `${f.progress}%` }}
                   />
                 </div>
@@ -198,8 +198,8 @@ function ImageUploader({
         className={cn(
           "flex flex-col items-center justify-center gap-2 p-6 rounded-xl border-2 border-dashed cursor-pointer transition-colors",
           dragOver
-            ? "border-[var(--accent)] bg-[var(--accent-subtle)]"
-            : "border-[var(--border)] bg-[var(--background)] hover:border-[var(--accent-border)]",
+            ? "border-accent bg-(--accent-subtle)"
+            : "border-border bg-background hover:border-(--accent-border)",
         )}
       >
         <svg
@@ -216,11 +216,11 @@ function ImageUploader({
           <polyline points="17 8 12 3 7 8" />
           <line x1="12" y1="3" x2="12" y2="15" />
         </svg>
-        <p className="text-xs text-[var(--muted)]">
+        <p className="text-xs text-muted">
           Перетащите фото или{" "}
-          <span className="text-[var(--accent)] font-medium">выберите файлы</span>
+          <span className="text-accent font-medium">выберите файлы</span>
         </p>
-        <p className="text-[10px] text-[var(--placeholder)]">
+        <p className="text-[10px] text-(--placeholder)">
           JPG, PNG, WEBP, HEIC
         </p>
         <input
@@ -273,19 +273,19 @@ function PortfolioForm({
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <label className="block text-xs text-[var(--muted)] mb-1">Название *</label>
+          <label className="block text-xs text-muted mb-1">Название *</label>
           <input
             {...register("title")}
-            className="w-full rounded-lg border border-[var(--border)] bg-[var(--background)] px-3 py-2 text-sm text-[var(--foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
+            className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
           />
           {errors.title && <p className="text-xs text-red-500 mt-1">{errors.title.message}</p>}
         </div>
 
         <div>
-          <label className="block text-xs text-[var(--muted)] mb-1">Категория *</label>
+          <label className="block text-xs text-muted mb-1">Категория *</label>
           <select
             {...register("category")}
-            className="w-full rounded-lg border border-[var(--border)] bg-[var(--background)] px-3 py-2 text-sm text-[var(--foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
+            className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
           >
             <option value="">Выберите…</option>
             {PORTFOLIO_CATEGORIES.map((c) => (
@@ -298,10 +298,10 @@ function PortfolioForm({
         </div>
 
         <div>
-          <label className="block text-xs text-[var(--muted)] mb-1">Материал *</label>
+          <label className="block text-xs text-muted mb-1">Материал *</label>
           <input
             {...register("material")}
-            className="w-full rounded-lg border border-[var(--border)] bg-[var(--background)] px-3 py-2 text-sm text-[var(--foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
+            className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
           />
           {errors.material && <p className="text-xs text-red-500 mt-1">{errors.material.message}</p>}
         </div>
@@ -311,20 +311,20 @@ function PortfolioForm({
             type="checkbox"
             id="published"
             {...register("published")}
-            className="rounded border-[var(--border)] accent-[var(--accent)]"
+            className="rounded border-border accent-accent"
           />
-          <label htmlFor="published" className="text-sm text-[var(--foreground)]">
+          <label htmlFor="published" className="text-sm text-foreground">
             Опубликовано
           </label>
         </div>
       </div>
 
       <div>
-        <label className="block text-xs text-[var(--muted)] mb-1">Описание</label>
+        <label className="block text-xs text-muted mb-1">Описание</label>
         <textarea
           {...register("description")}
           rows={3}
-          className="w-full rounded-lg border border-[var(--border)] bg-[var(--background)] px-3 py-2 text-sm text-[var(--foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)] resize-none"
+          className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent resize-none"
         />
       </div>
 
@@ -339,14 +339,14 @@ function PortfolioForm({
         <button
           type="submit"
           disabled={isPending}
-          className="px-5 py-2 rounded-lg bg-[var(--accent)] text-white text-sm font-medium hover:bg-[var(--accent-hover)] transition-colors disabled:opacity-50"
+          className="px-5 py-2 rounded-lg bg-accent text-white text-sm font-medium hover:bg-(--accent-hover) transition-colors disabled:opacity-50"
         >
           {isPending ? "Сохранение…" : "Сохранить"}
         </button>
         <button
           type="button"
           onClick={onCancel}
-          className="px-5 py-2 rounded-lg border border-[var(--border)] text-sm text-[var(--muted)] hover:text-[var(--foreground)] transition-colors"
+          className="px-5 py-2 rounded-lg border border-border text-sm text-muted hover:text-foreground transition-colors"
         >
           Отмена
         </button>
@@ -426,22 +426,22 @@ export function PortfolioAdminClient({ items: initialItems, categoryLabels }: Pr
           <div className="mb-4">
             <button
               onClick={() => { setMode("create"); setError(null) }}
-              className="px-4 py-2 rounded-lg bg-[var(--accent)] text-white text-sm font-medium hover:bg-[var(--accent-hover)] transition-colors"
+              className="px-4 py-2 rounded-lg bg-accent text-white text-sm font-medium hover:bg-(--accent-hover) transition-colors"
             >
               + Добавить работу
             </button>
           </div>
 
           {items.length === 0 ? (
-            <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-8 text-center text-[var(--muted)]">
+            <div className="rounded-xl border border-border bg-surface p-8 text-center text-muted">
               Нет работ в портфолио
             </div>
           ) : (
-            <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] overflow-hidden">
+            <div className="rounded-xl border border-border bg-surface overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b border-[var(--border)] bg-[var(--background)]">
+                    <tr className="border-b border-border bg-background">
                       {["Название", "Категория", "Материал", "Фото", "Статус", ""].map((h) => (
                         <th key={h} className="text-left px-4 py-3 label-mono font-normal">
                           {h}
@@ -449,29 +449,29 @@ export function PortfolioAdminClient({ items: initialItems, categoryLabels }: Pr
                       ))}
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-[var(--border)]">
+                  <tbody className="divide-y divide-border">
                     {items.map((item) => (
-                      <tr key={item.id} className="hover:bg-[var(--background)] transition-colors">
+                      <tr key={item.id} className="hover:bg-background transition-colors">
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-3">
                             {item.images[0] && (
                               <img
                                 src={item.images[0]}
                                 alt=""
-                                className="w-10 h-10 rounded-md object-cover border border-[var(--border)]"
+                                className="w-10 h-10 rounded-md object-cover border border-border"
                               />
                             )}
-                            <span className="font-medium text-[var(--foreground)]">{item.title}</span>
+                            <span className="font-medium text-foreground">{item.title}</span>
                           </div>
                         </td>
-                        <td className="px-4 py-3 text-[var(--muted)]">
+                        <td className="px-4 py-3 text-muted">
                           {categoryLabels[item.category] ?? item.category}
                         </td>
-                        <td className="px-4 py-3 font-mono text-xs text-[var(--foreground)]">
+                        <td className="px-4 py-3 font-mono text-xs text-foreground">
                           {item.material}
                         </td>
                         <td className="px-4 py-3">
-                          <span className="text-xs font-mono text-[var(--muted)]">
+                          <span className="text-xs font-mono text-muted">
                             {item.images.length}
                           </span>
                         </td>
@@ -480,7 +480,7 @@ export function PortfolioAdminClient({ items: initialItems, categoryLabels }: Pr
                             className={
                               item.published
                                 ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
-                                : "bg-[var(--surface)] text-[var(--muted)] border border-[var(--border)]"
+                                : "bg-surface text-muted border border-border"
                             }
                           >
                             {item.published ? "Опубликовано" : "Скрыто"}
@@ -494,7 +494,7 @@ export function PortfolioAdminClient({ items: initialItems, categoryLabels }: Pr
                                 setMode("edit")
                                 setError(null)
                               }}
-                              className="text-xs text-[var(--accent)] hover:underline"
+                              className="text-xs text-accent hover:underline"
                             >
                               Изменить
                             </button>
@@ -518,9 +518,9 @@ export function PortfolioAdminClient({ items: initialItems, categoryLabels }: Pr
       )}
 
       {(mode === "create" || mode === "edit") && (
-        <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-6">
+        <div className="rounded-xl border border-border bg-surface p-6">
           <h2
-            className="text-lg font-bold text-[var(--foreground)] mb-5"
+            className="text-lg font-bold text-foreground mb-5"
             style={{ fontFamily: "Syne, sans-serif" }}
           >
             {mode === "create" ? "Новая работа" : "Редактировать работу"}

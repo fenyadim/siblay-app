@@ -1,4 +1,4 @@
-import { prisma } from "@/lib/prisma"
+﻿import { prisma } from "@/lib/prisma"
 import { ORDER_STATUS_LABELS, ORDER_STATUS_COLORS, formatDate, formatPrice } from "@/lib/utils"
 import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
@@ -28,7 +28,7 @@ export default async function AdminOrdersPage({ searchParams }: Props) {
 
   return (
     <div>
-      <h1 className="text-3xl font-black text-[var(--foreground)] mb-6" style={{ fontFamily: "Syne, sans-serif" }}>
+      <h1 className="text-3xl font-black text-foreground mb-6" style={{ fontFamily: "Syne, sans-serif" }}>
         Заказы
       </h1>
 
@@ -40,8 +40,8 @@ export default async function AdminOrdersPage({ searchParams }: Props) {
             href={opt.value === "all" ? "/admin/orders" : `/admin/orders?status=${opt.value}`}
             className={`px-3.5 py-1.5 rounded-lg text-sm font-medium border transition-all ${
               (opt.value === "all" && !status) || status === opt.value
-                ? "bg-[var(--accent)] border-[var(--accent)] text-white"
-                : "border-[var(--border)] text-[var(--muted)] hover:border-[var(--accent-border)]"
+                ? "bg-accent border-accent text-white"
+                : "border-border text-muted hover:border-(--accent-border)"
             }`}
           >
             {opt.label}
@@ -50,37 +50,37 @@ export default async function AdminOrdersPage({ searchParams }: Props) {
       </div>
 
       {/* Table */}
-      <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] overflow-hidden">
+      <div className="rounded-xl border border-border bg-surface overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-[var(--border)] bg-[var(--background)]">
+              <tr className="border-b border-border bg-background">
                 {["ID", "Дата", "Клиент", "Материал", "Статус", "Сумма", ""].map((h) => (
                   <th key={h} className="text-left px-4 py-3 label-mono font-normal">{h}</th>
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-[var(--border)]">
+            <tbody className="divide-y divide-border">
               {orders.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-4 py-8 text-center text-[var(--muted)]">
+                  <td colSpan={7} className="px-4 py-8 text-center text-muted">
                     Заказов нет
                   </td>
                 </tr>
               ) : (
                 orders.map((order) => (
-                  <tr key={order.id} className="hover:bg-[var(--background)] transition-colors">
-                    <td className="px-4 py-3 font-mono text-xs text-[var(--muted)]">
+                  <tr key={order.id} className="hover:bg-background transition-colors">
+                    <td className="px-4 py-3 font-mono text-xs text-muted">
                       {order.id.slice(0, 8)}
                     </td>
-                    <td className="px-4 py-3 text-xs text-[var(--muted)] font-mono whitespace-nowrap">
+                    <td className="px-4 py-3 text-xs text-muted font-mono whitespace-nowrap">
                       {formatDate(order.createdAt)}
                     </td>
                     <td className="px-4 py-3">
-                      <p className="font-medium text-[var(--foreground)]">{order.fullName}</p>
-                      <p className="text-xs text-[var(--muted)]">{order.email}</p>
+                      <p className="font-medium text-foreground">{order.fullName}</p>
+                      <p className="text-xs text-muted">{order.email}</p>
                     </td>
-                    <td className="px-4 py-3 font-mono text-xs text-[var(--foreground)]">
+                    <td className="px-4 py-3 font-mono text-xs text-foreground">
                       {order.material}
                     </td>
                     <td className="px-4 py-3">
@@ -88,13 +88,13 @@ export default async function AdminOrdersPage({ searchParams }: Props) {
                         {ORDER_STATUS_LABELS[order.status]}
                       </Badge>
                     </td>
-                    <td className="px-4 py-3 font-mono text-sm text-[var(--foreground)]">
+                    <td className="px-4 py-3 font-mono text-sm text-foreground">
                       {order.estimatedPrice ? formatPrice(order.estimatedPrice) : "—"}
                     </td>
                     <td className="px-4 py-3">
                       <Link
                         href={`/admin/orders/${order.id}`}
-                        className="text-xs text-[var(--accent)] hover:underline"
+                        className="text-xs text-accent hover:underline"
                       >
                         Открыть →
                       </Link>

@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useState, useTransition } from "react"
 import { createMaterial, updateMaterial, updateMaterialColor, addMaterialColor, deleteMaterialColor } from "@/actions/materials"
@@ -39,9 +39,9 @@ function EditableField({
     return (
       <button
         onClick={() => { setDraft(value); setEditing(true) }}
-        className={`text-left hover:text-[var(--accent)] transition-colors ${mono ? "font-mono" : ""}`}
+        className={`text-left hover:text-accent transition-colors ${mono ? "font-mono" : ""}`}
       >
-        {value || <span className="text-[var(--muted)] italic">{placeholder ?? "—"}</span>}
+        {value || <span className="text-muted italic">{placeholder ?? "—"}</span>}
       </button>
     )
   }
@@ -56,17 +56,17 @@ function EditableField({
           if (e.key === "Enter") { onSave(draft); setEditing(false) }
           if (e.key === "Escape") { setEditing(false) }
         }}
-        className={`border border-[var(--accent)] rounded px-2 py-0.5 text-sm bg-[var(--background)] text-[var(--foreground)] focus:outline-none w-full min-w-0 ${mono ? "font-mono" : ""}`}
+        className={`border border-accent rounded px-2 py-0.5 text-sm bg-background text-foreground focus:outline-none w-full min-w-0 ${mono ? "font-mono" : ""}`}
       />
       <button
         onClick={() => { onSave(draft); setEditing(false) }}
-        className="text-[var(--accent)] text-xs font-medium whitespace-nowrap"
+        className="text-accent text-xs font-medium whitespace-nowrap"
       >
         ✓
       </button>
       <button
         onClick={() => setEditing(false)}
-        className="text-[var(--muted)] text-xs"
+        className="text-muted text-xs"
       >
         ✕
       </button>
@@ -93,7 +93,7 @@ function ColorRow({
   }
 
   return (
-    <div className="flex items-center gap-3 py-2 border-b border-[var(--border)] last:border-0 flex-wrap">
+    <div className="flex items-center gap-3 py-2 border-b border-border last:border-0 flex-wrap">
       {/* Color dot + hex editor */}
       <div className="flex items-center gap-1.5">
         <ColorDot hex={color.hex} hex2={color.hex2} />
@@ -107,13 +107,13 @@ function ColorRow({
                 if (e.key === "Enter") { save({ hex: hexDraft }); setEditingHex(false) }
                 if (e.key === "Escape") setEditingHex(false)
               }}
-              className="font-mono text-xs border border-[var(--accent)] rounded px-1.5 py-0.5 bg-[var(--background)] text-[var(--foreground)] focus:outline-none w-24"
+              className="font-mono text-xs border border-accent rounded px-1.5 py-0.5 bg-background text-foreground focus:outline-none w-24"
             />
-            <button onClick={() => { save({ hex: hexDraft }); setEditingHex(false) }} className="text-[var(--accent)] text-xs">✓</button>
-            <button onClick={() => setEditingHex(false)} className="text-[var(--muted)] text-xs">✕</button>
+            <button onClick={() => { save({ hex: hexDraft }); setEditingHex(false) }} className="text-accent text-xs">✓</button>
+            <button onClick={() => setEditingHex(false)} className="text-muted text-xs">✕</button>
           </div>
         ) : (
-          <button onClick={() => { setHexDraft(color.hex); setEditingHex(true) }} className="font-mono text-xs text-[var(--muted)] hover:text-[var(--accent)] transition-colors">
+          <button onClick={() => { setHexDraft(color.hex); setEditingHex(true) }} className="font-mono text-xs text-muted hover:text-accent transition-colors">
             {color.hex}
           </button>
         )}
@@ -132,16 +132,16 @@ function ColorRow({
                   if (e.key === "Enter") { save({ hex2: hex2Draft || null }); setEditingHex2(false) }
                   if (e.key === "Escape") setEditingHex2(false)
                 }}
-                className="font-mono text-xs border border-[var(--accent)] rounded px-1.5 py-0.5 bg-[var(--background)] text-[var(--foreground)] focus:outline-none w-24"
+                className="font-mono text-xs border border-accent rounded px-1.5 py-0.5 bg-background text-foreground focus:outline-none w-24"
                 placeholder="#hex2"
               />
-              <button onClick={() => { save({ hex2: hex2Draft || null }); setEditingHex2(false) }} className="text-[var(--accent)] text-xs">✓</button>
+              <button onClick={() => { save({ hex2: hex2Draft || null }); setEditingHex2(false) }} className="text-accent text-xs">✓</button>
               <button onClick={() => { setShowHex2(false); save({ hex2: null }) }} className="text-red-400 text-xs" title="Убрать цвет 2">✕</button>
             </div>
           ) : (
             <button
               onClick={() => { setHex2Draft(color.hex2 ?? ""); setEditingHex2(true) }}
-              className="font-mono text-xs text-[var(--muted)] hover:text-[var(--accent)] transition-colors"
+              className="font-mono text-xs text-muted hover:text-accent transition-colors"
             >
               {color.hex2 ?? <span className="italic opacity-60">цвет 2</span>}
             </button>
@@ -149,7 +149,7 @@ function ColorRow({
         ) : (
           <button
             onClick={() => setShowHex2(true)}
-            className="text-xs text-[var(--accent)] opacity-60 hover:opacity-100 transition-opacity"
+            className="text-xs text-accent opacity-60 hover:opacity-100 transition-opacity"
           >
             ＋ цвет 2
           </button>
@@ -187,7 +187,7 @@ function ColorRow({
             startTransition(() => deleteMaterialColor(color.id))
           }
         }}
-        className="text-[var(--muted)] hover:text-red-500 transition-colors text-sm"
+        className="text-muted hover:text-red-500 transition-colors text-sm"
       >
         ✕
       </button>
@@ -224,7 +224,7 @@ function AddColorForm({ materialId }: { materialId: string }) {
     return (
       <button
         onClick={() => setOpen(true)}
-        className="mt-2 text-xs text-[var(--accent)] hover:underline"
+        className="mt-2 text-xs text-accent hover:underline"
       >
         + Добавить цвет
       </button>
@@ -238,24 +238,24 @@ function AddColorForm({ materialId }: { materialId: string }) {
         value={name}
         onChange={(e) => setName(e.target.value)}
         placeholder="Название"
-        className="border border-[var(--border)] rounded px-2 py-1 text-sm bg-[var(--background)] text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)] w-28"
+        className="border border-border rounded px-2 py-1 text-sm bg-background text-foreground focus:outline-none focus:border-accent w-28"
       />
       <input
         value={hex}
         onChange={(e) => setHex(e.target.value)}
         placeholder="#hex"
-        className="font-mono border border-[var(--border)] rounded px-2 py-1 text-sm bg-[var(--background)] text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)] w-24"
+        className="font-mono border border-border rounded px-2 py-1 text-sm bg-background text-foreground focus:outline-none focus:border-accent w-24"
       />
       {isGradient && (
         <input
           value={hex2}
           onChange={(e) => setHex2(e.target.value)}
           placeholder="#hex2"
-          className="font-mono border border-[var(--border)] rounded px-2 py-1 text-sm bg-[var(--background)] text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)] w-24"
+          className="font-mono border border-border rounded px-2 py-1 text-sm bg-background text-foreground focus:outline-none focus:border-accent w-24"
         />
       )}
       <ColorDot hex={hex} hex2={isGradient ? hex2 : undefined} />
-      <label className="flex items-center gap-1 text-xs text-[var(--muted)] cursor-pointer select-none">
+      <label className="flex items-center gap-1 text-xs text-muted cursor-pointer select-none">
         <input
           type="checkbox"
           checked={isGradient}
@@ -267,11 +267,11 @@ function AddColorForm({ materialId }: { materialId: string }) {
       <button
         disabled={isPending || !name.trim()}
         onClick={handleAdd}
-        className="px-3 py-1 rounded-lg bg-[var(--accent)] text-white text-xs font-medium hover:bg-[var(--accent-hover)] disabled:opacity-40 transition-colors"
+        className="px-3 py-1 rounded-lg bg-accent text-white text-xs font-medium hover:bg-(--accent-hover) disabled:opacity-40 transition-colors"
       >
         {isPending ? "…" : "Добавить"}
       </button>
-      <button onClick={() => setOpen(false)} className="text-xs text-[var(--muted)]">Отмена</button>
+      <button onClick={() => setOpen(false)} className="text-xs text-muted">Отмена</button>
     </div>
   )
 }
@@ -285,14 +285,14 @@ function MaterialCard({ material }: { material: MaterialWithColors }) {
   }
 
   return (
-    <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] overflow-hidden">
+    <div className="rounded-xl border border-border bg-surface overflow-hidden">
       {/* Header */}
-      <div className="flex items-center gap-3 px-5 py-4 border-b border-[var(--border)]">
+      <div className="flex items-center gap-3 px-5 py-4 border-b border-border">
         <div
           className="w-3 h-3 rounded-full shrink-0"
           style={{ background: material.color, boxShadow: `0 0 8px ${material.color}66` }}
         />
-        <span className="font-black text-lg text-[var(--foreground)]" style={{ fontFamily: "Syne, sans-serif" }}>
+        <span className="font-black text-lg text-foreground" style={{ fontFamily: "Syne, sans-serif" }}>
           {material.name}
         </span>
 
@@ -313,7 +313,7 @@ function MaterialCard({ material }: { material: MaterialWithColors }) {
         {/* Expand/collapse colors */}
         <button
           onClick={() => setOpen((v) => !v)}
-          className="text-[var(--muted)] hover:text-[var(--foreground)] transition-colors text-sm"
+          className="text-muted hover:text-foreground transition-colors text-sm"
         >
           {open ? "▲" : "▼"}
         </button>
@@ -337,7 +337,7 @@ function MaterialCard({ material }: { material: MaterialWithColors }) {
 
       {/* Colors (expandable) */}
       {open && (
-        <div className="px-5 pb-4 border-t border-[var(--border)] pt-3">
+        <div className="px-5 pb-4 border-t border-border pt-3">
           <p className="label-mono mb-2">Цвета ({material.colors.length})</p>
           <div>
             {material.colors.map((c) => (
@@ -373,7 +373,7 @@ function AddMaterialForm() {
     return (
       <button
         onClick={() => setOpen(true)}
-        className="w-full rounded-xl border-2 border-dashed border-[var(--border)] py-4 text-sm text-[var(--muted)] hover:border-[var(--accent-border)] hover:text-[var(--accent)] transition-colors"
+        className="w-full rounded-xl border-2 border-dashed border-border py-4 text-sm text-muted hover:border-(--accent-border) hover:text-accent transition-colors"
       >
         + Добавить материал
       </button>
@@ -381,8 +381,8 @@ function AddMaterialForm() {
   }
 
   return (
-    <div className="rounded-xl border-2 border-[var(--accent)] bg-[var(--surface)] p-5 space-y-4">
-      <p className="font-black text-[var(--foreground)]" style={{ fontFamily: "Syne, sans-serif" }}>
+    <div className="rounded-xl border-2 border-accent bg-surface p-5 space-y-4">
+      <p className="font-black text-foreground" style={{ fontFamily: "Syne, sans-serif" }}>
         Новый материал
       </p>
 
@@ -394,7 +394,7 @@ function AddMaterialForm() {
             value={form.name}
             onChange={(e) => set("name", e.target.value)}
             placeholder="Например: ASA"
-            className="w-full border border-[var(--border)] rounded-lg px-3 py-2 text-sm bg-[var(--background)] text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)]"
+            className="w-full border border-border rounded-lg px-3 py-2 text-sm bg-background text-foreground focus:outline-none focus:border-accent"
           />
         </div>
         <div>
@@ -403,7 +403,7 @@ function AddMaterialForm() {
             value={form.price}
             onChange={(e) => set("price", e.target.value)}
             placeholder="от 3 ₽/г"
-            className="w-full border border-[var(--border)] rounded-lg px-3 py-2 text-sm font-mono bg-[var(--background)] text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)]"
+            className="w-full border border-border rounded-lg px-3 py-2 text-sm font-mono bg-background text-foreground focus:outline-none focus:border-accent"
           />
         </div>
         <div>
@@ -412,7 +412,7 @@ function AddMaterialForm() {
             value={form.description}
             onChange={(e) => set("description", e.target.value)}
             placeholder="Гибкий, термостойкий"
-            className="w-full border border-[var(--border)] rounded-lg px-3 py-2 text-sm bg-[var(--background)] text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)]"
+            className="w-full border border-border rounded-lg px-3 py-2 text-sm bg-background text-foreground focus:outline-none focus:border-accent"
           />
         </div>
         <div>
@@ -421,7 +421,7 @@ function AddMaterialForm() {
             value={form.best}
             onChange={(e) => set("best", e.target.value)}
             placeholder="Корпуса, детали"
-            className="w-full border border-[var(--border)] rounded-lg px-3 py-2 text-sm bg-[var(--background)] text-[var(--foreground)] focus:outline-none focus:border-[var(--accent)]"
+            className="w-full border border-border rounded-lg px-3 py-2 text-sm bg-background text-foreground focus:outline-none focus:border-accent"
           />
         </div>
       </div>
@@ -432,9 +432,9 @@ function AddMaterialForm() {
           type="color"
           value={form.color}
           onChange={(e) => set("color", e.target.value)}
-          className="w-8 h-8 rounded cursor-pointer border border-[var(--border)]"
+          className="w-8 h-8 rounded cursor-pointer border border-border"
         />
-        <span className="font-mono text-xs text-[var(--muted)]">{form.color}</span>
+        <span className="font-mono text-xs text-muted">{form.color}</span>
         <div className="w-4 h-4 rounded-full border border-black/10" style={{ background: form.color }} />
       </div>
 
@@ -442,11 +442,11 @@ function AddMaterialForm() {
         <button
           disabled={isPending || !form.name.trim()}
           onClick={handleAdd}
-          className="px-4 py-2 rounded-lg bg-[var(--accent)] text-white text-sm font-medium hover:bg-[var(--accent-hover)] disabled:opacity-40 transition-colors"
+          className="px-4 py-2 rounded-lg bg-accent text-white text-sm font-medium hover:bg-(--accent-hover) disabled:opacity-40 transition-colors"
         >
           {isPending ? "Создание…" : "Создать материал"}
         </button>
-        <button onClick={() => setOpen(false)} className="text-sm text-[var(--muted)] hover:text-[var(--foreground)] transition-colors">
+        <button onClick={() => setOpen(false)} className="text-sm text-muted hover:text-foreground transition-colors">
           Отмена
         </button>
       </div>

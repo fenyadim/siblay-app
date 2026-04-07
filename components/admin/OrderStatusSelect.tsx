@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useState, useTransition } from "react"
 import { OrderStatus } from "@/app/generated/prisma/client"
@@ -33,7 +33,7 @@ export function OrderStatusSelect({ orderId, currentStatus }: Props) {
         value={status}
         onChange={handleChange}
         disabled={isPending}
-        className="flex-1 rounded-lg border border-[var(--border)] bg-[var(--background)] text-[var(--foreground)] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:border-transparent disabled:opacity-50"
+        className="flex-1 rounded-lg border border-border bg-background text-foreground px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent disabled:opacity-50"
       >
         {Object.entries(ORDER_STATUS_LABELS).map(([value, label]) => (
           <option key={value} value={value}>
@@ -44,7 +44,7 @@ export function OrderStatusSelect({ orderId, currentStatus }: Props) {
       <button
         onClick={handleSave}
         disabled={isPending || status === currentStatus}
-        className="px-4 py-2 rounded-lg bg-[var(--accent)] text-white text-sm font-medium hover:bg-[var(--accent-hover)] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+        className="px-4 py-2 rounded-lg bg-accent text-white text-sm font-medium hover:bg-(--accent-hover) transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
       >
         {isPending ? "Сохранение…" : saved ? "Сохранено ✓" : "Сохранить"}
       </button>

@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useEffect, useRef, useState } from "react"
 import { useFormContext } from "react-hook-form"
@@ -21,14 +21,14 @@ export function Step2Color({ materials }: Props) {
 
   return (
     <div>
-      <h2 className="text-2xl font-black text-[var(--foreground)] mb-1" style={{ fontFamily: "Syne, sans-serif" }}>
+      <h2 className="text-2xl font-black text-foreground mb-1" style={{ fontFamily: "Syne, sans-serif" }}>
         Выберите цвет
       </h2>
-      <p className="text-sm text-[var(--muted)] mb-6">
-        Доступные цвета для <span className="font-mono font-medium text-[var(--foreground)]">{material}</span>
+      <p className="text-sm text-muted mb-6">
+        Доступные цвета для <span className="font-mono font-medium text-foreground">{material}</span>
       </p>
 
-      <div className="grid gap-3 [grid-template-columns:repeat(auto-fill,minmax(96px,1fr))]">
+      <div className="grid gap-3 grid-cols-[repeat(auto-fill,minmax(96px,1fr))]">
         {colors.map((c) => (
           <button
             key={c.name}
@@ -37,8 +37,8 @@ export function Step2Color({ materials }: Props) {
             className={cn(
               "color-card flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all w-full relative",
               selectedColor === c.name
-                ? "border-[var(--accent)] bg-[var(--accent-subtle)]"
-                : "border-[var(--border)] bg-[var(--surface)] hover:border-[var(--accent-border)]",
+                ? "border-accent bg-(--accent-subtle)"
+                : "border-border bg-surface hover:border-(--accent-border)",
             )}
           >
             {!c.inStock && (
@@ -71,9 +71,9 @@ export function Step2Color({ materials }: Props) {
       )}
 
       {selectedColor && (
-        <div className="mt-4 flex items-center gap-2 text-sm text-[var(--muted)]">
+        <div className="mt-4 flex items-center gap-2 text-sm text-muted">
           <span>Выбрано:</span>
-          <span className="font-medium text-[var(--foreground)]">{selectedColor}</span>
+          <span className="font-medium text-foreground">{selectedColor}</span>
           {selectedColorData && !selectedColorData.inStock && (
             <span className="text-xs font-mono px-2 py-0.5 rounded-full bg-amber-500 text-white">
               под заказ
@@ -83,7 +83,7 @@ export function Step2Color({ materials }: Props) {
       )}
 
       {errors.color && (
-        <p className="mt-3 text-sm text-[var(--error)]">{errors.color.message}</p>
+        <p className="mt-3 text-sm text-destructive">{errors.color.message}</p>
       )}
     </div>
   )
@@ -106,7 +106,7 @@ function ScrollingText({ text }: { text: string }) {
     <div ref={containerRef} className="w-full overflow-hidden text-center">
       <span
         ref={textRef}
-        className="scroll-text text-xs font-medium text-[var(--muted)] whitespace-nowrap inline-block"
+        className="scroll-text text-xs font-medium text-muted whitespace-nowrap inline-block"
         style={scrollX > 0 ? ({ "--scroll-x": `-${scrollX}px` } as React.CSSProperties) : undefined}
       >
         {text}
