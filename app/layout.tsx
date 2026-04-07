@@ -1,24 +1,24 @@
 import type { Metadata } from 'next'
-import { JetBrains_Mono, Outfit, Syne } from 'next/font/google'
+import { Inter, JetBrains_Mono, Manrope } from 'next/font/google'
 
 import { ThemeProvider } from '@/components/layout/ThemeProvider'
 
 import './globals.css'
 
-const outfit = Outfit({
-  subsets: ['latin'],
-  variable: '--font-outfit',
+const inter = Inter({
+  subsets: ['latin', 'cyrillic'],
+  variable: '--font-inter',
   display: 'swap',
 })
 
-const syne = Syne({
-  subsets: ['latin'],
-  variable: '--font-syne',
+const manrope = Manrope({
+  subsets: ['latin', 'cyrillic'],
+  variable: '--font-manrope ',
   display: 'swap',
 })
 
 const jetBrainsMono = JetBrains_Mono({
-  subsets: ['latin'],
+  subsets: ['latin', 'cyrillic'],
   variable: '--font-jetbrains-mono',
   display: 'swap',
 })
@@ -45,7 +45,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html
       lang="ru"
       suppressHydrationWarning
-      className={`${outfit.variable} ${syne.variable} ${jetBrainsMono.variable}`}
+      className={`${inter.variable} ${manrope.variable} ${jetBrainsMono.variable}`}
     >
       <body className="min-h-screen flex flex-col">
         <ThemeProvider>{children}</ThemeProvider>

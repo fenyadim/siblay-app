@@ -95,9 +95,9 @@ export function Header() {
           <div className="flex items-center gap-1.5">
             <ThemeToggle />
             <Button
-              asChild
               size="sm"
-              className="hidden md:flex text-white bg-accent hover:bg-(--accent-hover) rounded-full h-8 px-4 text-xs"
+              className="hidden md:flex text-white bg-accent hover:bg-(--accent-hover) rounded-full h-8 px-4"
+              asChild
             >
               <Link href="/order">Оформить заказ</Link>
             </Button>

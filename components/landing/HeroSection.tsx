@@ -11,7 +11,7 @@ export function HeroSection() {
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 lg:min-h-150">
           {/* Left: Text */}
-          <div className="flex flex-col justify-center py-16 lg:py-24 lg:pr-16">
+          <div className="flex flex-col justify-center py-12 sm:py-16 lg:py-24 lg:pr-16">
             <div className="mb-5">
               <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-(--accent-border) bg-(--accent-subtle) text-accent label-mono">
                 <span className="size-1.5 rounded-full bg-accent animate-pulse" />
@@ -23,7 +23,7 @@ export function HeroSection() {
               Точность <span className="md:block! gradient-text">в каждом</span> слое
             </h1>
 
-            <p className="text-lg text-muted max-w-md leading-relaxed mb-8">
+            <p className="text-muted max-w-md leading-relaxed mb-8">
               Профессиональная 3D-печать и моделирование под заказ. PLA, PETG, TPU — от прототипа до
               серии.
             </p>
@@ -47,10 +47,10 @@ export function HeroSection() {
             </div>
 
             {/* Stats */}
-            <div className="flex gap-8 mt-12 pt-8 border-t border-border">
+            <div className="flex gap-8 mt-10 sm:mt-12 pt-6 sm:pt-8 border-t border-border">
               {[
-                { value: '500+', label: 'заказов' },
-                { value: '5', label: 'материалов' },
+                { value: '50+', label: 'заказов' },
+                { value: '4', label: 'материалов' },
                 { value: '24ч', label: 'срок от' },
               ].map((s) => (
                 <div key={s.label}>

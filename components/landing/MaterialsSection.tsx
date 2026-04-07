@@ -1,36 +1,36 @@
-﻿import { getMaterialsWithColors } from "@/actions/materials"
+﻿import { getMaterialsWithColors } from '@/actions/materials'
 
 // Rich details shown on the landing page — separate from the order form data
 const MATERIAL_DETAILS: Record<string, { full: string; props: string[]; desc: string }> = {
   PLA: {
-    full: "Polylactic Acid",
-    props: ["Лёгкий", "Точный", "Экологичный"],
-    desc: "Лучший выбор для прототипов, декоративных изделий и учебных моделей. Легко печатается, широкая цветовая палитра.",
+    full: 'Polylactic Acid',
+    props: ['Лёгкий', 'Точный', 'Экологичный'],
+    desc: 'Лучший выбор для прототипов, декоративных изделий и учебных моделей. Легко печатается, широкая цветовая палитра.',
   },
   PETG: {
-    full: "Polyethylene Terephthalate Glycol",
-    props: ["Гибкий", "Прозрачный", "Химстойкий"],
-    desc: "Сочетает прочность ABS и простоту PLA. Подходит для пищевого контакта, медицины, деталей под нагрузку.",
+    full: 'Polyethylene Terephthalate Glycol',
+    props: ['Гибкий', 'Прозрачный', 'Химстойкий'],
+    desc: 'Сочетает прочность ABS и простоту PLA. Подходит для пищевого контакта, медицины, деталей под нагрузку.',
   },
   TPU: {
-    full: "Thermoplastic Polyurethane",
-    props: ["Эластичный", "Ударостойкий", "Гибкий"],
-    desc: "Резиноподобный материал для прокладок, защитных чехлов, мягких деталей и изделий с амортизацией.",
+    full: 'Thermoplastic Polyurethane',
+    props: ['Эластичный', 'Ударостойкий', 'Гибкий'],
+    desc: 'Резиноподобный материал для прокладок, защитных чехлов, мягких деталей и изделий с амортизацией.',
   },
   ABS: {
-    full: "Acrylonitrile Butadiene Styrene",
-    props: ["Прочный", "Термостойкий", "Ударопрочный"],
-    desc: "Для функциональных деталей, корпусов и изделий под механическую нагрузку. Выдерживает температуру до 80°C.",
+    full: 'Acrylonitrile Butadiene Styrene',
+    props: ['Прочный', 'Термостойкий', 'Ударопрочный'],
+    desc: 'Для функциональных деталей, корпусов и изделий под механическую нагрузку. Выдерживает температуру до 80°C.',
   },
   Nylon: {
-    full: "Polyamide",
-    props: ["Износостойкий", "Гибкий", "Прочный"],
-    desc: "Инженерный материал для шестерёнок, петель, деталей со скользящим контактом. Высокая усталостная прочность.",
+    full: 'Polyamide',
+    props: ['Износостойкий', 'Гибкий', 'Прочный'],
+    desc: 'Инженерный материал для шестерёнок, петель, деталей со скользящим контактом. Высокая усталостная прочность.',
   },
   Resin: {
-    full: "Фотополимер",
-    props: ["Высокая детализация", "Гладкая поверхность", "Точный"],
-    desc: "SLA/LCD печать для фигурок, ювелирных моделей, стоматологии и мелких деталей с тончайшими элементами.",
+    full: 'Фотополимер',
+    props: ['Высокая детализация', 'Гладкая поверхность', 'Точный'],
+    desc: 'SLA/LCD печать для фигурок, ювелирных моделей, стоматологии и мелких деталей с тончайшими элементами.',
   },
 }
 
@@ -38,15 +38,13 @@ export async function MaterialsSection() {
   const materials = await getMaterialsWithColors()
 
   return (
-    <section className="py-24 bg-surface border-y border-border overflow-hidden">
+    <section className="py-14 sm:py-24 bg-surface border-y border-border overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Asymmetric header */}
-        <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-16">
+        <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-10 sm:mb-16">
           <div>
-            <span className="label-mono mb-3 block">Чем печатаем</span>
-            <h2
-              className="text-5xl lg:text-6xl font-black tracking-tight leading-none font-display"
-            >
+            <span className="label-mono mb-3 text-sm block">Чем печатаем</span>
+            <h2 className="text-5xl lg:text-6xl font-black tracking-tight leading-none font-display">
               Материалы
             </h2>
           </div>
@@ -68,7 +66,9 @@ export async function MaterialsSection() {
                 {/* Color glow background */}
                 <div
                   className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl pointer-events-none"
-                  style={{ background: `radial-gradient(ellipse at top left, ${mat.color}18 0%, transparent 60%)` }}
+                  style={{
+                    background: `radial-gradient(ellipse at top left, ${mat.color}18 0%, transparent 60%)`,
+                  }}
                 />
 
                 {/* "Скоро" badge */}
@@ -83,13 +83,13 @@ export async function MaterialsSection() {
                     className="w-3 h-3 rounded-full shrink-0"
                     style={{ background: mat.color, boxShadow: `0 0 8px ${mat.color}66` }}
                   />
-                  <span
-                    className="text-xl font-black text-foreground font-display"
-                  >
+                  <span className="text-xl font-black text-foreground font-display">
                     {mat.name}
                   </span>
                 </div>
-                <p className="text-xs text-muted font-mono mb-3 leading-snug relative">{details.full}</p>
+                <p className="text-xs text-muted font-mono mb-3 leading-snug relative">
+                  {details.full}
+                </p>
                 <p className="text-xs text-muted leading-relaxed flex-1 relative">{details.desc}</p>
                 <div className="mt-4 space-y-1 relative">
                   {details.props.map((p) => (

@@ -17,7 +17,6 @@ interface PortfolioGridProps {
 
 export function PortfolioGrid({ items }: PortfolioGridProps) {
   const [activeCategory, setActiveCategory] = useState('all')
-  const [selected, setSelected] = useState<PortfolioItem | null>(null)
 
   const filtered =
     activeCategory === 'all' ? items : items.filter((i) => i.category === activeCategory)
@@ -47,13 +46,13 @@ export function PortfolioGrid({ items }: PortfolioGridProps) {
         <div className="columns-1 sm:columns-2 lg:columns-3 gap-4 space-y-4">
           {filtered.map((item) => (
             <div key={item.id} className="break-inside-avoid">
-              <PortfolioCard item={item} onClick={() => setSelected(item)} />
+              <PortfolioModal item={item}>
+                <PortfolioCard item={item} />
+              </PortfolioModal>
             </div>
           ))}
         </div>
       )}
-
-      {selected && <PortfolioModal item={selected} onClose={() => setSelected(null)} />}
     </>
   )
 }

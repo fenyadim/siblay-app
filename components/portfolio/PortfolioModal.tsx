@@ -2,21 +2,27 @@
 
 import { ArrowRight } from 'lucide-react'
 import Link from 'next/link'
-import { useCallback, useEffect, useState } from 'react'
+import { ReactNode, useCallback, useEffect, useState } from 'react'
 
 import type { PortfolioItem } from '@/app/generated/prisma/client'
-import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
 import { cn } from '@/lib/utils'
 import { PORTFOLIO_CATEGORY_LABELS } from '@/lib/validations/portfolio'
 
 import { Button } from '../ui/button'
 
 interface PortfolioModalProps {
+  children: ReactNode
   item: PortfolioItem
-  onClose: () => void
 }
 
-export function PortfolioModal({ item, onClose }: PortfolioModalProps) {
+export function PortfolioModal({ children, item }: PortfolioModalProps) {
   const [activeImg, setActiveImg] = useState(0)
   const hasMultiple = item.images.length > 1
 
@@ -45,11 +51,12 @@ export function PortfolioModal({ item, onClose }: PortfolioModalProps) {
       : null
 
   return (
-    <Dialog open onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl bg-surface border-border p-0 overflow-hidden rounded-2xl shadow-2xl shadow-black/20 gap-0">
-        <div className="grid grid-cols-1 md:grid-cols-2 md:h-130">
+    <Dialog>
+      <DialogTrigger asChild>{children}</DialogTrigger>
+      <DialogContent className="w-[min(96vw,72rem)] max-w-none sm:max-w-none h-[min(90vh,48rem)] bg-surface border-border p-0 overflow-hidden rounded-2xl shadow-2xl shadow-black/20 gap-0">
+        <div className="grid grid-cols-1 md:grid-cols-2 h-full">
           {/* ── Left: Image area ── */}
-          <div className="relative flex flex-col bg-background min-h-65 md:min-h-0">
+          <div className="relative flex flex-col bg-background min-h-72 md:min-h-0">
             {/* Main image */}
             <div className="relative flex-1 overflow-hidden">
               {item.images[activeImg] ? (
@@ -165,19 +172,20 @@ export function PortfolioModal({ item, onClose }: PortfolioModalProps) {
               </span>
             </div>
 
-            {/* Title */}
             <DialogTitle className="text-2xl font-black text-foreground leading-tight mb-3 font-display">
               {item.title}
             </DialogTitle>
 
-            {/* Description */}
-            {item.description && (
-              <p className="text-sm text-muted leading-relaxed mb-6">{item.description}</p>
-            )}
+            <DialogDescription
+              className="text-sm text-muted leading-relaxed mb-6"
+              hidden={!item.description}
+            >
+              {item.description}
+            </DialogDescription>
 
             {/* Params */}
             {params && (
-              <div className="mt-auto">
+              <div>
                 <p className="label-mono mb-3">Параметры</p>
                 <div className="rounded-xl border border-border bg-background overflow-hidden">
                   {Object.entries(params).map(([k, v], idx, arr) => (
