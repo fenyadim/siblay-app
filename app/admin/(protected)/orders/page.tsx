@@ -28,7 +28,7 @@ export default async function AdminOrdersPage({ searchParams }: Props) {
 
   return (
     <div>
-      <h1 className="text-3xl font-black text-foreground mb-6" style={{ fontFamily: "Syne, sans-serif" }}>
+      <h1 className="text-3xl font-black text-foreground mb-6 font-display">
         Заказы
       </h1>
 

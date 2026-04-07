@@ -33,7 +33,7 @@ export function PortfolioCard({ item, onClick }: PortfolioCardProps) {
       </div>
       {/* Body */}
       <div className="p-4">
-        <h3 className="font-semibold text-foreground" style={{ fontFamily: "Syne, sans-serif" }}>
+        <h3 className="font-semibold text-foreground font-display">
           {item.title}
         </h3>
         {item.description && (

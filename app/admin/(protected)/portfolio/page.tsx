@@ -11,8 +11,7 @@ export default async function AdminPortfolioPage() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <h1
-          className="text-3xl font-black text-foreground"
-          style={{ fontFamily: "Syne, sans-serif" }}
+          className="text-3xl font-black text-foreground font-display"
         >
           Портфолио
         </h1>

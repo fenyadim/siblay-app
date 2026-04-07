@@ -1,10 +1,15 @@
-﻿"use client"
+﻿'use client'
 
-import { useState, useCallback, useEffect } from "react"
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"
-import { PORTFOLIO_CATEGORY_LABELS } from "@/lib/validations/portfolio"
-import { cn } from "@/lib/utils"
-import type { PortfolioItem } from "@/app/generated/prisma/client"
+import { ArrowRight } from 'lucide-react'
+import Link from 'next/link'
+import { useCallback, useEffect, useState } from 'react'
+
+import type { PortfolioItem } from '@/app/generated/prisma/client'
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
+import { cn } from '@/lib/utils'
+import { PORTFOLIO_CATEGORY_LABELS } from '@/lib/validations/portfolio'
+
+import { Button } from '../ui/button'
 
 interface PortfolioModalProps {
   item: PortfolioItem
@@ -27,25 +32,24 @@ export function PortfolioModal({ item, onClose }: PortfolioModalProps) {
   useEffect(() => {
     if (!hasMultiple) return
     const handler = (e: KeyboardEvent) => {
-      if (e.key === "ArrowLeft") goPrev()
-      if (e.key === "ArrowRight") goNext()
+      if (e.key === 'ArrowLeft') goPrev()
+      if (e.key === 'ArrowRight') goNext()
     }
-    window.addEventListener("keydown", handler)
-    return () => window.removeEventListener("keydown", handler)
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
   }, [hasMultiple, goPrev, goNext])
 
   const params =
-    item.params && typeof item.params === "object" && !Array.isArray(item.params)
+    item.params && typeof item.params === 'object' && !Array.isArray(item.params)
       ? (item.params as Record<string, string>)
       : null
 
   return (
     <Dialog open onOpenChange={onClose}>
       <DialogContent className="max-w-4xl bg-surface border-border p-0 overflow-hidden rounded-2xl shadow-2xl shadow-black/20 gap-0">
-        <div className="grid grid-cols-1 md:grid-cols-2 md:h-[520px]">
-
+        <div className="grid grid-cols-1 md:grid-cols-2 md:h-130">
           {/* ── Left: Image area ── */}
-          <div className="relative flex flex-col bg-background min-h-[260px] md:min-h-0">
+          <div className="relative flex flex-col bg-background min-h-65 md:min-h-0">
             {/* Main image */}
             <div className="relative flex-1 overflow-hidden">
               {item.images[activeImg] ? (
@@ -70,7 +74,16 @@ export function PortfolioModal({ item, onClose }: PortfolioModalProps) {
                     className="absolute left-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/40 backdrop-blur-md text-white flex items-center justify-center hover:bg-black/60 transition-colors"
                     aria-label="Предыдущее фото"
                   >
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
                       <path d="M15 18l-6-6 6-6" />
                     </svg>
                   </button>
@@ -80,7 +93,16 @@ export function PortfolioModal({ item, onClose }: PortfolioModalProps) {
                     className="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/40 backdrop-blur-md text-white flex items-center justify-center hover:bg-black/60 transition-colors"
                     aria-label="Следующее фото"
                   >
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
                       <path d="M9 18l6-6-6-6" />
                     </svg>
                   </button>
@@ -96,10 +118,10 @@ export function PortfolioModal({ item, onClose }: PortfolioModalProps) {
                       type="button"
                       onClick={() => setActiveImg(i)}
                       className={cn(
-                        "rounded-full transition-all duration-200",
+                        'rounded-full transition-all duration-200',
                         i === activeImg
-                          ? "w-5 h-1.5 bg-white"
-                          : "w-1.5 h-1.5 bg-white/50 hover:bg-white/80",
+                          ? 'w-5 h-1.5 bg-white'
+                          : 'w-1.5 h-1.5 bg-white/50 hover:bg-white/80'
                       )}
                       aria-label={`Фото ${i + 1}`}
                     />
@@ -116,10 +138,10 @@ export function PortfolioModal({ item, onClose }: PortfolioModalProps) {
                     key={i}
                     onClick={() => setActiveImg(i)}
                     className={cn(
-                      "w-14 h-14 rounded-xl overflow-hidden shrink-0 border-2 transition-all duration-200",
+                      'w-14 h-14 rounded-xl overflow-hidden shrink-0 border-2 transition-all duration-200',
                       i === activeImg
-                        ? "border-accent scale-105 shadow-sm shadow-accent/30"
-                        : "border-transparent opacity-60 hover:opacity-100",
+                        ? 'border-accent scale-105 shadow-sm shadow-accent/30'
+                        : 'border-transparent opacity-60 hover:opacity-100'
                     )}
                   >
                     <img src={img} alt="" className="w-full h-full object-cover" />
@@ -131,7 +153,6 @@ export function PortfolioModal({ item, onClose }: PortfolioModalProps) {
 
           {/* ── Right: Info area ── */}
           <div className="flex flex-col p-7 border-l border-border overflow-y-auto">
-
             {/* Tags */}
             <div className="flex gap-2 mb-4 flex-wrap">
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-background text-muted border border-border">
@@ -145,18 +166,13 @@ export function PortfolioModal({ item, onClose }: PortfolioModalProps) {
             </div>
 
             {/* Title */}
-            <DialogTitle
-              className="text-2xl font-black text-foreground leading-tight mb-3"
-              style={{ fontFamily: "Syne, sans-serif" }}
-            >
+            <DialogTitle className="text-2xl font-black text-foreground leading-tight mb-3 font-display">
               {item.title}
             </DialogTitle>
 
             {/* Description */}
             {item.description && (
-              <p className="text-sm text-muted leading-relaxed mb-6">
-                {item.description}
-              </p>
+              <p className="text-sm text-muted leading-relaxed mb-6">{item.description}</p>
             )}
 
             {/* Params */}
@@ -168,8 +184,8 @@ export function PortfolioModal({ item, onClose }: PortfolioModalProps) {
                     <div
                       key={k}
                       className={cn(
-                        "flex items-center justify-between px-4 py-3",
-                        idx < arr.length - 1 && "border-b border-border",
+                        'flex items-center justify-between px-4 py-3',
+                        idx < arr.length - 1 && 'border-b border-border'
                       )}
                     >
                       <span className="text-xs text-muted">{k}</span>
@@ -183,15 +199,12 @@ export function PortfolioModal({ item, onClose }: PortfolioModalProps) {
             )}
 
             {/* CTA */}
-            <a
-              href="/order"
-              className="mt-6 flex items-center justify-center gap-2 w-full h-10 rounded-full bg-accent hover:bg-(--accent-hover) text-white text-sm font-semibold transition-colors"
-            >
-              Заказать похожее
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M5 12h14M12 5l7 7-7 7" />
-              </svg>
-            </a>
+            <Button className="rounded-full mt-5" asChild>
+              <Link href="/order">
+                Заказать похожее
+                <ArrowRight className="size-3.5" />
+              </Link>
+            </Button>
           </div>
         </div>
       </DialogContent>

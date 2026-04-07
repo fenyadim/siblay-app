@@ -57,8 +57,7 @@ export function Step1Material({ materials }: Props) {
   return (
     <div>
       <h2
-        className="text-2xl font-black text-foreground mb-1"
-        style={{ fontFamily: "Syne, sans-serif" }}
+        className="text-2xl font-black text-foreground mb-1 font-display"
       >
         Выберите материал
       </h2>
@@ -106,8 +105,7 @@ export function Step1Material({ materials }: Props) {
                   style={{ background: mat.color, boxShadow: `0 0 8px ${mat.color}66` }}
                 />
                 <span
-                  className="font-black text-lg text-foreground"
-                  style={{ fontFamily: "Syne, sans-serif" }}
+                  className="font-black text-lg text-foreground font-display"
                 >
                   {mat.name}
                 </span>
@@ -198,7 +196,7 @@ function MaterialInfo({
               style={{ background: mat.color }}
             />
             <div>
-              <p className="font-bold text-foreground" style={{ fontFamily: "Syne, sans-serif" }}>
+              <p className="font-bold text-foreground font-display">
                 {mat.name}
               </p>
               <p className="text-[11px] text-muted font-mono">{info.full}</p>

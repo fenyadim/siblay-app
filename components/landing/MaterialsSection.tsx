@@ -45,8 +45,7 @@ export async function MaterialsSection() {
           <div>
             <span className="label-mono mb-3 block">Чем печатаем</span>
             <h2
-              className="text-5xl lg:text-6xl font-black tracking-tight leading-none"
-              style={{ fontFamily: "Syne, sans-serif" }}
+              className="text-5xl lg:text-6xl font-black tracking-tight leading-none font-display"
             >
               Материалы
             </h2>
@@ -85,8 +84,7 @@ export async function MaterialsSection() {
                     style={{ background: mat.color, boxShadow: `0 0 8px ${mat.color}66` }}
                   />
                   <span
-                    className="text-xl font-black text-foreground"
-                    style={{ fontFamily: "Syne, sans-serif" }}
+                    className="text-xl font-black text-foreground font-display"
                   >
                     {mat.name}
                   </span>

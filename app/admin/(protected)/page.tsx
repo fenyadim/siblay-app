@@ -25,7 +25,7 @@ export default async function AdminDashboard() {
 
   return (
     <div>
-      <h1 className="text-3xl font-black text-foreground mb-6" style={{ fontFamily: "Syne, sans-serif" }}>
+      <h1 className="text-3xl font-black text-foreground mb-6 font-display">
         Дашборд
       </h1>
 
@@ -34,7 +34,7 @@ export default async function AdminDashboard() {
         {STAT_CARDS.map((s) => (
           <div key={s.label} className="rounded-xl border border-border bg-surface p-5">
             <p className="label-mono mb-2">{s.label}</p>
-            <p className={`text-4xl font-black ${s.color}`} style={{ fontFamily: "Syne, sans-serif" }}>
+            <p className={`text-4xl font-black ${s.color} font-display`}>
               {s.value}
             </p>
           </div>
@@ -44,7 +44,7 @@ export default async function AdminDashboard() {
       {/* Recent orders */}
       <div className="rounded-xl border border-border bg-surface">
         <div className="flex items-center justify-between px-5 py-4 border-b border-border">
-          <h2 className="font-bold text-foreground" style={{ fontFamily: "Syne, sans-serif" }}>
+          <h2 className="font-bold text-foreground font-display">
             Последние заказы
           </h2>
           <Link href="/admin/orders" className="text-sm text-accent hover:underline">

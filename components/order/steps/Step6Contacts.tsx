@@ -46,7 +46,7 @@ export function Step6Contacts() {
   return (
     <div className="space-y-8">
       <div>
-        <h2 className="text-2xl font-black text-foreground mb-1" style={{ fontFamily: "Syne, sans-serif" }}>
+        <h2 className="text-2xl font-black text-foreground mb-1 font-display">
           Контактные данные
         </h2>
         <p className="text-sm text-muted">Для связи и доставки готового заказа</p>

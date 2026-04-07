@@ -520,8 +520,7 @@ export function PortfolioAdminClient({ items: initialItems, categoryLabels }: Pr
       {(mode === "create" || mode === "edit") && (
         <div className="rounded-xl border border-border bg-surface p-6">
           <h2
-            className="text-lg font-bold text-foreground mb-5"
-            style={{ fontFamily: "Syne, sans-serif" }}
+            className="text-lg font-bold text-foreground mb-5 font-display"
           >
             {mode === "create" ? "Новая работа" : "Редактировать работу"}
           </h2>

@@ -42,7 +42,7 @@ export default async function AdminOrderDetailPage({ params }: Props) {
       {/* Header */}
       <div className="flex items-start justify-between mb-6">
         <div>
-          <h1 className="text-3xl font-black text-foreground" style={{ fontFamily: "Syne, sans-serif" }}>
+          <h1 className="text-3xl font-black text-foreground font-display">
             {order.fullName}
           </h1>
           <p className="text-sm text-muted font-mono mt-1">{formatDate(order.createdAt)}</p>
@@ -78,7 +78,7 @@ export default async function AdminOrderDetailPage({ params }: Props) {
         <div className="rounded-xl border border-border bg-surface p-5">
           <p className="label-mono mb-3">Стоимость</p>
           {order.estimatedPrice && (
-            <p className="text-3xl font-black text-accent mb-3" style={{ fontFamily: "Syne, sans-serif" }}>
+            <p className="text-3xl font-black text-accent mb-3 font-display">
               {formatPrice(order.estimatedPrice)}
             </p>
           )}

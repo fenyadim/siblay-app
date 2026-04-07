@@ -31,7 +31,7 @@ export function AdminSidebar() {
               <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </div>
-          <span className="font-black text-sm text-foreground" style={{ fontFamily: "Syne, sans-serif" }}>
+          <span className="font-black text-sm text-foreground font-display">
             Siblay
           </span>
         </Link>

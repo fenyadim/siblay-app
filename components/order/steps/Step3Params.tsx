@@ -27,7 +27,7 @@ export function Step3Params() {
   return (
     <div className="space-y-8">
       <div>
-        <h2 className="text-2xl font-black text-foreground mb-1" style={{ fontFamily: "Syne, sans-serif" }}>
+        <h2 className="text-2xl font-black text-foreground mb-1 font-display">
           Параметры печати
         </h2>
         <p className="text-sm text-muted">Укажите размеры изделия и желаемые параметры</p>
@@ -94,8 +94,7 @@ export function Step3Params() {
         <div className="flex items-center justify-between mb-3">
           <p className="label-mono">Заполнение (Infill)</p>
           <span
-            className="text-sm font-black"
-            style={{ fontFamily: "Syne, sans-serif", color: "var(--accent)" }}
+            className="text-sm font-black font-display" style={{ color: "var(--accent)" }}
           >
             {infill}%
           </span>
@@ -115,11 +114,9 @@ export function Step3Params() {
               )}
             >
               <div className={cn(
-                "text-base font-black mb-0.5",
+                "text-base font-black mb-0.5 font-display",
                 infill === p.value ? "text-accent" : "text-foreground",
-              )}
-                style={{ fontFamily: "Syne, sans-serif" }}
-              >
+              )}>
                 {p.value}%
               </div>
               <div className="text-[11px] font-medium text-muted">{p.label}</div>

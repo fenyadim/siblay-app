@@ -46,8 +46,7 @@ export default function AdminLoginPage() {
             </svg>
           </div>
           <span
-            className="text-xl font-black text-foreground"
-            style={{ fontFamily: 'Syne, sans-serif' }}
+            className="text-xl font-black text-foreground font-display"
           >
             Siblay Admin
           </span>

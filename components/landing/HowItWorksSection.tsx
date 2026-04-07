@@ -28,8 +28,7 @@ export function HowItWorksSection() {
         <div className="text-center mb-16">
           <span className="label-mono mb-3 block">Процесс</span>
           <h2
-            className="text-5xl font-black tracking-tight text-foreground"
-            style={{ fontFamily: "Syne, sans-serif" }}
+            className="text-5xl font-black tracking-tight text-foreground font-display"
           >
             Как мы работаем
           </h2>
@@ -65,8 +64,7 @@ export function HowItWorksSection() {
                 </div>
 
                 <h3
-                  className="text-lg font-bold text-foreground mb-2"
-                  style={{ fontFamily: "Syne, sans-serif" }}
+                  className="text-lg font-bold text-foreground mb-2 font-display"
                 >
                   {step.title}
                 </h3>

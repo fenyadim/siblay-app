@@ -21,7 +21,7 @@ export function Step2Color({ materials }: Props) {
 
   return (
     <div>
-      <h2 className="text-2xl font-black text-foreground mb-1" style={{ fontFamily: "Syne, sans-serif" }}>
+      <h2 className="text-2xl font-black text-foreground mb-1 font-display">
         Выберите цвет
       </h2>
       <p className="text-sm text-muted mb-6">

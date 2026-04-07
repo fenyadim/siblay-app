@@ -1,46 +1,40 @@
-﻿"use client"
+﻿'use client'
 
-import { useState } from "react"
-import { PortfolioCard } from "./PortfolioCard"
-import { PortfolioModal } from "./PortfolioModal"
-import { PORTFOLIO_CATEGORIES, PORTFOLIO_CATEGORY_LABELS } from "@/lib/validations/portfolio"
-import { cn } from "@/lib/utils"
-import type { PortfolioItem } from "@/app/generated/prisma/client"
+import { useState } from 'react'
 
-const ALL_CATEGORIES = [
-  { value: "all", label: "Все" },
-  ...PORTFOLIO_CATEGORIES,
-]
+import type { PortfolioItem } from '@/app/generated/prisma/client'
+import { PORTFOLIO_CATEGORIES } from '@/lib/validations/portfolio'
+
+import { Button } from '../ui/button'
+import { PortfolioCard } from './PortfolioCard'
+import { PortfolioModal } from './PortfolioModal'
+
+const ALL_CATEGORIES = [{ value: 'all', label: 'Все' }, ...PORTFOLIO_CATEGORIES]
 
 interface PortfolioGridProps {
   items: PortfolioItem[]
 }
 
 export function PortfolioGrid({ items }: PortfolioGridProps) {
-  const [activeCategory, setActiveCategory] = useState("all")
+  const [activeCategory, setActiveCategory] = useState('all')
   const [selected, setSelected] = useState<PortfolioItem | null>(null)
 
-  const filtered = activeCategory === "all"
-    ? items
-    : items.filter((i) => i.category === activeCategory)
+  const filtered =
+    activeCategory === 'all' ? items : items.filter((i) => i.category === activeCategory)
 
   return (
     <>
       {/* Category filter */}
       <div className="flex flex-wrap gap-2 mb-8">
         {ALL_CATEGORIES.map((cat) => (
-          <button
+          <Button
+            variant={activeCategory === cat.value ? 'default' : 'outline'}
             key={cat.value}
             onClick={() => setActiveCategory(cat.value)}
-            className={cn(
-              "px-4 py-1.5 rounded-full text-sm font-medium border transition-all",
-              activeCategory === cat.value
-                ? "bg-accent border-accent text-white"
-                : "border-border text-muted hover:border-(--accent-border) hover:text-foreground",
-            )}
+            className="px-4 py-1.5 rounded-full text-sm font-medium border transition-all"
           >
             {cat.label}
-          </button>
+          </Button>
         ))}
       </div>
 
@@ -59,9 +53,7 @@ export function PortfolioGrid({ items }: PortfolioGridProps) {
         </div>
       )}
 
-      {selected && (
-        <PortfolioModal item={selected} onClose={() => setSelected(null)} />
-      )}
+      {selected && <PortfolioModal item={selected} onClose={() => setSelected(null)} />}
     </>
   )
 }

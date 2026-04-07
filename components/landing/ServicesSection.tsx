@@ -45,8 +45,7 @@ export function ServicesSection() {
           <div>
             <span className="label-mono mb-3 block">Что мы делаем</span>
             <h2
-              className="text-5xl lg:text-6xl font-black tracking-tight leading-none"
-              style={{ fontFamily: "Syne, sans-serif" }}
+              className="text-5xl lg:text-6xl font-black tracking-tight leading-none font-display"
             >
               Наши услуги
             </h2>
@@ -64,8 +63,7 @@ export function ServicesSection() {
             >
               {/* Ghost number background */}
               <div
-                className="absolute -top-3 -right-1 text-9xl font-black text-accent opacity-[0.04] select-none pointer-events-none leading-none"
-                style={{ fontFamily: "Syne, sans-serif" }}
+                className="absolute -top-3 -right-1 text-9xl font-black text-accent opacity-[0.04] select-none pointer-events-none leading-none font-display"
               >
                 {svc.num}
               </div>
@@ -78,8 +76,7 @@ export function ServicesSection() {
                   {svc.num}
                 </span>
                 <h3
-                  className="text-xl font-bold text-foreground mb-3"
-                  style={{ fontFamily: "Syne, sans-serif" }}
+                  className="text-xl font-bold text-foreground mb-3 font-display"
                 >
                   {svc.title}
                 </h3>

@@ -19,7 +19,7 @@ export function Step5Comment() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-black text-foreground mb-1" style={{ fontFamily: "Syne, sans-serif" }}>
+        <h2 className="text-2xl font-black text-foreground mb-1 font-display">
           Комментарии к заказу
         </h2>
         <p className="text-sm text-muted">Необязательный шаг — пропустите, если нет особых требований</p>

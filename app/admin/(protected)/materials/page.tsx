@@ -8,8 +8,7 @@ export default async function AdminMaterialsPage() {
     <div>
       <div className="mb-6">
         <h1
-          className="text-3xl font-black text-foreground"
-          style={{ fontFamily: "Syne, sans-serif" }}
+          className="text-3xl font-black text-foreground font-display"
         >
           Материалы
         </h1>

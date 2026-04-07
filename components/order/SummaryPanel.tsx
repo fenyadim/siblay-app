@@ -69,8 +69,7 @@ export function SummaryPanel() {
         {price !== null ? (
           <>
             <p
-              className="text-2xl font-black"
-              style={{ fontFamily: "Syne, sans-serif", color: "var(--accent)" }}
+              className="text-2xl font-black font-display" style={{ color: "var(--accent)" }}
             >
               {formatPrice(price)}
             </p>
@@ -92,8 +91,7 @@ export function SummaryPanel() {
         <div className="rounded-2xl border border-border bg-surface overflow-hidden">
           <div className="px-5 py-4 border-b border-border bg-surface-raised">
             <h3
-              className="font-black text-foreground"
-              style={{ fontFamily: "Syne, sans-serif" }}
+              className="font-black text-foreground font-display"
             >
               Ваш заказ
             </h3>
@@ -117,8 +115,7 @@ export function SummaryPanel() {
             <span className="text-sm font-semibold text-foreground">Ваш заказ</span>
             {price !== null && (
               <span
-                className="text-sm font-black"
-                style={{ color: "var(--accent)", fontFamily: "Syne, sans-serif" }}
+                className="text-sm font-black font-display" style={{ color: "var(--accent)" }}
               >
                 {formatPrice(price)}
               </span>

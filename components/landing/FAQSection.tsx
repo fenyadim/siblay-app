@@ -45,8 +45,7 @@ export function FAQSection() {
           <div className="lg:sticky lg:top-24 lg:self-start">
             <span className="label-mono mb-3 block">Вопросы и ответы</span>
             <h2
-              className="text-5xl font-black tracking-tight leading-tight mb-5"
-              style={{ fontFamily: "Syne, sans-serif" }}
+              className="text-5xl font-black tracking-tight leading-tight mb-5 font-display"
             >
               Частые
               <br />

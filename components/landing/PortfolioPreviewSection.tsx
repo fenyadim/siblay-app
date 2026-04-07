@@ -14,8 +14,7 @@ export async function PortfolioPreviewSection() {
           <div>
             <span className="label-mono mb-3 block">Наши работы</span>
             <h2
-              className="text-5xl lg:text-6xl font-black tracking-tight leading-none"
-              style={{ fontFamily: "Syne, sans-serif" }}
+              className="text-5xl lg:text-6xl font-black tracking-tight leading-none font-display"
             >
               Примеры
             </h2>
@@ -69,8 +68,7 @@ export async function PortfolioPreviewSection() {
                 {/* Body */}
                 <div className="p-4">
                   <h3
-                    className="font-semibold text-foreground truncate"
-                    style={{ fontFamily: "Syne, sans-serif" }}
+                    className="font-semibold text-foreground truncate font-display"
                   >
                     {item.title}
                   </h3>

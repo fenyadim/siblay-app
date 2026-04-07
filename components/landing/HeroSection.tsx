@@ -54,12 +54,7 @@ export function HeroSection() {
                 { value: '24ч', label: 'срок от' },
               ].map((s) => (
                 <div key={s.label}>
-                  <div
-                    className="text-2xl font-black text-foreground"
-                    style={{ fontFamily: 'Syne, sans-serif' }}
-                  >
-                    {s.value}
-                  </div>
+                  <div className="text-2xl font-black text-foreground font-display">{s.value}</div>
                   <div className="label-mono mt-0.5">{s.label}</div>
                 </div>
               ))}

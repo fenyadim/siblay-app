@@ -292,7 +292,7 @@ function MaterialCard({ material }: { material: MaterialWithColors }) {
           className="w-3 h-3 rounded-full shrink-0"
           style={{ background: material.color, boxShadow: `0 0 8px ${material.color}66` }}
         />
-        <span className="font-black text-lg text-foreground" style={{ fontFamily: "Syne, sans-serif" }}>
+        <span className="font-black text-lg text-foreground font-display">
           {material.name}
         </span>
 
@@ -382,7 +382,7 @@ function AddMaterialForm() {
 
   return (
     <div className="rounded-xl border-2 border-accent bg-surface p-5 space-y-4">
-      <p className="font-black text-foreground" style={{ fontFamily: "Syne, sans-serif" }}>
+      <p className="font-black text-foreground font-display">
         Новый материал
       </p>
 

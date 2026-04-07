@@ -162,8 +162,7 @@ function MobileMenu({ links, onClose }: { links: typeof NAV_LINKS; onClose: () =
               key={link.href}
               href={link.href}
               onClick={onClose}
-              className="flex items-center gap-3 px-4 py-4 rounded-2xl text-lg font-semibold text-foreground hover:bg-surface hover:text-accent transition-colors"
-              style={{ fontFamily: 'Syne, sans-serif' }}
+              className="flex items-center gap-3 px-4 py-4 rounded-2xl text-lg font-semibold text-foreground hover:bg-surface hover:text-accent transition-colors font-display"
             >
               <span className="text-xs font-mono text-accent w-6">0{i + 1}</span>
               {link.label}

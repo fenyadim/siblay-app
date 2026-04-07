@@ -19,8 +19,7 @@ export default async function PortfolioPage() {
         <div className="mb-10">
           <span className="label-mono">Работы</span>
           <h1
-            className="mt-3 text-5xl font-black tracking-tight text-foreground"
-            style={{ fontFamily: "Syne, sans-serif" }}
+            className="mt-3 text-5xl font-black tracking-tight text-foreground font-display"
           >
             Портфолио
           </h1>
