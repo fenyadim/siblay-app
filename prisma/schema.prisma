@@ -28,9 +28,6 @@ model Order {
   delivery       String
   address        String?
   estimatedPrice Float?
-  personalDataConsentGiven   Boolean   @default(false)
-  personalDataConsentAt      DateTime?
-  personalDataConsentVersion String?
 }
 
 model OrderFile {
@@ -70,7 +67,6 @@ model Material {
   name        String          @unique
   description String
   price       String
-  color       String
   best        String
   available   Boolean         @default(true)
   sortOrder   Int             @default(0)
