@@ -54,6 +54,9 @@ export const step6Schema = z.object({
   email: z.string().email("Неверный email"),
   delivery: z.enum(["pickup", "courier", "sdek", "pochta"], "Выберите способ доставки"),
   address: z.string().optional(),
+  personalDataConsent: z
+    .boolean()
+    .refine((value) => value, "Необходимо согласие на обработку персональных данных"),
 }).passthrough().refine(
   (data) => data.delivery === "pickup" || (data.address && data.address.length > 5),
   { message: "Укажите адрес доставки", path: ["address"] },

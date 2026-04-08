@@ -28,6 +28,9 @@ model Order {
   delivery       String
   address        String?
   estimatedPrice Float?
+  personalDataConsentGiven   Boolean   @default(false)
+  personalDataConsentAt      DateTime?
+  personalDataConsentVersion String?
 }
 
 model OrderFile {

@@ -107,7 +107,15 @@ export function Footer() {
           <p className="text-xs text-muted">
             © {new Date().getFullYear()} Siblay. Все права защищены.
           </p>
-          <p className="text-xs text-muted font-mono">3D-печать · Моделирование · Постобработка</p>
+          <div className="flex items-center gap-4 text-xs">
+            <Link href="/privacy" className="text-muted hover:text-accent transition-colors">
+              Политика ПДн
+            </Link>
+            <Link href="/consent" className="text-muted hover:text-accent transition-colors">
+              Согласие ПДн
+            </Link>
+            <span className="text-muted font-mono">3D-печать · Моделирование · Постобработка</span>
+          </div>
         </div>
       </div>
     </footer>

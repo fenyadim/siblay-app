@@ -87,7 +87,10 @@ async function main() {
 
   // Create admin user
   const adminEmail = process.env.ADMIN_EMAIL ?? "admin@siblay.ru"
-  const adminPassword = process.env.ADMIN_PASSWORD ?? "changeme123"
+  const adminPassword = process.env.ADMIN_PASSWORD
+  if (!adminPassword) {
+    throw new Error("ADMIN_PASSWORD is required to seed admin user")
+  }
 
   console.log(`👤 Создаём admin пользователя (${adminEmail})...`)
 

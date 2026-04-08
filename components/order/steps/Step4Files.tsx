@@ -18,29 +18,35 @@ interface UploadedFile {
 }
 
 export function Step4Files() {
-  const { watch, setValue, formState: { errors } } = useFormContext<OrderFormData>()
+  const { watch, setValue, getValues, formState: { errors } } = useFormContext<OrderFormData>()
   const hasModel = watch("hasModel") ?? true
   const files = (watch("files") ?? []) as UploadedFile[]
 
-  const [uploading, setUploading] = useState<Record<string, number>>({})
+  const [uploading, setUploading] = useState<Record<string, { name: string; progress: number }>>({})
   const [uploadErrors, setUploadErrors] = useState<string[]>([])
   const inputRef = useRef<HTMLInputElement>(null)
+  const inFlightRef = useRef(0)
+  const uploadIdRef = useRef(0)
 
   const accept = hasModel ? MODEL_FORMATS.join(",") : PHOTO_FORMATS.join(",")
   const maxSize = hasModel ? MODEL_MAX_SIZE : PHOTO_MAX_SIZE
   const maxFiles = hasModel ? 3 : 10
 
   async function uploadFile(file: File) {
+    const currentFiles = (getValues("files") ?? []) as UploadedFile[]
+
     if (file.size > maxSize) {
       setUploadErrors((prev) => [...prev, `${file.name}: файл слишком большой`])
       return
     }
-    if (files.length >= maxFiles) {
+    if (currentFiles.length + inFlightRef.current >= maxFiles) {
       setUploadErrors((prev) => [...prev, `Максимум ${maxFiles} файлов`])
       return
     }
 
-    setUploading((prev) => ({ ...prev, [file.name]: 0 }))
+    inFlightRef.current += 1
+    const uploadId = `upload-${uploadIdRef.current++}`
+    setUploading((prev) => ({ ...prev, [uploadId]: { name: file.name, progress: 0 } }))
 
     try {
       const formData = new FormData()
@@ -66,13 +72,20 @@ export function Step4Files() {
         fileSize: file.size,
       }
 
-      setValue("files", [...files, newFile], { shouldValidate: true })
+      const latestFiles = (getValues("files") ?? []) as UploadedFile[]
+      if (latestFiles.length >= maxFiles) {
+        setUploadErrors((prev) => [...prev, `${file.name}: превышен лимит файлов`])
+        return
+      }
+
+      setValue("files", [...latestFiles, newFile], { shouldValidate: true })
     } catch {
       setUploadErrors((prev) => [...prev, `${file.name}: ошибка загрузки`])
     } finally {
+      inFlightRef.current = Math.max(0, inFlightRef.current - 1)
       setUploading((prev) => {
         const next = { ...prev }
-        delete next[file.name]
+        delete next[uploadId]
         return next
       })
     }
@@ -144,7 +157,10 @@ export function Step4Files() {
           accept={accept}
           multiple
           className="hidden"
-          onChange={(e) => Array.from(e.target.files ?? []).forEach(uploadFile)}
+          onChange={(e) => {
+            Array.from(e.target.files ?? []).forEach(uploadFile)
+            e.target.value = ""
+          }}
         />
         <div className="text-3xl mb-3 text-muted">
           {isUploading ? "⏳" : "📎"}
@@ -160,10 +176,10 @@ export function Step4Files() {
       </div>
 
       {/* Uploading indicators */}
-      {Object.keys(uploading).map((name) => (
-        <div key={name} className="mt-2 flex items-center gap-2 text-sm text-muted">
+      {Object.entries(uploading).map(([id, upload]) => (
+        <div key={id} className="mt-2 flex items-center gap-2 text-sm text-muted">
           <div className="w-4 h-4 border-2 border-accent border-t-transparent rounded-full animate-spin shrink-0" />
-          {name}
+          {upload.name}
         </div>
       ))}
 

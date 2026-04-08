@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server"
 import { s3, getS3Url } from "@/lib/s3"
 import { PutObjectCommand } from "@aws-sdk/client-s3"
 import { nanoid } from "nanoid"
+import { Readable } from "node:stream"
+import { auth } from "@/lib/auth"
 
 // ── Rate limiting (in-memory, per IP) ────────────────────────────────────────
 const RATE_LIMIT = 20
@@ -9,16 +11,32 @@ const WINDOW_MS = 60 * 60 * 1000
 
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>()
 
-function checkRateLimit(ip: string): boolean {
+function checkRateLimit(clientId: string): { allowed: boolean; retryAfter: number } {
   const now = Date.now()
-  const entry = rateLimitMap.get(ip)
+  const entry = rateLimitMap.get(clientId)
   if (!entry || entry.resetAt < now) {
-    rateLimitMap.set(ip, { count: 1, resetAt: now + WINDOW_MS })
-    return true
+    rateLimitMap.set(clientId, { count: 1, resetAt: now + WINDOW_MS })
+    return { allowed: true, retryAfter: 0 }
   }
-  if (entry.count >= RATE_LIMIT) return false
+  if (entry.count >= RATE_LIMIT) {
+    return {
+      allowed: false,
+      retryAfter: Math.max(1, Math.ceil((entry.resetAt - now) / 1000)),
+    }
+  }
   entry.count++
-  return true
+  return { allowed: true, retryAfter: 0 }
+}
+
+function getClientIdentifier(req: NextRequest): string {
+  const realIp = req.headers.get("x-real-ip")?.trim()
+  if (realIp) return realIp
+
+  const forwardedIp = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim()
+  if (forwardedIp) return forwardedIp
+
+  // Fallback prevents every unknown client from sharing one global bucket.
+  return req.headers.get("user-agent")?.trim() || "unknown"
 }
 
 // ── Allowed types ─────────────────────────────────────────────────────────────
@@ -49,15 +67,16 @@ const MAX_IMAGE_SIZE = 20 * 1024 * 1024  // 20 MB
 const MAX_MODEL_SIZE = 100 * 1024 * 1024 // 100 MB
 
 export async function POST(req: NextRequest) {
-  const ip =
-    req.headers.get("x-forwarded-for")?.split(",")[0].trim() ??
-    req.headers.get("x-real-ip") ??
-    "unknown"
+  const clientId = getClientIdentifier(req)
+  const rateLimit = checkRateLimit(clientId)
 
-  if (!checkRateLimit(ip)) {
+  if (!rateLimit.allowed) {
     return NextResponse.json(
       { error: "Слишком много запросов. Попробуйте позже." },
-      { status: 429 },
+      {
+        status: 429,
+        headers: { "Retry-After": String(rateLimit.retryAfter) },
+      },
     )
   }
 
@@ -66,8 +85,19 @@ export async function POST(req: NextRequest) {
     const file = formData.get("file") as File | null
     const folder = formData.get("folder") === "portfolio" ? "portfolio" : "orders"
 
+    if (folder === "portfolio") {
+      const session = await auth.api.getSession({ headers: req.headers })
+      if (!session || session.user.email !== process.env.ADMIN_EMAIL) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+      }
+    }
+
     if (!file) {
       return NextResponse.json({ error: "Файл не передан" }, { status: 400 })
+    }
+
+    if (file.size <= 0) {
+      return NextResponse.json({ error: "Файл пустой" }, { status: 400 })
     }
 
     if (file.name.length > 255) {
@@ -90,18 +120,28 @@ export async function POST(req: NextRequest) {
       )
     }
 
+    if (folder === "portfolio" && !file.type.toLowerCase().startsWith("image/")) {
+      return NextResponse.json(
+        { error: "В портфолио можно загружать только изображения" },
+        { status: 400 },
+      )
+    }
+
+    if (!process.env.AWS_S3_BUCKET) {
+      return NextResponse.json({ error: "S3 bucket is not configured" }, { status: 500 })
+    }
+
     const ext = file.name.split(".").pop()?.toLowerCase() ?? "bin"
     const key = `${folder}/${nanoid()}/${Date.now()}.${ext}`
-
-    const buffer = Buffer.from(await file.arrayBuffer())
+    const body = Readable.fromWeb(file.stream() as any)
 
     await s3.send(
       new PutObjectCommand({
         Bucket: process.env.AWS_S3_BUCKET,
         Key: key,
-        Body: buffer,
+        Body: body,
         ContentType: file.type,
-        ContentLength: buffer.length,
+        ContentLength: file.size,
         ACL: "public-read",
       }),
     )

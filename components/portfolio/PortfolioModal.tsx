@@ -23,6 +23,7 @@ interface PortfolioModalProps {
 }
 
 export function PortfolioModal({ children, item }: PortfolioModalProps) {
+  const [open, setOpen] = useState(false)
   const [activeImg, setActiveImg] = useState(0)
   const hasMultiple = item.images.length > 1
 
@@ -36,14 +37,18 @@ export function PortfolioModal({ children, item }: PortfolioModalProps) {
 
   // Keyboard navigation
   useEffect(() => {
-    if (!hasMultiple) return
+    if (!open || !hasMultiple) return
     const handler = (e: KeyboardEvent) => {
       if (e.key === 'ArrowLeft') goPrev()
       if (e.key === 'ArrowRight') goNext()
     }
     window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
-  }, [hasMultiple, goPrev, goNext])
+  }, [open, hasMultiple, goPrev, goNext])
+
+  useEffect(() => {
+    if (!open) setActiveImg(0)
+  }, [open])
 
   const params =
     item.params && typeof item.params === 'object' && !Array.isArray(item.params)
@@ -51,7 +56,7 @@ export function PortfolioModal({ children, item }: PortfolioModalProps) {
       : null
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="w-[min(96vw,72rem)] max-w-none sm:max-w-none h-[min(90vh,48rem)] bg-surface border-border p-0 overflow-hidden rounded-2xl shadow-2xl shadow-black/20 gap-0">
         <div className="grid grid-cols-1 md:grid-cols-2 h-full">

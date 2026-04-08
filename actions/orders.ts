@@ -1,12 +1,14 @@
 "use server"
 
-import { prisma } from "@/lib/prisma"
-import { sendEmail, sendTelegram, orderEmailTemplate } from "@/lib/notifications"
-import { fullOrderSchema, type OrderFormData } from "@/lib/validations/order"
-import { auth } from "@/lib/auth"
-import { headers } from "next/headers"
 import { OrderStatus } from "@/app/generated/prisma/client"
+import { auth } from "@/lib/auth"
+import { sendEmail, sendTelegram, orderEmailTemplate } from "@/lib/notifications"
+import { prisma } from "@/lib/prisma"
+import { fullOrderSchema, type OrderFormData } from "@/lib/validations/order"
 import { revalidatePath } from "next/cache"
+import { headers } from "next/headers"
+
+const CONSENT_VERSION = process.env.PERSONAL_DATA_CONSENT_VERSION ?? "2026-04-08"
 
 export async function createOrder(data: OrderFormData) {
   const parsed = fullOrderSchema.safeParse(data)
@@ -14,18 +16,25 @@ export async function createOrder(data: OrderFormData) {
     return { error: "Ошибка валидации данных" }
   }
 
-  const { files, ...rest } = parsed.data
+  const { files, personalDataConsent, ...rest } = parsed.data
+
+  if (!personalDataConsent) {
+    return { error: "Требуется согласие на обработку персональных данных" }
+  }
 
   const order = await prisma.order.create({
     data: {
       ...rest,
       estimatedPrice: undefined,
+      personalDataConsentGiven: true,
+      personalDataConsentAt: new Date(),
+      personalDataConsentVersion: CONSENT_VERSION,
       files: {
-        create: files.map((f) => ({
-          fileName: f.fileName,
-          fileUrl: f.fileUrl,
-          fileType: f.fileType,
-          fileSize: f.fileSize,
+        create: files.map((file) => ({
+          fileName: file.fileName,
+          fileUrl: file.fileUrl,
+          fileType: file.fileType,
+          fileSize: file.fileSize,
         })),
       },
     },
@@ -37,19 +46,17 @@ export async function createOrder(data: OrderFormData) {
     notificationEmail
       ? sendEmail({
           to: notificationEmail,
-          subject: `🖨️ Новый заказ #${order.id} — ${order.fullName}`,
+          subject: `Новый заказ #${order.id} — ${order.fullName}`,
           html: orderEmailTemplate(order),
         })
       : Promise.resolve(),
     sendTelegram(
-      `🖨️ <b>Новый заказ #${order.id}</b>\n` +
-        `👤 ${order.fullName}\n` +
-        `📞 ${order.phone}\n` +
-        `📧 ${order.email}\n` +
-        `🧱 Материал: ${order.material}, ${order.color}\n` +
-        `📦 ${order.quantity} шт. | Infill: ${order.infill}%\n` +
-        `${!order.hasModel ? "⚠️ Нет 3D-модели (нужно моделирование)\n" : ""}` +
-        `🚚 ${order.delivery}`,
+      `Новый заказ #${order.id}\n` +
+        `Материал: ${order.material}, ${order.color}\n` +
+        `Количество: ${order.quantity} шт. | Infill: ${order.infill}%\n` +
+        `${!order.hasModel ? "Нет 3D-модели (нужно моделирование)\n" : ""}` +
+        `Доставка: ${order.delivery}` +
+        `${order.personalDataConsentVersion ? `\nConsent: ${order.personalDataConsentVersion}` : ""}`,
     ),
   ])
 

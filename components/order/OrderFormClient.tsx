@@ -44,7 +44,7 @@ export function OrderFormClient({ materials }: Props) {
 
   const methods = useForm<OrderFormData>({
     resolver: zodResolver(fullOrderSchema) as Resolver<OrderFormData>,
-    defaultValues: { quantity: 1, infill: 50, hasModel: true, files: [] },
+    defaultValues: { quantity: 1, infill: 50, hasModel: true, files: [], personalDataConsent: false },
     mode: 'onBlur',
   })
 

@@ -13,7 +13,7 @@ const inter = Inter({
 
 const manrope = Manrope({
   subsets: ['latin', 'cyrillic'],
-  variable: '--font-manrope ',
+  variable: '--font-manrope',
   display: 'swap',
 })
 

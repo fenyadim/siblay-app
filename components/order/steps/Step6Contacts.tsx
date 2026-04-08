@@ -4,6 +4,7 @@ import { useFormContext } from "react-hook-form"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import Link from "next/link"
 import { cn } from "@/lib/utils"
 import type { OrderFormData } from "@/lib/validations/order"
 
@@ -121,6 +122,30 @@ export function Step6Contacts() {
           />
         </Field>
       )}
+
+      <div className="rounded-xl border border-border bg-surface-raised p-4">
+        <label className="flex items-start gap-3 cursor-pointer">
+          <input
+            {...register("personalDataConsent")}
+            type="checkbox"
+            className="mt-0.5 size-4 rounded border-border text-accent focus:ring-accent"
+          />
+          <span className="text-sm text-foreground leading-relaxed">
+            Я даю согласие на обработку моих персональных данных в целях оформления и исполнения заказа, а также ознакомлен(а) с{" "}
+            <Link href="/privacy" target="_blank" rel="noopener noreferrer" className="text-accent underline-offset-2 hover:underline">
+              политикой обработки персональных данных
+            </Link>
+            {" "}и{" "}
+            <Link href="/consent" target="_blank" rel="noopener noreferrer" className="text-accent underline-offset-2 hover:underline">
+              текстом согласия
+            </Link>
+            .
+          </span>
+        </label>
+        {errors.personalDataConsent && (
+          <p className="text-xs text-destructive mt-2">{errors.personalDataConsent.message}</p>
+        )}
+      </div>
     </div>
   )
 }

@@ -173,7 +173,7 @@
 }
 
 @utility gradient-border {
-  @apply relative border border-transparent [background-clip:padding-box];
+  @apply relative border border-transparent bg-clip-padding;
 }
 
 @keyframes scroll-x {
@@ -189,7 +189,7 @@
 }
 
 .color-card:hover .scroll-text {
-  @apply [animation:scroll-x_2s_ease-in-out_infinite_alternate];
+  @apply animate-[scroll-x_2s_ease-in-out_infinite_alternate];
 }
 
 @utility section-glow {
