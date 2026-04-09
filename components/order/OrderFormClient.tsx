@@ -44,7 +44,14 @@ export function OrderFormClient({ materials }: Props) {
 
   const methods = useForm<OrderFormData>({
     resolver: zodResolver(fullOrderSchema) as Resolver<OrderFormData>,
-    defaultValues: { quantity: 1, infill: 50, hasModel: true, files: [], personalDataConsent: false },
+    defaultValues: {
+      material: 'PLA',
+      quantity: 1,
+      infill: 50,
+      hasModel: true,
+      files: [],
+      personalDataConsent: false,
+    },
     mode: 'onBlur',
   })
 
@@ -93,9 +100,7 @@ export function OrderFormClient({ materials }: Props) {
         {/* Page header */}
         <div className="mb-8">
           <span className="label-mono">Оформление заказа</span>
-          <h1
-            className="mt-2 text-4xl font-black tracking-tight text-foreground font-display"
-          >
+          <h1 className="mt-2 text-4xl font-black tracking-tight text-foreground font-display">
             Новый заказ
           </h1>
         </div>

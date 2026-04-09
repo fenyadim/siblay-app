@@ -45,6 +45,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html
       lang="ru"
       suppressHydrationWarning
+      data-scroll-behavior="smooth"
       className={`${inter.variable} ${manrope.variable} ${jetBrainsMono.variable}`}
     >
       <body className="min-h-screen flex flex-col">
