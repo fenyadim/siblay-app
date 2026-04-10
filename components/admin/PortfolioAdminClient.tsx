@@ -1,7 +1,7 @@
 ﻿"use client"
 
 import { useState, useTransition, useRef, useCallback } from "react"
-import { useForm, useFieldArray, type Resolver } from "react-hook-form"
+import { useForm, type Resolver } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { portfolioSchema, PORTFOLIO_CATEGORIES, type PortfolioFormData } from "@/lib/validations/portfolio"
 import { createPortfolioItem, updatePortfolioItem, deletePortfolioItem } from "@/actions/portfolio"
@@ -34,6 +34,24 @@ interface UploadingFile {
   url?: string
   error?: string
 }
+
+interface ParamRow {
+  id: string
+  key: string
+  value: string
+}
+
+const PARAMETER_OPTIONS = [
+  "Слой",
+  "Заполнение",
+  "Масштаб",
+  "Поддержки",
+  "Высота",
+  "Ширина",
+  "Длина",
+  "Диаметр",
+  "Модуль",
+] as const
 
 function ImageUploader({
   images,
@@ -261,16 +279,68 @@ function PortfolioForm({
   } = useForm<PortfolioFormData>({
     resolver: zodResolver(portfolioSchema) as Resolver<PortfolioFormData>,
     defaultValues: {
+      title: defaultValues?.title ?? "",
+      description: defaultValues?.description ?? "",
+      category: defaultValues?.category,
+      material: defaultValues?.material ?? "",
       published: true,
       images: [],
-      ...defaultValues,
+      ...(typeof defaultValues?.published === "boolean"
+        ? { published: defaultValues.published }
+        : {}),
+      ...(Array.isArray(defaultValues?.images)
+        ? { images: defaultValues.images }
+        : {}),
     },
   })
 
   const images = watch("images") ?? []
+  const [paramRows, setParamRows] = useState<ParamRow[]>(() => {
+    if (!defaultValues?.params) return []
+    return Object.entries(defaultValues.params)
+      .filter(([k, v]) => Boolean(k) && Boolean(v))
+      .map(([key, value], index) => ({
+        id: `${index}-${Math.random().toString(36).slice(2)}`,
+        key,
+        value,
+      }))
+  })
+
+  const addParamRow = () => {
+    setParamRows((prev) => [
+      ...prev,
+      { id: Math.random().toString(36).slice(2), key: PARAMETER_OPTIONS[0], value: "" },
+    ])
+  }
+
+  const updateParamRow = (id: string, patch: Partial<ParamRow>) => {
+    setParamRows((prev) =>
+      prev.map((row) => (row.id === id ? { ...row, ...patch } : row)),
+    )
+  }
+
+  const removeParamRow = (id: string) => {
+    setParamRows((prev) => prev.filter((row) => row.id !== id))
+  }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+    <form
+      onSubmit={handleSubmit((data) => {
+        const params = paramRows.reduce<Record<string, string>>((acc, row) => {
+          const key = row.key.trim()
+          const value = row.value.trim()
+          if (!key || !value) return acc
+          acc[key] = value
+          return acc
+        }, {})
+
+        onSubmit({
+          ...data,
+          params: Object.keys(params).length > 0 ? params : undefined,
+        })
+      })}
+      className="space-y-4"
+    >
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className="block text-xs text-muted mb-1">Название *</label>
@@ -326,6 +396,56 @@ function PortfolioForm({
           rows={3}
           className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent resize-none"
         />
+      </div>
+
+      <div>
+        <div className="flex items-center justify-between mb-2">
+          <label className="block text-xs text-muted">Параметры детали</label>
+          <button
+            type="button"
+            onClick={addParamRow}
+            className="text-xs text-accent hover:underline"
+          >
+            + Добавить параметр
+          </button>
+        </div>
+
+        {paramRows.length === 0 ? (
+          <div className="rounded-lg border border-dashed border-border px-3 py-2 text-xs text-muted">
+            Параметры не добавлены
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {paramRows.map((row) => (
+              <div key={row.id} className="grid grid-cols-[1fr_1fr_auto] gap-2">
+                <select
+                  value={row.key}
+                  onChange={(e) => updateParamRow(row.id, { key: e.target.value })}
+                  className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
+                >
+                  {Array.from(new Set([...PARAMETER_OPTIONS, row.key])).map((option) => (
+                    <option key={option} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </select>
+                <input
+                  value={row.value}
+                  onChange={(e) => updateParamRow(row.id, { value: e.target.value })}
+                  placeholder="Значение (например: 0.1 мм)"
+                  className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
+                />
+                <button
+                  type="button"
+                  onClick={() => removeParamRow(row.id)}
+                  className="px-3 rounded-lg border border-border text-sm text-muted hover:text-red-500"
+                >
+                  ×
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Image uploader */}

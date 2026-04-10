@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server"
 import { s3, getS3Url } from "@/lib/s3"
 import { PutObjectCommand } from "@aws-sdk/client-s3"
 import { nanoid } from "nanoid"
-import { Readable } from "node:stream"
 import { auth } from "@/lib/auth"
 
 // ── Rate limiting (in-memory, per IP) ────────────────────────────────────────
@@ -133,7 +132,7 @@ export async function POST(req: NextRequest) {
 
     const ext = file.name.split(".").pop()?.toLowerCase() ?? "bin"
     const key = `${folder}/${nanoid()}/${Date.now()}.${ext}`
-    const body = Readable.fromWeb(file.stream() as any)
+    const body = Buffer.from(await file.arrayBuffer())
 
     await s3.send(
       new PutObjectCommand({
