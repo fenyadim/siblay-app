@@ -6,6 +6,17 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { portfolioSchema, PORTFOLIO_CATEGORIES, type PortfolioFormData } from "@/lib/validations/portfolio"
 import { createPortfolioItem, updatePortfolioItem, deletePortfolioItem } from "@/actions/portfolio"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Input } from "@/components/ui/input"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { Textarea } from "@/components/ui/textarea"
 import { cn } from "@/lib/utils"
 
 interface PortfolioItem {
@@ -152,13 +163,14 @@ function ImageUploader({
                 alt=""
                 className="w-20 h-20 rounded-xl object-cover border border-border"
               />
-              <button
+              <Button
                 type="button"
+                size="icon-xs"
                 onClick={() => removeImage(i)}
                 className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-destructive text-white text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
               >
                 ×
-              </button>
+              </Button>
               {i === 0 && (
                 <span className="absolute bottom-0.5 left-0.5 right-0.5 text-center text-[9px] font-mono bg-black/50 text-white rounded-b-lg py-0.5">
                   обложка
@@ -183,13 +195,15 @@ function ImageUploader({
               {f.error ? (
                 <>
                   <span className="text-xs text-destructive">{f.error}</span>
-                  <button
+                  <Button
                     type="button"
+                    variant="ghost"
+                    size="xs"
                     onClick={() => removeUploadError(f.id)}
-                    className="text-xs text-muted hover:text-foreground"
+                    className="text-xs text-muted hover:bg-transparent hover:text-foreground"
                   >
                     ×
-                  </button>
+                  </Button>
                 </>
               ) : (
                 <div className="w-20 h-1.5 rounded-full bg-border overflow-hidden">
@@ -241,7 +255,7 @@ function ImageUploader({
         <p className="text-[10px] text-(--placeholder)">
           JPG, PNG, WEBP, HEIC
         </p>
-        <input
+        <Input
           ref={inputRef}
           type="file"
           accept="image/*"
@@ -295,6 +309,8 @@ function PortfolioForm({
   })
 
   const images = watch("images") ?? []
+  const category = watch("category")
+  const published = watch("published")
   const [paramRows, setParamRows] = useState<ParamRow[]>(() => {
     if (!defaultValues?.params) return []
     return Object.entries(defaultValues.params)
@@ -344,7 +360,7 @@ function PortfolioForm({
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className="block text-xs text-muted mb-1">Название *</label>
-          <input
+          <Input
             {...register("title")}
             className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
           />
@@ -353,23 +369,32 @@ function PortfolioForm({
 
         <div>
           <label className="block text-xs text-muted mb-1">Категория *</label>
-          <select
-            {...register("category")}
-            className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
+          <Select
+            value={category ?? undefined}
+            onValueChange={(value) =>
+              setValue("category", value as PortfolioFormData["category"], {
+                shouldDirty: true,
+                shouldValidate: true,
+              })
+            }
           >
-            <option value="">Выберите…</option>
+            <SelectTrigger className="w-full rounded-lg border-border bg-background text-sm text-foreground">
+              <SelectValue placeholder="Выберите…" />
+            </SelectTrigger>
+            <SelectContent>
             {PORTFOLIO_CATEGORIES.map((c) => (
-              <option key={c.value} value={c.value}>
+              <SelectItem key={c.value} value={c.value}>
                 {c.label}
-              </option>
+              </SelectItem>
             ))}
-          </select>
+            </SelectContent>
+          </Select>
           {errors.category && <p className="text-xs text-red-500 mt-1">{errors.category.message}</p>}
         </div>
 
         <div>
           <label className="block text-xs text-muted mb-1">Материал *</label>
-          <input
+          <Input
             {...register("material")}
             className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
           />
@@ -377,11 +402,15 @@ function PortfolioForm({
         </div>
 
         <div className="flex items-center gap-2 pt-5">
-          <input
-            type="checkbox"
+          <Checkbox
             id="published"
-            {...register("published")}
-            className="rounded border-border accent-accent"
+            checked={Boolean(published)}
+            onCheckedChange={(checked) =>
+              setValue("published", Boolean(checked), {
+                shouldDirty: true,
+                shouldValidate: true,
+              })
+            }
           />
           <label htmlFor="published" className="text-sm text-foreground">
             Опубликовано
@@ -391,7 +420,7 @@ function PortfolioForm({
 
       <div>
         <label className="block text-xs text-muted mb-1">Описание</label>
-        <textarea
+        <Textarea
           {...register("description")}
           rows={3}
           className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent resize-none"
@@ -401,13 +430,15 @@ function PortfolioForm({
       <div>
         <div className="flex items-center justify-between mb-2">
           <label className="block text-xs text-muted">Параметры детали</label>
-          <button
+          <Button
             type="button"
+            variant="ghost"
+            size="sm"
             onClick={addParamRow}
-            className="text-xs text-accent hover:underline"
+            className="text-xs text-accent hover:bg-transparent hover:underline"
           >
             + Добавить параметр
-          </button>
+          </Button>
         </div>
 
         {paramRows.length === 0 ? (
@@ -418,30 +449,36 @@ function PortfolioForm({
           <div className="space-y-2">
             {paramRows.map((row) => (
               <div key={row.id} className="grid grid-cols-[1fr_1fr_auto] gap-2">
-                <select
+                <Select
                   value={row.key}
-                  onChange={(e) => updateParamRow(row.id, { key: e.target.value })}
-                  className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
+                  onValueChange={(value) => updateParamRow(row.id, { key: value })}
                 >
-                  {Array.from(new Set([...PARAMETER_OPTIONS, row.key])).map((option) => (
-                    <option key={option} value={option}>
-                      {option}
-                    </option>
-                  ))}
-                </select>
-                <input
+                  <SelectTrigger className="w-full rounded-lg border-border bg-background text-sm text-foreground">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Array.from(new Set([...PARAMETER_OPTIONS, row.key])).map((option) => (
+                      <SelectItem key={option} value={option}>
+                        {option}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Input
                   value={row.value}
                   onChange={(e) => updateParamRow(row.id, { value: e.target.value })}
                   placeholder="Значение (например: 0.1 мм)"
                   className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
                 />
-                <button
+                <Button
                   type="button"
+                  variant="outline"
+                  size="sm"
                   onClick={() => removeParamRow(row.id)}
                   className="px-3 rounded-lg border border-border text-sm text-muted hover:text-red-500"
                 >
                   ×
-                </button>
+                </Button>
               </div>
             ))}
           </div>
@@ -456,20 +493,21 @@ function PortfolioForm({
       {errors.images && <p className="text-xs text-red-500 mt-1">{errors.images.message}</p>}
 
       <div className="flex gap-3 pt-2">
-        <button
+        <Button
           type="submit"
           disabled={isPending}
           className="px-5 py-2 rounded-lg bg-accent text-white text-sm font-medium hover:bg-(--accent-hover) transition-colors disabled:opacity-50"
         >
           {isPending ? "Сохранение…" : "Сохранить"}
-        </button>
-        <button
+        </Button>
+        <Button
           type="button"
+          variant="outline"
           onClick={onCancel}
           className="px-5 py-2 rounded-lg border border-border text-sm text-muted hover:text-foreground transition-colors"
         >
           Отмена
-        </button>
+        </Button>
       </div>
     </form>
   )
@@ -544,12 +582,13 @@ export function PortfolioAdminClient({ items: initialItems, categoryLabels }: Pr
       {mode === "list" && (
         <>
           <div className="mb-4">
-            <button
+            <Button
+              type="button"
               onClick={() => { setMode("create"); setError(null) }}
               className="px-4 py-2 rounded-lg bg-accent text-white text-sm font-medium hover:bg-(--accent-hover) transition-colors"
             >
               + Добавить работу
-            </button>
+            </Button>
           </div>
 
           {items.length === 0 ? (
@@ -608,23 +647,29 @@ export function PortfolioAdminClient({ items: initialItems, categoryLabels }: Pr
                         </td>
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-3">
-                            <button
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
                               onClick={() => {
                                 setEditingId(item.id)
                                 setMode("edit")
                                 setError(null)
                               }}
-                              className="text-xs text-accent hover:underline"
+                              className="text-xs text-accent hover:bg-transparent hover:underline"
                             >
                               Изменить
-                            </button>
-                            <button
+                            </Button>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
                               onClick={() => handleDelete(item.id)}
                               disabled={isPending}
-                              className="text-xs text-red-500 hover:underline disabled:opacity-50"
+                              className="text-xs text-red-500 hover:bg-transparent hover:underline disabled:opacity-50"
                             >
                               Удалить
-                            </button>
+                            </Button>
                           </div>
                         </td>
                       </tr>

@@ -4,6 +4,14 @@ import { useState, useTransition } from "react"
 import { OrderStatus } from "@/app/generated/prisma/client"
 import { ORDER_STATUS_LABELS } from "@/lib/utils"
 import { updateOrderStatus } from "@/actions/orders"
+import { Button } from "@/components/ui/button"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
 interface Props {
   orderId: string
@@ -15,8 +23,8 @@ export function OrderStatusSelect({ orderId, currentStatus }: Props) {
   const [isPending, startTransition] = useTransition()
   const [saved, setSaved] = useState(false)
 
-  function handleChange(e: React.ChangeEvent<HTMLSelectElement>) {
-    setStatus(e.target.value as OrderStatus)
+  function handleChange(value: string) {
+    setStatus(value as OrderStatus)
     setSaved(false)
   }
 
@@ -29,25 +37,30 @@ export function OrderStatusSelect({ orderId, currentStatus }: Props) {
 
   return (
     <div className="flex items-center gap-3">
-      <select
+      <Select
         value={status}
-        onChange={handleChange}
+        onValueChange={handleChange}
         disabled={isPending}
-        className="flex-1 rounded-lg border border-border bg-background text-foreground px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent disabled:opacity-50"
       >
-        {Object.entries(ORDER_STATUS_LABELS).map(([value, label]) => (
-          <option key={value} value={value}>
-            {label}
-          </option>
-        ))}
-      </select>
-      <button
+        <SelectTrigger className="flex-1 rounded-lg border-border bg-background text-foreground">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          {Object.entries(ORDER_STATUS_LABELS).map(([value, label]) => (
+            <SelectItem key={value} value={value}>
+              {label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+      <Button
+        type="button"
         onClick={handleSave}
         disabled={isPending || status === currentStatus}
         className="px-4 py-2 rounded-lg bg-accent text-white text-sm font-medium hover:bg-(--accent-hover) transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
       >
         {isPending ? "Сохранение…" : saved ? "Сохранено ✓" : "Сохранить"}
-      </button>
+      </Button>
     </div>
   )
 }

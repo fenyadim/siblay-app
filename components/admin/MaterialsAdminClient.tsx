@@ -3,9 +3,22 @@
 import { useState, useTransition } from "react"
 import { createMaterial, updateMaterial, updateMaterialColor, addMaterialColor, deleteMaterialColor } from "@/actions/materials"
 import type { MaterialWithColors } from "@/actions/materials"
+import { Button } from "@/components/ui/button"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Input } from "@/components/ui/input"
 
 interface Props {
   materials: MaterialWithColors[]
+}
+
+function toColorInputValue(value: string, fallback = "#ffffff") {
+  const trimmed = value.trim()
+  if (/^#[\da-fA-F]{6}$/.test(trimmed)) return trimmed
+  if (/^#[\da-fA-F]{3}$/.test(trimmed)) {
+    const [, r, g, b] = trimmed
+    return `#${r}${r}${g}${g}${b}${b}`
+  }
+  return fallback
 }
 
 function ColorDot({ hex, hex2 }: { hex: string; hex2?: string | null }) {
@@ -37,18 +50,20 @@ function EditableField({
 
   if (!editing) {
     return (
-      <button
+      <Button
+        type="button"
+        variant="ghost"
         onClick={() => { setDraft(value); setEditing(true) }}
-        className={`text-left hover:text-accent transition-colors ${mono ? "font-mono" : ""}`}
+        className={`h-auto w-full justify-start p-0 text-left font-normal hover:bg-transparent hover:text-accent transition-colors ${mono ? "font-mono" : ""}`}
       >
         {value || <span className="text-muted italic">{placeholder ?? "—"}</span>}
-      </button>
+      </Button>
     )
   }
 
   return (
     <div className="flex items-center gap-1.5">
-      <input
+      <Input
         autoFocus
         value={draft}
         onChange={(e) => setDraft(e.target.value)}
@@ -58,18 +73,24 @@ function EditableField({
         }}
         className={`border border-accent rounded px-2 py-0.5 text-sm bg-background text-foreground focus:outline-none w-full min-w-0 ${mono ? "font-mono" : ""}`}
       />
-      <button
+      <Button
+        type="button"
+        variant="ghost"
+        size="xs"
         onClick={() => { onSave(draft); setEditing(false) }}
         className="text-accent text-xs font-medium whitespace-nowrap"
       >
         ✓
-      </button>
-      <button
+      </Button>
+      <Button
+        type="button"
+        variant="ghost"
+        size="xs"
         onClick={() => setEditing(false)}
         className="text-muted text-xs"
       >
         ✕
-      </button>
+      </Button>
     </div>
   )
 }
@@ -99,7 +120,7 @@ function ColorRow({
         <ColorDot hex={color.hex} hex2={color.hex2} />
         {editingHex ? (
           <div className="flex items-center gap-1">
-            <input
+            <Input
               autoFocus
               value={hexDraft}
               onChange={(e) => setHexDraft(e.target.value)}
@@ -109,13 +130,20 @@ function ColorRow({
               }}
               className="font-mono text-xs border border-accent rounded px-1.5 py-0.5 bg-background text-foreground focus:outline-none w-24"
             />
-            <button onClick={() => { save({ hex: hexDraft }); setEditingHex(false) }} className="text-accent text-xs">✓</button>
-            <button onClick={() => setEditingHex(false)} className="text-muted text-xs">✕</button>
+            <Input
+              type="color"
+              value={toColorInputValue(hexDraft, color.hex)}
+              onChange={(e) => setHexDraft(e.target.value)}
+              className="h-6 w-6 cursor-pointer rounded p-0"
+              aria-label="Выбрать цвет"
+            />
+            <Button type="button" variant="ghost" size="xs" onClick={() => { save({ hex: hexDraft }); setEditingHex(false) }} className="text-accent text-xs hover:bg-transparent">✓</Button>
+            <Button type="button" variant="ghost" size="xs" onClick={() => setEditingHex(false)} className="text-muted text-xs hover:bg-transparent">✕</Button>
           </div>
         ) : (
-          <button onClick={() => { setHexDraft(color.hex); setEditingHex(true) }} className="font-mono text-xs text-muted hover:text-accent transition-colors">
+          <Button type="button" variant="ghost" size="xs" onClick={() => { setHexDraft(color.hex); setEditingHex(true) }} className="font-mono text-xs text-muted hover:bg-transparent hover:text-accent transition-colors">
             {color.hex}
-          </button>
+          </Button>
         )}
       </div>
 
@@ -124,7 +152,7 @@ function ColorRow({
         {showHex2 ? (
           editingHex2 ? (
             <div className="flex items-center gap-1">
-              <input
+              <Input
                 autoFocus
                 value={hex2Draft}
                 onChange={(e) => setHex2Draft(e.target.value)}
@@ -135,24 +163,37 @@ function ColorRow({
                 className="font-mono text-xs border border-accent rounded px-1.5 py-0.5 bg-background text-foreground focus:outline-none w-24"
                 placeholder="#hex2"
               />
-              <button onClick={() => { save({ hex2: hex2Draft || null }); setEditingHex2(false) }} className="text-accent text-xs">✓</button>
-              <button onClick={() => { setShowHex2(false); save({ hex2: null }) }} className="text-red-400 text-xs" title="Убрать цвет 2">✕</button>
+              <Input
+                type="color"
+                value={toColorInputValue(hex2Draft, color.hex2 ?? "#000000")}
+                onChange={(e) => setHex2Draft(e.target.value)}
+                className="h-6 w-6 cursor-pointer rounded p-0"
+                aria-label="Выбрать второй цвет"
+              />
+              <Button type="button" variant="ghost" size="xs" onClick={() => { save({ hex2: hex2Draft || null }); setEditingHex2(false) }} className="text-accent text-xs hover:bg-transparent">✓</Button>
+              <Button type="button" variant="ghost" size="xs" onClick={() => { setShowHex2(false); save({ hex2: null }) }} className="text-red-400 text-xs hover:bg-transparent" title="Убрать цвет 2">✕</Button>
             </div>
           ) : (
-            <button
+            <Button
+              type="button"
+              variant="ghost"
+              size="xs"
               onClick={() => { setHex2Draft(color.hex2 ?? ""); setEditingHex2(true) }}
-              className="font-mono text-xs text-muted hover:text-accent transition-colors"
+              className="font-mono text-xs text-muted hover:bg-transparent hover:text-accent transition-colors"
             >
               {color.hex2 ?? <span className="italic opacity-60">цвет 2</span>}
-            </button>
+            </Button>
           )
         ) : (
-          <button
+          <Button
+            type="button"
+            variant="ghost"
+            size="xs"
             onClick={() => setShowHex2(true)}
-            className="text-xs text-accent opacity-60 hover:opacity-100 transition-opacity"
+            className="text-xs text-accent opacity-60 hover:bg-transparent hover:opacity-100 transition-opacity"
           >
             ＋ цвет 2
-          </button>
+          </Button>
         )}
       </div>
 
@@ -166,8 +207,9 @@ function ColorRow({
       </div>
 
       {/* In stock toggle */}
-      <button
+      <Button
         type="button"
+        size="xs"
         disabled={isPending}
         onClick={() => save({ inStock: !color.inStock })}
         className={`text-xs font-mono px-2 py-0.5 rounded-full transition-colors ${
@@ -177,20 +219,23 @@ function ColorRow({
         }`}
       >
         {color.inStock ? "В наличии" : "Под заказ"}
-      </button>
+      </Button>
 
       {/* Delete */}
-      <button
+      <Button
+        type="button"
+        variant="ghost"
+        size="xs"
         disabled={isPending}
         onClick={() => {
           if (confirm("Удалить цвет?")) {
             startTransition(() => deleteMaterialColor(color.id))
           }
         }}
-        className="text-muted hover:text-red-500 transition-colors text-sm"
+        className="text-muted hover:bg-transparent hover:text-red-500 transition-colors text-sm"
       >
         ✕
-      </button>
+      </Button>
     </div>
   )
 }
@@ -222,56 +267,76 @@ function AddColorForm({ materialId }: { materialId: string }) {
 
   if (!open) {
     return (
-      <button
+      <Button
+        type="button"
+        variant="ghost"
+        size="sm"
         onClick={() => setOpen(true)}
-        className="mt-2 text-xs text-accent hover:underline"
+        className="mt-2 text-xs text-accent hover:bg-transparent hover:underline"
       >
         + Добавить цвет
-      </button>
+      </Button>
     )
   }
 
   return (
     <div className="mt-3 flex items-center gap-2 flex-wrap">
-      <input
+      <Input
         autoFocus
         value={name}
         onChange={(e) => setName(e.target.value)}
         placeholder="Название"
         className="border border-border rounded px-2 py-1 text-sm bg-background text-foreground focus:outline-none focus:border-accent w-28"
       />
-      <input
+      <Input
         value={hex}
         onChange={(e) => setHex(e.target.value)}
         placeholder="#hex"
         className="font-mono border border-border rounded px-2 py-1 text-sm bg-background text-foreground focus:outline-none focus:border-accent w-24"
       />
+      <Input
+        type="color"
+        value={toColorInputValue(hex)}
+        onChange={(e) => setHex(e.target.value)}
+        className="h-8 w-8 cursor-pointer rounded p-0"
+        aria-label="Выбрать основной цвет"
+      />
       {isGradient && (
-        <input
-          value={hex2}
-          onChange={(e) => setHex2(e.target.value)}
-          placeholder="#hex2"
-          className="font-mono border border-border rounded px-2 py-1 text-sm bg-background text-foreground focus:outline-none focus:border-accent w-24"
-        />
+        <>
+          <Input
+            value={hex2}
+            onChange={(e) => setHex2(e.target.value)}
+            placeholder="#hex2"
+            className="font-mono border border-border rounded px-2 py-1 text-sm bg-background text-foreground focus:outline-none focus:border-accent w-24"
+          />
+          <Input
+            type="color"
+            value={toColorInputValue(hex2, "#000000")}
+            onChange={(e) => setHex2(e.target.value)}
+            className="h-8 w-8 cursor-pointer rounded p-0"
+            aria-label="Выбрать второй цвет"
+          />
+        </>
       )}
       <ColorDot hex={hex} hex2={isGradient ? hex2 : undefined} />
       <label className="flex items-center gap-1 text-xs text-muted cursor-pointer select-none">
-        <input
-          type="checkbox"
+        <Checkbox
           checked={isGradient}
-          onChange={(e) => setIsGradient(e.target.checked)}
+          onCheckedChange={(checked) => setIsGradient(Boolean(checked))}
           className="cursor-pointer"
         />
         Градиентный
       </label>
-      <button
+      <Button
+        type="button"
+        size="sm"
         disabled={isPending || !name.trim()}
         onClick={handleAdd}
         className="px-3 py-1 rounded-lg bg-accent text-white text-xs font-medium hover:bg-(--accent-hover) disabled:opacity-40 transition-colors"
       >
         {isPending ? "…" : "Добавить"}
-      </button>
-      <button onClick={() => setOpen(false)} className="text-xs text-muted">Отмена</button>
+      </Button>
+      <Button type="button" variant="ghost" size="sm" onClick={() => setOpen(false)} className="text-xs text-muted hover:bg-transparent">Отмена</Button>
     </div>
   )
 }
@@ -297,8 +362,9 @@ function MaterialCard({ material }: { material: MaterialWithColors }) {
         </span>
 
         {/* Available toggle */}
-        <button
+        <Button
           type="button"
+          size="xs"
           disabled={isPending}
           onClick={() => save({ available: !material.available })}
           className={`ml-auto text-xs font-mono px-2.5 py-0.5 rounded-full transition-colors ${
@@ -308,15 +374,18 @@ function MaterialCard({ material }: { material: MaterialWithColors }) {
           }`}
         >
           {material.available ? "Активен" : "Скоро"}
-        </button>
+        </Button>
 
         {/* Expand/collapse colors */}
-        <button
+        <Button
+          type="button"
+          variant="ghost"
+          size="xs"
           onClick={() => setOpen((v) => !v)}
-          className="text-muted hover:text-foreground transition-colors text-sm"
+          className="text-muted hover:bg-transparent hover:text-foreground transition-colors text-sm"
         >
           {open ? "▲" : "▼"}
-        </button>
+        </Button>
       </div>
 
       {/* Editable fields */}
@@ -371,12 +440,14 @@ function AddMaterialForm() {
 
   if (!open) {
     return (
-      <button
+      <Button
+        type="button"
+        variant="outline"
         onClick={() => setOpen(true)}
-        className="w-full rounded-xl border-2 border-dashed border-border py-4 text-sm text-muted hover:border-(--accent-border) hover:text-accent transition-colors"
+        className="w-full rounded-xl border-2 border-dashed border-border py-4 text-sm text-muted hover:bg-transparent hover:border-(--accent-border) hover:text-accent transition-colors"
       >
         + Добавить материал
-      </button>
+      </Button>
     )
   }
 
@@ -389,7 +460,7 @@ function AddMaterialForm() {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div>
           <label className="label-mono mb-1 block">Название *</label>
-          <input
+          <Input
             autoFocus
             value={form.name}
             onChange={(e) => set("name", e.target.value)}
@@ -399,7 +470,7 @@ function AddMaterialForm() {
         </div>
         <div>
           <label className="label-mono mb-1 block">Цена</label>
-          <input
+          <Input
             value={form.price}
             onChange={(e) => set("price", e.target.value)}
             placeholder="от 3 ₽/г"
@@ -408,7 +479,7 @@ function AddMaterialForm() {
         </div>
         <div>
           <label className="label-mono mb-1 block">Описание</label>
-          <input
+          <Input
             value={form.description}
             onChange={(e) => set("description", e.target.value)}
             placeholder="Гибкий, термостойкий"
@@ -417,7 +488,7 @@ function AddMaterialForm() {
         </div>
         <div>
           <label className="label-mono mb-1 block">Лучше всего для</label>
-          <input
+          <Input
             value={form.best}
             onChange={(e) => set("best", e.target.value)}
             placeholder="Корпуса, детали"
@@ -428,7 +499,7 @@ function AddMaterialForm() {
 
       <div className="flex items-center gap-3">
         <label className="label-mono">Цвет точки</label>
-        <input
+        <Input
           type="color"
           value={form.color}
           onChange={(e) => set("color", e.target.value)}
@@ -439,16 +510,17 @@ function AddMaterialForm() {
       </div>
 
       <div className="flex items-center gap-2 pt-1">
-        <button
+        <Button
+          type="button"
           disabled={isPending || !form.name.trim()}
           onClick={handleAdd}
           className="px-4 py-2 rounded-lg bg-accent text-white text-sm font-medium hover:bg-(--accent-hover) disabled:opacity-40 transition-colors"
         >
           {isPending ? "Создание…" : "Создать материал"}
-        </button>
-        <button onClick={() => setOpen(false)} className="text-sm text-muted hover:text-foreground transition-colors">
+        </Button>
+        <Button type="button" variant="ghost" onClick={() => setOpen(false)} className="text-sm text-muted hover:bg-transparent hover:text-foreground transition-colors">
           Отмена
-        </button>
+        </Button>
       </div>
     </div>
   )

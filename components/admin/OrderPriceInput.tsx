@@ -2,6 +2,8 @@
 
 import { useState, useTransition } from "react"
 import { updateOrderPrice } from "@/actions/orders"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 
 interface Props {
   orderId: string
@@ -28,7 +30,7 @@ export function OrderPriceInput({ orderId, currentPrice }: Props) {
   return (
     <div className="flex items-center gap-3">
       <div className="relative flex-1">
-        <input
+        <Input
           type="number"
           min="0"
           step="1"
@@ -42,13 +44,14 @@ export function OrderPriceInput({ orderId, currentPrice }: Props) {
           ₽
         </span>
       </div>
-      <button
+      <Button
+        type="button"
         onClick={handleSave}
         disabled={isPending || !isValid || !hasChange}
         className="px-4 py-2 rounded-lg bg-accent text-white text-sm font-medium hover:bg-(--accent-hover) transition-colors disabled:opacity-40 disabled:cursor-not-allowed whitespace-nowrap"
       >
         {isPending ? "Сохранение…" : saved ? "Сохранено ✓" : "Сохранить"}
-      </button>
+      </Button>
     </div>
   )
 }
