@@ -18,7 +18,6 @@ export type MaterialWithColors = {
   name: string
   description: string
   price: string
-  color: string
   best: string
   available: boolean
   sortOrder: number
@@ -140,6 +139,7 @@ const SEED_MATERIALS = [
 
 export async function getMaterialsWithColors(): Promise<MaterialWithColors[]> {
   return await prisma.material.findMany({
+    // include: { colors: { orderBy: { sortOrder: 'asc' } } },
     include: { colors: { orderBy: { sortOrder: 'asc' } } },
     orderBy: { sortOrder: 'asc' },
   })

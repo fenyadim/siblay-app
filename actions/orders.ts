@@ -1,34 +1,30 @@
-"use server"
+'use server'
 
-import { OrderStatus } from "@/app/generated/prisma/client"
-import { auth } from "@/lib/auth"
-import { sendEmail, sendTelegram, orderEmailTemplate } from "@/lib/notifications"
-import { prisma } from "@/lib/prisma"
-import { fullOrderSchema, type OrderFormData } from "@/lib/validations/order"
-import { revalidatePath } from "next/cache"
-import { headers } from "next/headers"
+import { revalidatePath } from 'next/cache'
+import { headers } from 'next/headers'
 
-const CONSENT_VERSION = process.env.PERSONAL_DATA_CONSENT_VERSION ?? "2026-04-08"
+import { OrderStatus } from '@/app/generated/prisma/client'
+import { auth } from '@/lib/auth'
+import { orderEmailTemplate, sendEmail, sendTelegram } from '@/lib/notifications'
+import { prisma } from '@/lib/prisma'
+import { fullOrderSchema, type OrderFormData } from '@/lib/validations/order'
 
 export async function createOrder(data: OrderFormData) {
   const parsed = fullOrderSchema.safeParse(data)
   if (!parsed.success) {
-    return { error: "Ошибка валидации данных" }
+    return { error: 'Ошибка валидации данных' }
   }
 
   const { files, personalDataConsent, ...rest } = parsed.data
 
   if (!personalDataConsent) {
-    return { error: "Требуется согласие на обработку персональных данных" }
+    return { error: 'Требуется согласие на обработку персональных данных' }
   }
 
   const order = await prisma.order.create({
     data: {
       ...rest,
       estimatedPrice: undefined,
-      personalDataConsentGiven: true,
-      personalDataConsentAt: new Date(),
-      personalDataConsentVersion: CONSENT_VERSION,
       files: {
         create: files.map((file) => ({
           fileName: file.fileName,
@@ -54,9 +50,8 @@ export async function createOrder(data: OrderFormData) {
       `Новый заказ #${order.id}\n` +
         `Материал: ${order.material}, ${order.color}\n` +
         `Количество: ${order.quantity} шт. | Infill: ${order.infill}%\n` +
-        `${!order.hasModel ? "Нет 3D-модели (нужно моделирование)\n" : ""}` +
-        `Доставка: ${order.delivery}` +
-        `${order.personalDataConsentVersion ? `\nConsent: ${order.personalDataConsentVersion}` : ""}`,
+        `${!order.hasModel ? 'Нет 3D-модели (нужно моделирование)\n' : ''}` +
+        `Доставка: ${order.delivery}`
     ),
   ])
 
@@ -66,7 +61,7 @@ export async function createOrder(data: OrderFormData) {
 async function requireAdmin() {
   const session = await auth.api.getSession({ headers: await headers() })
   if (!session || session.user.email !== process.env.ADMIN_EMAIL) {
-    throw new Error("Unauthorized")
+    throw new Error('Unauthorized')
   }
   return session
 }
@@ -80,8 +75,8 @@ export async function updateOrderPrice(id: string, price: number | null) {
   })
 
   revalidatePath(`/admin/orders/${id}`)
-  revalidatePath("/admin/orders")
-  revalidatePath("/admin")
+  revalidatePath('/admin/orders')
+  revalidatePath('/admin')
   return order
 }
 
@@ -93,7 +88,7 @@ export async function updateOrderStatus(id: string, status: OrderStatus) {
     data: { status },
   })
 
-  revalidatePath("/admin/orders")
+  revalidatePath('/admin/orders')
   revalidatePath(`/admin/orders/${id}`)
   return order
 }
@@ -104,7 +99,7 @@ export async function getOrders(status?: OrderStatus) {
   return prisma.order.findMany({
     where: status ? { status } : undefined,
     include: { files: true },
-    orderBy: { createdAt: "desc" },
+    orderBy: { createdAt: 'desc' },
   })
 }
 
