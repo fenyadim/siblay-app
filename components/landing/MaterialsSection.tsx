@@ -44,7 +44,14 @@ const MATERIAL_DETAILS: Record<
 }
 
 export async function MaterialsSection() {
-  const materials = await getMaterialsWithColors()
+  let materials: Awaited<ReturnType<typeof getMaterialsWithColors>> = []
+  try {
+    materials = await getMaterialsWithColors()
+  } catch (error) {
+    // Database may not be available during build
+    console.warn('Failed to fetch materials:', error)
+    materials = []
+  }
 
   return (
     <section className="py-14 sm:py-24 bg-surface border-y border-border overflow-hidden">
