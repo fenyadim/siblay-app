@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import { Inter, JetBrains_Mono, Manrope } from 'next/font/google'
 
 import { ThemeProvider } from '@/components/layout/ThemeProvider'
+import { AnalyticsLayer } from '@/components/analytics/AnalyticsLayer'
 
 import './globals.css'
 
@@ -135,7 +136,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
         />
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider>
+          {children}
+          <AnalyticsLayer />
+        </ThemeProvider>
       </body>
     </html>
   )
