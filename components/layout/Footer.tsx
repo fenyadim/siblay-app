@@ -1,6 +1,7 @@
 ﻿import { Mail, Phone } from 'lucide-react'
 import Link from 'next/link'
 
+import { ConsentSettingsButton } from '@/components/analytics/ConsentSettingsButton'
 import { Logo } from '@/components/ui/logo'
 
 export function Footer() {
@@ -100,6 +101,7 @@ export function Footer() {
             <Link href="/privacy" className="text-muted hover:text-accent transition-colors">
               Политика ПДн
             </Link>
+            <ConsentSettingsButton />
             <span className="text-muted font-mono">3D-печать · Моделирование · Постобработка</span>
           </div>
         </div>

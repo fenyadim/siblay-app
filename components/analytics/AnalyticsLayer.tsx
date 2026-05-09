@@ -1,6 +1,6 @@
 'use client'
 
-import { Suspense } from 'react'
+import { Suspense, type ReactNode } from 'react'
 
 import { ConsentBanner } from './ConsentBanner'
 import { ConsentProvider, useConsent } from './ConsentProvider'
@@ -14,9 +14,10 @@ function AnalyticsScripts() {
   return <YandexMetrika />
 }
 
-export function AnalyticsLayer() {
+export function AnalyticsLayer({ children }: { children: ReactNode }) {
   return (
     <ConsentProvider>
+      {children}
       <Suspense fallback={null}>
         <AnalyticsScripts />
       </Suspense>

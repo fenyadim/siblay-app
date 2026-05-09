@@ -136,10 +136,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
         />
-        <ThemeProvider>
-          {children}
-          <AnalyticsLayer />
-        </ThemeProvider>
+        <AnalyticsLayer>
+          <ThemeProvider>{children}</ThemeProvider>
+        </AnalyticsLayer>
       </body>
     </html>
   )
