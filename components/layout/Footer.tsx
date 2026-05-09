@@ -1,6 +1,8 @@
 ﻿import { Mail, Phone } from 'lucide-react'
 import Link from 'next/link'
 
+import { Logo } from '@/components/ui/logo'
+
 export function Footer() {
   return (
     <footer className="border-t border-border bg-surface mt-auto">
@@ -8,20 +10,7 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand */}
           <div className="md:col-span-2">
-            <div className="flex items-center gap-2.5 mb-4">
-              <div className="w-7 h-7 rounded-lg bg-accent flex items-center justify-center">
-                <svg width="14" height="14" fill="none" viewBox="0 0 24 24">
-                  <path
-                    d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"
-                    stroke="white"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </div>
-              <span className="font-display font-bold text-foreground">Siblay</span>
-            </div>
+            <Logo className="text-base mb-4" markClassName="h-6" />
             <p className="text-sm text-muted max-w-xs leading-relaxed">
               Профессиональные услуги 3D-моделирования и 3D-печати. Точные детали, прототипы и
               серийные изделия под ваш проект.
@@ -110,9 +99,6 @@ export function Footer() {
           <div className="flex items-center gap-4 text-xs">
             <Link href="/privacy" className="text-muted hover:text-accent transition-colors">
               Политика ПДн
-            </Link>
-            <Link href="/consent" className="text-muted hover:text-accent transition-colors">
-              Согласие ПДн
             </Link>
             <span className="text-muted font-mono">3D-печать · Моделирование · Постобработка</span>
           </div>

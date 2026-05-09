@@ -1,18 +1,19 @@
-﻿"use client"
+﻿'use client'
 
-import { useFormContext } from "react-hook-form"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import Link from "next/link"
-import { cn } from "@/lib/utils"
-import type { OrderFormData } from "@/lib/validations/order"
+import Link from 'next/link'
+import { useFormContext } from 'react-hook-form'
+
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
+import { cn } from '@/lib/utils'
+import type { OrderFormData } from '@/lib/validations/order'
 
 const DELIVERY_OPTIONS = [
-  { value: "pickup", label: "Самовывоз", icon: "🏪" },
-  { value: "courier", label: "Курьер по городу", icon: "🛵" },
-  { value: "sdek", label: "Доставка СДЭК", icon: "📦" },
-  { value: "pochta", label: "Почта России", icon: "✉️" },
+  { value: 'pickup', label: 'Самовывоз', icon: '🏪' },
+  { value: 'courier', label: 'Курьер по городу', icon: '🛵' },
+  { value: 'sdek', label: 'Доставка СДЭК', icon: '📦' },
+  { value: 'pochta', label: 'Почта России', icon: '✉️' },
 ]
 
 function Field({
@@ -38,25 +39,29 @@ function Field({
   )
 }
 
-const inputClass = "bg-background border-border text-foreground focus-visible:ring-0 focus-visible:border-accent transition-colors"
+const inputClass =
+  'bg-background border-border text-foreground focus-visible:ring-0 focus-visible:border-accent transition-colors'
 
 export function Step6Contacts() {
-  const { register, watch, setValue, formState: { errors } } = useFormContext<OrderFormData>()
-  const delivery = watch("delivery")
+  const {
+    register,
+    watch,
+    setValue,
+    formState: { errors },
+  } = useFormContext<OrderFormData>()
+  const delivery = watch('delivery')
 
   return (
     <div className="space-y-8">
       <div>
-        <h2 className="text-2xl font-black text-foreground mb-1 font-display">
-          Контактные данные
-        </h2>
+        <h2 className="text-2xl font-black text-foreground mb-1 font-display">Контактные данные</h2>
         <p className="text-sm text-muted">Для связи и доставки готового заказа</p>
       </div>
 
       <div className="space-y-4">
         <Field label="ФИО" required error={errors.fullName?.message}>
           <Input
-            {...register("fullName")}
+            {...register('fullName')}
             placeholder="Иванов Иван Иванович"
             className={inputClass}
           />
@@ -65,7 +70,7 @@ export function Step6Contacts() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Field label="Телефон" required error={errors.phone?.message}>
             <Input
-              {...register("phone")}
+              {...register('phone')}
               placeholder="+7 (999) 123-45-67"
               type="tel"
               className={inputClass}
@@ -73,7 +78,7 @@ export function Step6Contacts() {
           </Field>
           <Field label="Email" required error={errors.email?.message}>
             <Input
-              {...register("email")}
+              {...register('email')}
               placeholder="ivan@example.ru"
               type="email"
               className={inputClass}
@@ -84,41 +89,51 @@ export function Step6Contacts() {
 
       {/* Delivery */}
       <div>
-        <p className="label-mono mb-3">Способ доставки <span className="text-destructive">*</span></p>
+        <p className="label-mono mb-3">
+          Способ доставки <span className="text-destructive">*</span>
+        </p>
         <div className="grid grid-cols-2 gap-2">
           {DELIVERY_OPTIONS.map((opt) => (
             <button
               key={opt.value}
               type="button"
-              onClick={() => setValue("delivery", opt.value as OrderFormData["delivery"], { shouldValidate: true })}
+              onClick={() =>
+                setValue('delivery', opt.value as OrderFormData['delivery'], {
+                  shouldValidate: true,
+                })
+              }
               className={cn(
-                "flex items-center gap-3 p-3.5 rounded-xl border text-left transition-all duration-150",
+                'flex items-center gap-3 p-3.5 rounded-xl border text-left transition-all duration-150',
                 delivery === opt.value
-                  ? "border-accent bg-(--accent-subtle)"
-                  : "border-border bg-background hover:border-(--accent-border)",
+                  ? 'border-accent bg-(--accent-subtle)'
+                  : 'border-border bg-background hover:border-(--accent-border)'
               )}
             >
               <span className="text-xl leading-none">{opt.icon}</span>
-              <span className={cn(
-                "text-sm font-medium",
-                delivery === opt.value ? "text-accent" : "text-foreground",
-              )}>
+              <span
+                className={cn(
+                  'text-sm font-medium',
+                  delivery === opt.value ? 'text-accent' : 'text-foreground'
+                )}
+              >
                 {opt.label}
               </span>
             </button>
           ))}
         </div>
-        {errors.delivery && <p className="text-xs text-destructive mt-2">{errors.delivery.message}</p>}
+        {errors.delivery && (
+          <p className="text-xs text-destructive mt-2">{errors.delivery.message}</p>
+        )}
       </div>
 
       {/* Address */}
-      {delivery && delivery !== "pickup" && (
+      {delivery && delivery !== 'pickup' && (
         <Field label="Адрес доставки" required error={errors.address?.message}>
           <Textarea
-            {...register("address")}
+            {...register('address')}
             placeholder="Город, улица, дом, квартира / индекс (для Почты России)"
             rows={3}
-            className={cn(inputClass, "resize-none placeholder:text-(--placeholder)")}
+            className={cn(inputClass, 'resize-none placeholder:text-(--placeholder)')}
           />
         </Field>
       )}
@@ -126,18 +141,20 @@ export function Step6Contacts() {
       <div className="rounded-xl border border-border bg-surface-raised p-4">
         <label className="flex items-start gap-3 cursor-pointer">
           <input
-            {...register("personalDataConsent")}
+            {...register('personalDataConsent')}
             type="checkbox"
             className="mt-0.5 size-4 rounded border-border text-accent focus:ring-accent"
           />
           <span className="text-sm text-foreground leading-relaxed">
-            Я даю согласие на обработку моих персональных данных в целях оформления и исполнения заказа, а также ознакомлен(а) с{" "}
-            <Link href="/privacy" target="_blank" rel="noopener noreferrer" className="text-accent underline-offset-2 hover:underline">
+            Я даю согласие на обработку моих персональных данных в целях оформления и исполнения
+            заказа, а также ознакомлен(а) с{' '}
+            <Link
+              href="/privacy"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-accent underline-offset-2 hover:underline"
+            >
               политикой обработки персональных данных
-            </Link>
-            {" "}и{" "}
-            <Link href="/consent" target="_blank" rel="noopener noreferrer" className="text-accent underline-offset-2 hover:underline">
-              текстом согласия
             </Link>
             .
           </span>

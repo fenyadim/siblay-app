@@ -6,6 +6,7 @@ import { useState } from 'react'
 import { createPortal } from 'react-dom'
 
 import { Button } from '@/components/ui/button'
+import { Logo } from '@/components/ui/logo'
 import { useScroll } from '@/hooks/use-scroll'
 import { cn } from '@/lib/utils'
 
@@ -56,21 +57,8 @@ export function Header() {
           )}
         >
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2.5 shrink-0">
-            <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center">
-              <svg width="14" height="14" fill="none" viewBox="0 0 24 24">
-                <path
-                  d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"
-                  stroke="white"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </div>
-            <span className="text-lg font-black tracking-tight text-foreground font-display">
-              Siblay
-            </span>
+          <Link href="/" className="shrink-0" aria-label="Siblay — на главную">
+            <Logo className="text-lg" markClassName="h-6" />
           </Link>
 
           {/* Desktop nav */}

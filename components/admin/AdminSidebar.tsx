@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 
 import { Button } from '@/components/ui/button'
+import { Logo } from '@/components/ui/logo'
 import { signOut } from '@/lib/auth-client'
 import { cn } from '@/lib/utils'
 
@@ -28,19 +29,8 @@ export function AdminSidebar() {
     <aside className="w-56 shrink-0 border-r border-border bg-surface flex flex-col min-h-screen">
       {/* Logo */}
       <div className="h-16 flex items-center px-5 border-b border-border">
-        <Link href="/admin" className="flex items-center gap-2">
-          <div className="w-6 h-6 rounded-md bg-accent flex items-center justify-center">
-            <svg width="12" height="12" fill="none" viewBox="0 0 24 24">
-              <path
-                d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"
-                stroke="white"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </div>
-          <span className="font-black text-sm text-foreground font-display">Siblay</span>
+        <Link href="/admin" aria-label="Siblay Admin">
+          <Logo className="text-sm" markClassName="h-5" />
         </Link>
       </div>
 
