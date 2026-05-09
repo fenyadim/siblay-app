@@ -4,9 +4,6 @@ import path from 'path'
 const nextConfig: NextConfig = {
   output: 'standalone',
   outputFileTracingRoot: path.resolve(__dirname),
-  outputFileTracingIncludes: {
-    '/**/*': ['./node_modules/.prisma/**'],
-  },
   turbopack: {
     root: path.resolve(__dirname),
   },

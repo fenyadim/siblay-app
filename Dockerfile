@@ -9,7 +9,7 @@ WORKDIR /app
 COPY package.json pnpm-lock.yaml ./
 COPY prisma ./prisma
 
-RUN (pnpm install --frozen-lockfile 2>&1 && echo "SUCCESS") || (echo "Initial failed, retrying..."; pnpm install 2>&1 && echo "RETRY SUCCESS") || echo "Still failed, continuing anyway"
+RUN pnpm install --frozen-lockfile
 
 # ─── Stage 2: builder ─────────────────────────────────────────────────────
 FROM node:22-alpine AS builder
@@ -22,8 +22,6 @@ ARG NEXT_PUBLIC_YANDEX_METRIKA_ID
 ENV NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL
 ENV NEXT_PUBLIC_YANDEX_METRIKA_ID=$NEXT_PUBLIC_YANDEX_METRIKA_ID
 ENV NEXT_TELEMETRY_DISABLED=1
-ENV NODE_ENV=production
-ENV DATABASE_URL=postgresql://user:password@localhost:5432/db
 
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
@@ -35,7 +33,8 @@ FROM node:22-alpine AS runner
 RUN apk add --no-cache libc6-compat openssl
 WORKDIR /app
 
-# Skip global prisma install - will use from node_modules in standalone bundle or via entrypoint
+# Prisma CLI globally — for migrate deploy in entrypoint
+RUN npm install -g prisma@7.6.0 && npm cache clean --force
 
 # Non-root user
 RUN addgroup -g 1001 -S nodejs && adduser -S nextjs -u 1001 -G nodejs
@@ -48,9 +47,9 @@ COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 # Prisma: schema + migrations for migrate deploy
 COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
 
-# Prisma client (custom output)
+# Prisma client (custom output) + engine binary
 COPY --from=builder --chown=nextjs:nodejs /app/app/generated/prisma ./app/generated/prisma
-# Prisma engines are included in the standalone Next.js bundle
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules/.prisma ./node_modules/.prisma
 
 # Entrypoint
 COPY --chown=nextjs:nodejs docker/entrypoint.sh ./docker/entrypoint.sh

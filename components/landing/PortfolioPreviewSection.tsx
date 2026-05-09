@@ -15,14 +15,7 @@ const ButtonLink = ({ className }: { className?: string }) => (
 )
 
 export async function PortfolioPreviewSection() {
-  let items: Awaited<ReturnType<typeof getPortfolioItems>> = []
-  try {
-    items = await getPortfolioItems(undefined, true)
-  } catch (error) {
-    // Database may not be available during build
-    console.warn('Failed to fetch portfolio items:', error)
-    items = []
-  }
+  const items = await getPortfolioItems(undefined, true)
   const preview = items.slice(0, 6)
 
   return (

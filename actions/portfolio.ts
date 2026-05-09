@@ -14,22 +14,13 @@ async function requireAdmin() {
 }
 
 export async function getPortfolioItems(category?: string, published = true) {
-  try {
-    return await prisma.portfolioItem.findMany({
-      where: {
-        ...(published ? { published: true } : {}),
-        ...(category && category !== "all" ? { category } : {}),
-      },
-      orderBy: { createdAt: "desc" },
-    })
-  } catch (error) {
-    // During build time, database may not be available
-    // Return empty array rather than failing the build
-    if (process.env.NODE_ENV === 'production' && error instanceof Error && error.message.includes('ECONNREFUSED')) {
-      return []
-    }
-    throw error
-  }
+  return prisma.portfolioItem.findMany({
+    where: {
+      ...(published ? { published: true } : {}),
+      ...(category && category !== "all" ? { category } : {}),
+    },
+    orderBy: { createdAt: "desc" },
+  })
 }
 
 export async function getPortfolioItem(id: string, publishedOnly = true) {

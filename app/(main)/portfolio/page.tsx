@@ -19,14 +19,7 @@ export const metadata: Metadata = {
 }
 
 export default async function PortfolioPage() {
-  let items: Awaited<ReturnType<typeof getPortfolioItems>> = []
-  try {
-    items = await getPortfolioItems(undefined, true)
-  } catch (error) {
-    // Database may not be available during build
-    console.warn('Failed to fetch portfolio items:', error)
-    items = []
-  }
+  const items = await getPortfolioItems(undefined, true)
 
   return (
     <div className="min-h-screen bg-background py-12">

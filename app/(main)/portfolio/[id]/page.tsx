@@ -31,16 +31,7 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params
-  let item
-  try {
-    item = await getPortfolioItem(id)
-  } catch (error) {
-    console.warn('Failed to fetch portfolio item for metadata:', error)
-    return {
-      title: "Работа не найдена",
-      robots: { index: false, follow: false },
-    }
-  }
+  const item = await getPortfolioItem(id)
 
   if (!item) {
     return {
@@ -78,13 +69,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function PortfolioDetailPage({ params }: Props) {
   const { id } = await params
-  let item
-  try {
-    item = await getPortfolioItem(id)
-  } catch (error) {
-    console.warn('Failed to fetch portfolio item:', error)
-    notFound()
-  }
+  const item = await getPortfolioItem(id)
   if (!item) notFound()
 
   const category = PORTFOLIO_CATEGORY_LABELS[item.category] ?? item.category
