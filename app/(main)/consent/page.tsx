@@ -5,6 +5,8 @@ const consentVersion = process.env.PERSONAL_DATA_CONSENT_VERSION ?? "2026-04-08"
 export const metadata: Metadata = {
   title: "Согласие на обработку персональных данных",
   description: "Текст согласия на обработку персональных данных",
+  alternates: { canonical: "/consent" },
+  robots: { index: true, follow: true },
 }
 
 export default function ConsentPage() {

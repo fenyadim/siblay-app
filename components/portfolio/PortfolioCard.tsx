@@ -1,55 +1,46 @@
-﻿import { type ComponentPropsWithoutRef, forwardRef } from 'react'
+import Image from 'next/image'
+import Link from 'next/link'
 
 import type { PortfolioItem } from '@/app/generated/prisma/client'
-import { cn } from '@/lib/utils'
 import { PORTFOLIO_CATEGORY_LABELS } from '@/lib/validations/portfolio'
 
-interface PortfolioCardProps extends ComponentPropsWithoutRef<'button'> {
+interface PortfolioCardProps {
   item: PortfolioItem
 }
 
-export const PortfolioCard = forwardRef<HTMLButtonElement, PortfolioCardProps>(
-  ({ item, className, type = 'button', ...props }, ref) => {
-    return (
-      <button
-        ref={ref}
-        type={type}
-        className={cn(
-          'card-hover group w-full text-left rounded-2xl border border-border bg-surface overflow-hidden',
-          className
-        )}
-        {...props}
-      >
-        {/* Image */}
-        <div className="relative bg-background overflow-hidden">
-          {item.images[0] ? (
-            <img
-              src={item.images[0]}
-              alt={item.title}
-              className="w-full object-cover group-hover:scale-105 transition-transform duration-500"
-            />
-          ) : (
-            <div className="aspect-4/3 flex items-center justify-center text-5xl text-muted opacity-20">
-              ◈
-            </div>
-          )}
-          <div className="absolute top-3 left-3">
-            <span className="px-2 py-1 text-xs font-mono rounded-md bg-surface/90 text-muted border border-border">
-              {PORTFOLIO_CATEGORY_LABELS[item.category] ?? item.category}
-            </span>
+export function PortfolioCard({ item }: PortfolioCardProps) {
+  return (
+    <Link
+      href={`/portfolio/${item.id}`}
+      className="card-hover group block w-full text-left rounded-2xl border border-border bg-surface overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
+    >
+      <div className="relative bg-background overflow-hidden aspect-4/3">
+        {item.images[0] ? (
+          <Image
+            src={item.images[0]}
+            alt={item.title}
+            fill
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            className="object-cover group-hover:scale-105 transition-transform duration-500"
+          />
+        ) : (
+          <div className="absolute inset-0 flex items-center justify-center text-5xl text-muted opacity-20">
+            ◈
           </div>
+        )}
+        <div className="absolute top-3 left-3 z-10">
+          <span className="px-2 py-1 text-xs font-mono rounded-md bg-surface/90 text-muted border border-border">
+            {PORTFOLIO_CATEGORY_LABELS[item.category] ?? item.category}
+          </span>
         </div>
-        {/* Body */}
-        <div className="p-4">
-          <h3 className="font-semibold text-foreground font-display">{item.title}</h3>
-          {item.description && (
-            <p className="text-sm text-muted mt-1 line-clamp-2">{item.description}</p>
-          )}
-          <p className="label-mono mt-2">{item.material}</p>
-        </div>
-      </button>
-    )
-  }
-)
-
-PortfolioCard.displayName = 'PortfolioCard'
+      </div>
+      <div className="p-4">
+        <h3 className="font-semibold text-foreground font-display">{item.title}</h3>
+        {item.description && (
+          <p className="text-sm text-muted mt-1 line-clamp-2">{item.description}</p>
+        )}
+        <p className="label-mono mt-2">{item.material}</p>
+      </div>
+    </Link>
+  )
+}

@@ -7,7 +7,6 @@ import { PORTFOLIO_CATEGORIES } from '@/lib/validations/portfolio'
 
 import { Button } from '../ui/button'
 import { PortfolioCard } from './PortfolioCard'
-import { PortfolioModal } from './PortfolioModal'
 
 const ALL_CATEGORIES = [{ value: 'all', label: 'Все' }, ...PORTFOLIO_CATEGORIES]
 
@@ -43,13 +42,9 @@ export function PortfolioGrid({ items }: PortfolioGridProps) {
           <p className="text-muted">Работ в этой категории пока нет</p>
         </div>
       ) : (
-        <div className="columns-1 sm:columns-2 lg:columns-3 gap-4 space-y-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {filtered.map((item) => (
-            <div key={item.id} className="break-inside-avoid">
-              <PortfolioModal item={item}>
-                <PortfolioCard item={item} />
-              </PortfolioModal>
-            </div>
+            <PortfolioCard key={item.id} item={item} />
           ))}
         </div>
       )}

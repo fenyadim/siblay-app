@@ -6,6 +6,8 @@ export const metadata: Metadata = {
   title: "Политика в отношении обработки персональных данных",
   description:
     "Политика в отношении обработки персональных данных для пользователей сайта Siblay",
+  alternates: { canonical: "/privacy" },
+  robots: { index: true, follow: true },
 }
 
 export default function PrivacyPage() {

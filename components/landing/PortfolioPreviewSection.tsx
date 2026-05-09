@@ -1,4 +1,5 @@
-﻿import { ArrowRight } from 'lucide-react'
+import { ArrowRight } from 'lucide-react'
+import Image from 'next/image'
 import Link from 'next/link'
 
 import { getPortfolioItems } from '@/actions/portfolio'
@@ -40,20 +41,21 @@ export async function PortfolioPreviewSection() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {preview.map((item) => (
-              <div
+              <Link
                 key={item.id}
-                className="group rounded-2xl border border-border bg-surface overflow-hidden hover:border-(--accent-border) transition-all duration-300"
+                href={`/portfolio/${item.id}`}
+                className="group rounded-2xl border border-border bg-surface overflow-hidden hover:border-(--accent-border) transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
               >
-                {/* Image */}
                 <div className="aspect-4/3 bg-background relative overflow-hidden">
                   {item.images[0] ? (
                     <>
-                      <img
+                      <Image
                         src={item.images[0]}
                         alt={item.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        fill
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                        className="object-cover group-hover:scale-105 transition-transform duration-500"
                       />
-                      {/* Gradient overlay on hover */}
                       <div className="absolute inset-0 bg-linear-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                     </>
                   ) : (
@@ -61,20 +63,19 @@ export async function PortfolioPreviewSection() {
                       ◈
                     </div>
                   )}
-                  <div className="absolute top-3 left-3">
+                  <div className="absolute top-3 left-3 z-10">
                     <span className="px-2 py-1 rounded-md text-xs font-mono bg-surface/90 backdrop-blur-sm text-muted border border-border">
                       {PORTFOLIO_CATEGORY_LABELS[item.category] ?? item.category}
                     </span>
                   </div>
                 </div>
-                {/* Body */}
                 <div className="p-4">
                   <h3 className="font-semibold text-foreground truncate font-display">
                     {item.title}
                   </h3>
                   <p className="text-sm text-muted mt-1 label-mono">{item.material}</p>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         )}

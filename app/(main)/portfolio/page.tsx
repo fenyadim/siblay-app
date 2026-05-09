@@ -1,13 +1,21 @@
-﻿export const dynamic = "force-dynamic"
-
+import type { Metadata } from "next"
 import { Suspense } from "react"
+
 import { PortfolioGrid } from "@/components/portfolio/PortfolioGrid"
 import { getPortfolioItems } from "@/actions/portfolio"
-import type { Metadata } from "next"
+
+export const revalidate = 300
 
 export const metadata: Metadata = {
   title: "Портфолио",
-  description: "Примеры выполненных работ по 3D-печати и моделированию",
+  description:
+    "Примеры выполненных работ Siblay по 3D-печати и моделированию: прототипы, детали, фигурки, архитектурные макеты, промышленные изделия.",
+  alternates: { canonical: "/portfolio" },
+  openGraph: {
+    title: "Портфолио — Siblay",
+    description: "Примеры выполненных работ по 3D-печати и моделированию",
+    url: "/portfolio",
+  },
 }
 
 export default async function PortfolioPage() {
