@@ -25,19 +25,8 @@ export function YandexMetrika() {
   `
 
   return (
-    <>
-      <Script id="yandex-metrika" strategy="afterInteractive">
-        {initScript}
-      </Script>
-      <noscript>
-        <div>
-          <img
-            src={`https://mc.yandex.ru/watch/${safeId}`}
-            style={{ position: 'absolute', left: '-9999px' }}
-            alt=""
-          />
-        </div>
-      </noscript>
-    </>
+    <Script id="yandex-metrika" strategy="afterInteractive">
+      {initScript}
+    </Script>
   )
 }
