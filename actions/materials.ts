@@ -148,17 +148,18 @@ export async function getMaterialsWithColors(): Promise<MaterialWithColors[]> {
 export async function getSeedMaterialsPreview(): Promise<MaterialWithColors[]> {
   return SEED_MATERIALS.map((material) => {
     const materialId = `seed-${material.name.toLowerCase()}`
+    const { color: _color, colors, ...rest } = material
     return {
-      ...material,
+      ...rest,
       id: materialId,
-      colors: material.colors.map((color, index) => ({
+      colors: colors.map((c, index) => ({
         id: `${materialId}-${index}`,
         materialId,
-        name: color.name,
-        hex: color.hex,
+        name: c.name,
+        hex: c.hex,
         hex2: null,
-        inStock: color.inStock,
-        sortOrder: color.sortOrder,
+        inStock: c.inStock,
+        sortOrder: c.sortOrder,
       })),
     }
   })
@@ -168,7 +169,7 @@ async function seedMaterials(): Promise<MaterialWithColors[]> {
   const results: MaterialWithColors[] = []
 
   for (const mat of SEED_MATERIALS) {
-    const { colors, ...matData } = mat
+    const { colors, color: _color, ...matData } = mat
     try {
       // upsert — safe under concurrent calls
       const record = await prisma.material.upsert({
@@ -207,7 +208,6 @@ export async function createMaterial(data: {
   name: string
   description: string
   price: string
-  color: string
   best: string
 }) {
   await requireAdmin()
@@ -227,7 +227,6 @@ export async function updateMaterial(
     name?: string
     description?: string
     price?: string
-    color?: string
     best?: string
     available?: boolean
   }

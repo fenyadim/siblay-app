@@ -509,7 +509,6 @@ function AddMaterialForm() {
     name: '',
     description: '',
     price: '',
-    color: '#3b82f6',
     best: '',
   })
 
@@ -521,7 +520,7 @@ function AddMaterialForm() {
     if (!form.name.trim()) return
     startTransition(async () => {
       await createMaterial(form)
-      setForm({ name: '', description: '', price: '', color: '#3b82f6', best: '' })
+      setForm({ name: '', description: '', price: '', best: '' })
       setOpen(false)
     })
   }
@@ -581,21 +580,6 @@ function AddMaterialForm() {
             className="w-full border border-border rounded-lg px-3 py-2 text-sm bg-background text-foreground focus:outline-none focus:border-accent"
           />
         </div>
-      </div>
-
-      <div className="flex items-center gap-3">
-        <label className="label-mono">Цвет точки</label>
-        <Input
-          type="color"
-          value={form.color}
-          onChange={(e) => set('color', e.target.value)}
-          className="w-8 h-8 rounded cursor-pointer border border-border"
-        />
-        <span className="font-mono text-xs text-muted">{form.color}</span>
-        <div
-          className="w-4 h-4 rounded-full border border-black/10"
-          style={{ background: form.color }}
-        />
       </div>
 
       <div className="flex items-center gap-2 pt-1">
