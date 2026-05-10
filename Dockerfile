@@ -28,6 +28,9 @@ ENV NEXT_TELEMETRY_DISABLED=1
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
+# app/generated/prisma в .gitignore, на свежем clone её нет → регенерируем.
+RUN pnpm prisma generate
+
 RUN pnpm build
 
 # ─── Stage 3: runner ──────────────────────────────────────────────────────
