@@ -1,9 +1,11 @@
 import { notFound } from "next/navigation"
 import { prisma } from "@/lib/prisma"
-import { ORDER_STATUS_LABELS, ORDER_STATUS_COLORS, formatDate, formatPrice, formatFileSize } from "@/lib/utils"
+import { ORDER_STATUS_LABELS, ORDER_STATUS_COLORS, formatPrice, formatFileSize } from "@/lib/utils"
 import { Badge } from "@/components/ui/badge"
 import { OrderStatusSelect } from "@/components/admin/OrderStatusSelect"
 import { OrderPriceInput } from "@/components/admin/OrderPriceInput"
+import { DeleteOrderButton } from "@/components/admin/DeleteOrderButton"
+import { FormattedDate } from "@/components/admin/FormattedDate"
 import { OrderStatus } from "@/app/generated/prisma/client"
 import Link from "next/link"
 
@@ -45,7 +47,7 @@ export default async function AdminOrderDetailPage({ params }: Props) {
           <h1 className="text-3xl font-black text-foreground font-display">
             {order.fullName}
           </h1>
-          <p className="text-sm text-muted font-mono mt-1">{formatDate(order.createdAt)}</p>
+          <FormattedDate date={order.createdAt} className="text-sm text-muted font-mono mt-1 block" />
         </div>
         <Badge className={`${ORDER_STATUS_COLORS[order.status]} text-sm px-3 py-1`}>
           {ORDER_STATUS_LABELS[order.status]}
@@ -111,7 +113,7 @@ export default async function AdminOrderDetailPage({ params }: Props) {
       )}
 
       {/* Files */}
-      {order.files.length > 0 && (
+      {order.files.length > 0 ? (
         <div className="mt-4 rounded-xl border border-border bg-surface p-5">
           <p className="label-mono mb-3">Файлы ({order.files.length})</p>
           <div className="space-y-2">
@@ -137,7 +139,18 @@ export default async function AdminOrderDetailPage({ params }: Props) {
             ))}
           </div>
         </div>
-      )}
+      ) : null}
+
+      {/* Danger zone */}
+      <div className="mt-6 rounded-xl border border-red-500/30 bg-red-500/5 p-5 flex items-center justify-between gap-4">
+        <div>
+          <p className="label-mono mb-1 text-red-500">Опасная зона</p>
+          <p className="text-xs text-muted">
+            Удаление заказа необратимо. Файлы из хранилища также будут удалены.
+          </p>
+        </div>
+        <DeleteOrderButton orderId={order.id} customerName={order.fullName} />
+      </div>
     </div>
   )
 }

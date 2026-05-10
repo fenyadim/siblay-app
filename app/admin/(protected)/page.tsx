@@ -1,7 +1,8 @@
 ﻿import { prisma } from "@/lib/prisma"
-import { ORDER_STATUS_LABELS, ORDER_STATUS_COLORS, formatDate } from "@/lib/utils"
+import { ORDER_STATUS_LABELS, ORDER_STATUS_COLORS } from "@/lib/utils"
 import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
+import { FormattedDate } from "@/components/admin/FormattedDate"
 
 export default async function AdminDashboard() {
   const [total, byStatus, recent] = await Promise.all([
@@ -63,7 +64,9 @@ export default async function AdminDashboard() {
               >
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-foreground truncate">{order.fullName}</p>
-                  <p className="text-xs text-muted font-mono">{order.material} · {formatDate(order.createdAt)}</p>
+                  <p className="text-xs text-muted font-mono">
+                    {order.material} · <FormattedDate date={order.createdAt} />
+                  </p>
                 </div>
                 <Badge className={ORDER_STATUS_COLORS[order.status]}>
                   {ORDER_STATUS_LABELS[order.status]}

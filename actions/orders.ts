@@ -7,6 +7,7 @@ import { OrderStatus } from '@/app/generated/prisma/client'
 import { auth } from '@/lib/auth'
 import { orderEmailTemplate, sendEmail, sendTelegram } from '@/lib/notifications'
 import { prisma } from '@/lib/prisma'
+import { deleteS3Object } from '@/lib/s3'
 import { fullOrderSchema, type OrderFormData } from '@/lib/validations/order'
 
 export async function createOrder(data: OrderFormData) {
@@ -91,6 +92,40 @@ export async function updateOrderStatus(id: string, status: OrderStatus) {
   revalidatePath('/admin/orders')
   revalidatePath(`/admin/orders/${id}`)
   return order
+}
+
+function s3KeyFromUrl(fileUrl: string): string | null {
+  const region = process.env.AWS_REGION ?? 'ru1'
+  const bucket = process.env.AWS_S3_BUCKET
+  if (!bucket) return null
+  const prefix = `https://s3.${region}.storage.beget.cloud/${bucket}/`
+  return fileUrl.startsWith(prefix) ? fileUrl.slice(prefix.length) : null
+}
+
+export async function deleteOrder(id: string) {
+  await requireAdmin()
+
+  const order = await prisma.order.findUnique({
+    where: { id },
+    include: { files: true },
+  })
+  if (!order) {
+    throw new Error('Заказ не найден')
+  }
+
+  // Best-effort S3 cleanup; DB deletion proceeds even if some objects fail.
+  await Promise.allSettled(
+    order.files
+      .map((f) => s3KeyFromUrl(f.fileUrl))
+      .filter((key): key is string => key !== null)
+      .map((key) => deleteS3Object(key))
+  )
+
+  await prisma.order.delete({ where: { id } })
+
+  revalidatePath('/admin/orders')
+  revalidatePath('/admin')
+  return { success: true }
 }
 
 export async function getOrders(status?: OrderStatus) {

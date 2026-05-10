@@ -3,7 +3,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ArrowLeft, ArrowRight, Check, Loader2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { Resolver } from 'react-hook-form'
 import { FormProvider, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -42,6 +42,13 @@ export function OrderFormClient({ materials }: Props) {
   const [submitting, setSubmitting] = useState(false)
   const router = useRouter()
 
+  // Scroll-to-top fires after React commits the new step DOM, so mobile
+  // browsers don't cancel the scroll mid-flight as they did with the
+  // immediate window.scrollTo({ behavior: 'smooth' }) call.
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0 })
+  }, [step])
+
   const methods = useForm<OrderFormData>({
     resolver: zodResolver(fullOrderSchema) as Resolver<OrderFormData>,
     defaultValues: {
@@ -74,7 +81,6 @@ export function OrderFormClient({ materials }: Props) {
       return
     }
     setStep((s) => s + 1)
-    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   async function handleSubmit() {
@@ -122,10 +128,7 @@ export function OrderFormClient({ materials }: Props) {
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => {
-                    setStep((s) => s - 1)
-                    window.scrollTo({ top: 0, behavior: 'smooth' })
-                  }}
+                  onClick={() => setStep((s) => s - 1)}
                   disabled={step === 1}
                 >
                   <ArrowLeft className="size-3.5" />

@@ -1,8 +1,9 @@
 ﻿import { prisma } from "@/lib/prisma"
-import { ORDER_STATUS_LABELS, ORDER_STATUS_COLORS, formatDate, formatPrice } from "@/lib/utils"
+import { ORDER_STATUS_LABELS, ORDER_STATUS_COLORS, formatPrice } from "@/lib/utils"
 import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
 import { OrderStatus } from "@/app/generated/prisma/client"
+import { FormattedDate } from "@/components/admin/FormattedDate"
 
 const FILTER_OPTIONS = [
   { value: "all", label: "Все" },
@@ -74,7 +75,7 @@ export default async function AdminOrdersPage({ searchParams }: Props) {
                       {order.id.slice(0, 8)}
                     </td>
                     <td className="px-4 py-3 text-xs text-muted font-mono whitespace-nowrap">
-                      {formatDate(order.createdAt)}
+                      <FormattedDate date={order.createdAt} />
                     </td>
                     <td className="px-4 py-3">
                       <p className="font-medium text-foreground">{order.fullName}</p>

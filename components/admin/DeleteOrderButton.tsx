@@ -1,0 +1,82 @@
+"use client"
+
+import { useState, useTransition } from "react"
+import { useRouter } from "next/navigation"
+import { deleteOrder } from "@/actions/orders"
+import { Button } from "@/components/ui/button"
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+
+interface Props {
+  orderId: string
+  customerName: string
+}
+
+export function DeleteOrderButton({ orderId, customerName }: Props) {
+  const router = useRouter()
+  const [open, setOpen] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [isPending, startTransition] = useTransition()
+
+  function handleDelete() {
+    setError(null)
+    startTransition(async () => {
+      try {
+        await deleteOrder(orderId)
+        setOpen(false)
+        router.replace("/admin/orders")
+        router.refresh()
+      } catch (e) {
+        setError(e instanceof Error ? e.message : "Ошибка при удалении")
+      }
+    })
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button
+          type="button"
+          className="px-4 py-2 rounded-lg bg-red-500 text-white text-sm font-medium hover:bg-red-600 transition-colors"
+        >
+          Удалить заказ
+        </Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Удалить заказ?</DialogTitle>
+          <DialogDescription>
+            Заказ клиента <span className="font-medium text-foreground">{customerName}</span>{" "}
+            будет удалён вместе с прикреплёнными файлами. Действие необратимо.
+          </DialogDescription>
+        </DialogHeader>
+        {error && (
+          <p className="text-sm text-red-500">{error}</p>
+        )}
+        <DialogFooter>
+          <DialogClose asChild>
+            <Button type="button" variant="outline" disabled={isPending}>
+              Отмена
+            </Button>
+          </DialogClose>
+          <Button
+            type="button"
+            onClick={handleDelete}
+            disabled={isPending}
+            className="bg-red-500 text-white hover:bg-red-600 disabled:opacity-50"
+          >
+            {isPending ? "Удаление…" : "Удалить"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
+}
