@@ -39,26 +39,29 @@ function getClientIdentifier(req: NextRequest): string {
 }
 
 // ── Allowed types ─────────────────────────────────────────────────────────────
-const ALLOWED_EXTENSIONS = new Set([
-  "stl", "obj", "3mf", "step", "stp",
-  "jpg", "jpeg", "png", "webp", "heic",
-])
+// Server-side mapping: extension → Content-Type. Client-supplied MIME is ignored
+// so an attacker can't upload e.g. SVG-as-PNG and get it served as image/svg+xml.
+const EXTENSION_CONTENT_TYPE: Record<string, string> = {
+  stl: "application/sla",
+  obj: "model/obj",
+  "3mf": "model/3mf",
+  step: "model/step",
+  stp: "model/step",
+  jpg: "image/jpeg",
+  jpeg: "image/jpeg",
+  png: "image/png",
+  webp: "image/webp",
+  heic: "image/heic",
+}
 
-const ALLOWED_MIME_PREFIXES = [
-  "image/",
-  "model/",
-  "application/octet-stream",
-  "application/x-octet-stream",
-  "application/sla",
-  "application/vnd.ms-pki.stl",
-  "application/3mf",
-]
+const IMAGE_EXTENSIONS = new Set(["jpg", "jpeg", "png", "webp", "heic"])
 
-function isAllowedFile(fileName: string, contentType: string): boolean {
-  const ext = fileName.split(".").pop()?.toLowerCase() ?? ""
-  if (!ALLOWED_EXTENSIONS.has(ext)) return false
-  const normalizedType = contentType.toLowerCase().split(";")[0].trim()
-  return ALLOWED_MIME_PREFIXES.some((prefix) => normalizedType.startsWith(prefix))
+function getExtension(fileName: string): string {
+  return fileName.split(".").pop()?.toLowerCase() ?? ""
+}
+
+function getServerContentType(ext: string): string | null {
+  return EXTENSION_CONTENT_TYPE[ext] ?? null
 }
 
 // ── Max sizes ─────────────────────────────────────────────────────────────────
@@ -103,14 +106,16 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Слишком длинное имя файла" }, { status: 400 })
     }
 
-    if (!isAllowedFile(file.name, file.type)) {
+    const ext = getExtension(file.name)
+    const serverContentType = getServerContentType(ext)
+    if (!serverContentType) {
       return NextResponse.json(
         { error: "Недопустимый тип файла. Разрешены: STL, OBJ, 3MF, STEP, JPG, PNG, WEBP, HEIC" },
         { status: 400 },
       )
     }
 
-    const isImage = file.type.startsWith("image/")
+    const isImage = IMAGE_EXTENSIONS.has(ext)
     const maxSize = isImage ? MAX_IMAGE_SIZE : MAX_MODEL_SIZE
     if (file.size > maxSize) {
       return NextResponse.json(
@@ -119,7 +124,7 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    if (folder === "portfolio" && !file.type.toLowerCase().startsWith("image/")) {
+    if (folder === "portfolio" && !isImage) {
       return NextResponse.json(
         { error: "В портфолио можно загружать только изображения" },
         { status: 400 },
@@ -130,7 +135,6 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "S3 bucket is not configured" }, { status: 500 })
     }
 
-    const ext = file.name.split(".").pop()?.toLowerCase() ?? "bin"
     const key = `${folder}/${nanoid()}/${Date.now()}.${ext}`
     const body = Buffer.from(await file.arrayBuffer())
 
@@ -139,7 +143,7 @@ export async function POST(req: NextRequest) {
         Bucket: process.env.AWS_S3_BUCKET,
         Key: key,
         Body: body,
-        ContentType: file.type,
+        ContentType: serverContentType,
         ContentLength: file.size,
         ACL: "public-read",
       }),

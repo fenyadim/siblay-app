@@ -164,7 +164,7 @@ export async function getSeedMaterialsPreview(): Promise<MaterialWithColors[]> {
   })
 }
 
-export async function seedMaterials(): Promise<MaterialWithColors[]> {
+async function seedMaterials(): Promise<MaterialWithColors[]> {
   const results: MaterialWithColors[] = []
 
   for (const mat of SEED_MATERIALS) {

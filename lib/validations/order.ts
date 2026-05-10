@@ -29,12 +29,17 @@ export const step3Schema = z.object({
   infill: z.coerce.number().int().min(10).max(100),
 }).passthrough()
 
+const BEGET_S3_URL = /^https:\/\/s3\.[a-z0-9-]+\.storage\.beget\.cloud\//i
+
 export const step4Schema = z.object({
   hasModel: z.boolean(),
   files: z.array(
     z.object({
       fileName: z.string(),
-      fileUrl: z.string().url(),
+      fileUrl: z
+        .string()
+        .url()
+        .refine((u) => BEGET_S3_URL.test(u), "Неверный URL файла"),
       fileType: z.string(),
       fileSize: z.number(),
     }),

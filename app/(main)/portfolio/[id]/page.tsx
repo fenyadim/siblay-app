@@ -117,15 +117,18 @@ export default async function PortfolioDetailPage({ params }: Props) {
     ],
   }
 
+  const safeJsonLd = (data: unknown) =>
+    JSON.stringify(data).replace(/</g, "\\u003c")
+
   return (
     <div className="min-h-screen bg-background py-12">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: safeJsonLd(productJsonLd) }}
       />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: safeJsonLd(breadcrumbJsonLd) }}
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
