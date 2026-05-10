@@ -67,7 +67,6 @@ model Material {
   name        String          @unique
   description String
   price       String
-  color       String
   best        String
   available   Boolean         @default(true)
   sortOrder   Int             @default(0)

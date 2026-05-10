@@ -1,46 +1,46 @@
-import { PORTFOLIO_CATEGORY_LABELS } from "@/lib/validations/portfolio"
-import type { PortfolioItem } from "@/app/generated/prisma/client"
+import Image from 'next/image'
+import Link from 'next/link'
+
+import type { PortfolioItem } from '@/app/generated/prisma/client'
+import { PORTFOLIO_CATEGORY_LABELS } from '@/lib/validations/portfolio'
 
 interface PortfolioCardProps {
   item: PortfolioItem
-  onClick: () => void
 }
 
-export function PortfolioCard({ item, onClick }: PortfolioCardProps) {
+export function PortfolioCard({ item }: PortfolioCardProps) {
   return (
-    <button
-      onClick={onClick}
-      className="card-hover group w-full text-left rounded-2xl border border-[var(--border)] bg-[var(--surface)] overflow-hidden"
+    <Link
+      href={`/portfolio/${item.id}`}
+      className="card-hover group block w-full text-left rounded-2xl border border-border bg-surface overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
     >
-      {/* Image */}
-      <div className="relative bg-[var(--background)] overflow-hidden">
+      <div className="relative bg-background overflow-hidden aspect-4/3">
         {item.images[0] ? (
-          <img
+          <Image
             src={item.images[0]}
             alt={item.title}
-            className="w-full object-cover group-hover:scale-105 transition-transform duration-500"
+            fill
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            className="object-cover group-hover:scale-105 transition-transform duration-500"
           />
         ) : (
-          <div className="aspect-[4/3] flex items-center justify-center text-5xl text-[var(--muted)] opacity-20">
+          <div className="absolute inset-0 flex items-center justify-center text-5xl text-muted opacity-20">
             ◈
           </div>
         )}
-        <div className="absolute top-3 left-3">
-          <span className="px-2 py-1 text-xs font-mono rounded-md bg-[var(--surface)]/90 text-[var(--muted)] border border-[var(--border)]">
+        <div className="absolute top-3 left-3 z-10">
+          <span className="px-2 py-1 text-xs font-mono rounded-md bg-surface/90 text-muted border border-border">
             {PORTFOLIO_CATEGORY_LABELS[item.category] ?? item.category}
           </span>
         </div>
       </div>
-      {/* Body */}
       <div className="p-4">
-        <h3 className="font-semibold text-[var(--foreground)]" style={{ fontFamily: "Syne, sans-serif" }}>
-          {item.title}
-        </h3>
+        <h3 className="font-semibold text-foreground font-display">{item.title}</h3>
         {item.description && (
-          <p className="text-sm text-[var(--muted)] mt-1 line-clamp-2">{item.description}</p>
+          <p className="text-sm text-muted mt-1 line-clamp-2">{item.description}</p>
         )}
         <p className="label-mono mt-2">{item.material}</p>
       </div>
-    </button>
+    </Link>
   )
 }

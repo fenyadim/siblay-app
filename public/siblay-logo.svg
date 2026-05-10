@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 380 110" width="760" height="220" font-family="'Archivo Black','Arial Black','Helvetica Neue',sans-serif">
+  <rect width="380" height="110" fill="#fafaf6"/>
+
+  <g transform="translate(14 18) scale(1.05)">
+    <g fill="#0d0d0d">
+      <path d="M 6 16 Q 24 6 42 16 Q 60 26 76 18 L 76 25 Q 60 33 42 23 Q 24 13 6 23 Z"/>
+      <path d="M 6 36 Q 24 26 42 36 Q 60 46 76 38 L 76 45 Q 60 53 42 43 Q 24 33 6 43 Z"/>
+      <path d="M 6 56 Q 24 46 42 56 Q 60 66 76 58 L 76 65 Q 60 73 42 63 Q 24 53 6 63 Z"/>
+    </g>
+    <circle cx="76" cy="18" r="4.5" fill="#0a5efa"/>
+  </g>
+
+  <text x="116" y="80" font-weight="900" font-style="italic" font-size="64" letter-spacing="-1.2" fill="#0d0d0d" font-family="'Archivo Black','Arial Black','Helvetica Neue',sans-serif">SIBLAY<tspan fill="#0a5efa">.</tspan></text>
+</svg>

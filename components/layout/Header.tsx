@@ -6,6 +6,7 @@ import { useState } from 'react'
 import { createPortal } from 'react-dom'
 
 import { Button } from '@/components/ui/button'
+import { Logo } from '@/components/ui/logo'
 import { useScroll } from '@/hooks/use-scroll'
 import { cn } from '@/lib/utils'
 
@@ -56,21 +57,8 @@ export function Header() {
           )}
         >
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2.5 shrink-0">
-            <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center">
-              <svg width="14" height="14" fill="none" viewBox="0 0 24 24">
-                <path
-                  d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"
-                  stroke="white"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </div>
-            <span className="text-lg font-black tracking-tight text-foreground font-display">
-              Siblay
-            </span>
+          <Link href="/" className="shrink-0" aria-label="Siblay — на главную">
+            <Logo className="text-lg" markClassName="h-6" />
           </Link>
 
           {/* Desktop nav */}
@@ -95,9 +83,9 @@ export function Header() {
           <div className="flex items-center gap-1.5">
             <ThemeToggle />
             <Button
-              asChild
               size="sm"
-              className="hidden md:flex text-white bg-accent hover:bg-(--accent-hover) rounded-full h-8 px-4 text-xs"
+              className="hidden md:flex text-white bg-accent hover:bg-(--accent-hover) rounded-full h-8 px-4"
+              asChild
             >
               <Link href="/order">Оформить заказ</Link>
             </Button>
@@ -162,8 +150,7 @@ function MobileMenu({ links, onClose }: { links: typeof NAV_LINKS; onClose: () =
               key={link.href}
               href={link.href}
               onClick={onClose}
-              className="flex items-center gap-3 px-4 py-4 rounded-2xl text-lg font-semibold text-foreground hover:bg-surface hover:text-accent transition-colors"
-              style={{ fontFamily: 'Syne, sans-serif' }}
+              className="flex items-center gap-3 px-4 py-4 rounded-2xl text-lg font-semibold text-foreground hover:bg-surface hover:text-accent transition-colors font-display"
             >
               <span className="text-xs font-mono text-accent w-6">0{i + 1}</span>
               {link.label}

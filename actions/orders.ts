@@ -1,31 +1,36 @@
-"use server"
+'use server'
 
-import { prisma } from "@/lib/prisma"
-import { sendEmail, sendTelegram, orderEmailTemplate } from "@/lib/notifications"
-import { fullOrderSchema, type OrderFormData } from "@/lib/validations/order"
-import { auth } from "@/lib/auth"
-import { headers } from "next/headers"
-import { OrderStatus } from "@/app/generated/prisma/client"
-import { revalidatePath } from "next/cache"
+import { revalidatePath } from 'next/cache'
+import { headers } from 'next/headers'
+
+import { OrderStatus } from '@/app/generated/prisma/client'
+import { auth } from '@/lib/auth'
+import { orderEmailTemplate, sendEmail, sendTelegram } from '@/lib/notifications'
+import { prisma } from '@/lib/prisma'
+import { fullOrderSchema, type OrderFormData } from '@/lib/validations/order'
 
 export async function createOrder(data: OrderFormData) {
   const parsed = fullOrderSchema.safeParse(data)
   if (!parsed.success) {
-    return { error: "Ошибка валидации данных" }
+    return { error: 'Ошибка валидации данных' }
   }
 
-  const { files, ...rest } = parsed.data
+  const { files, personalDataConsent, ...rest } = parsed.data
+
+  if (!personalDataConsent) {
+    return { error: 'Требуется согласие на обработку персональных данных' }
+  }
 
   const order = await prisma.order.create({
     data: {
       ...rest,
       estimatedPrice: undefined,
       files: {
-        create: files.map((f) => ({
-          fileName: f.fileName,
-          fileUrl: f.fileUrl,
-          fileType: f.fileType,
-          fileSize: f.fileSize,
+        create: files.map((file) => ({
+          fileName: file.fileName,
+          fileUrl: file.fileUrl,
+          fileType: file.fileType,
+          fileSize: file.fileSize,
         })),
       },
     },
@@ -37,19 +42,16 @@ export async function createOrder(data: OrderFormData) {
     notificationEmail
       ? sendEmail({
           to: notificationEmail,
-          subject: `🖨️ Новый заказ #${order.id} — ${order.fullName}`,
+          subject: `Новый заказ #${order.id} — ${order.fullName}`,
           html: orderEmailTemplate(order),
         })
       : Promise.resolve(),
     sendTelegram(
-      `🖨️ <b>Новый заказ #${order.id}</b>\n` +
-        `👤 ${order.fullName}\n` +
-        `📞 ${order.phone}\n` +
-        `📧 ${order.email}\n` +
-        `🧱 Материал: ${order.material}, ${order.color}\n` +
-        `📦 ${order.quantity} шт. | Infill: ${order.infill}%\n` +
-        `${!order.hasModel ? "⚠️ Нет 3D-модели (нужно моделирование)\n" : ""}` +
-        `🚚 ${order.delivery}`,
+      `Новый заказ #${order.id}\n` +
+        `Материал: ${order.material}, ${order.color}\n` +
+        `Количество: ${order.quantity} шт. | Infill: ${order.infill}%\n` +
+        `${!order.hasModel ? 'Нет 3D-модели (нужно моделирование)\n' : ''}` +
+        `Доставка: ${order.delivery}`
     ),
   ])
 
@@ -59,7 +61,7 @@ export async function createOrder(data: OrderFormData) {
 async function requireAdmin() {
   const session = await auth.api.getSession({ headers: await headers() })
   if (!session || session.user.email !== process.env.ADMIN_EMAIL) {
-    throw new Error("Unauthorized")
+    throw new Error('Unauthorized')
   }
   return session
 }
@@ -73,8 +75,8 @@ export async function updateOrderPrice(id: string, price: number | null) {
   })
 
   revalidatePath(`/admin/orders/${id}`)
-  revalidatePath("/admin/orders")
-  revalidatePath("/admin")
+  revalidatePath('/admin/orders')
+  revalidatePath('/admin')
   return order
 }
 
@@ -86,7 +88,7 @@ export async function updateOrderStatus(id: string, status: OrderStatus) {
     data: { status },
   })
 
-  revalidatePath("/admin/orders")
+  revalidatePath('/admin/orders')
   revalidatePath(`/admin/orders/${id}`)
   return order
 }
@@ -97,7 +99,7 @@ export async function getOrders(status?: OrderStatus) {
   return prisma.order.findMany({
     where: status ? { status } : undefined,
     include: { files: true },
-    orderBy: { createdAt: "desc" },
+    orderBy: { createdAt: 'desc' },
   })
 }
 

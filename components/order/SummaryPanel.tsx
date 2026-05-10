@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useFormContext } from "react-hook-form"
 import { calculatePrice, formatPrice, formatFileSize } from "@/lib/utils"
@@ -8,9 +8,9 @@ import { useState } from "react"
 
 function Row({ label, value }: { label: string; value: React.ReactNode }) {
   return (
-    <div className="flex items-start justify-between gap-2 py-2.5 border-b border-[var(--border)] last:border-0">
-      <span className="text-xs text-[var(--muted)] shrink-0">{label}</span>
-      <span className="text-xs font-medium text-[var(--foreground)] text-right">{value}</span>
+    <div className="flex items-start justify-between gap-2 py-2.5 border-b border-border last:border-0">
+      <span className="text-xs text-muted shrink-0">{label}</span>
+      <span className="text-xs font-medium text-foreground text-right">{value}</span>
     </div>
   )
 }
@@ -37,7 +37,7 @@ export function SummaryPanel() {
 
   const content = (
     <div>
-      <div className="divide-y divide-[var(--border)] mb-4">
+      <div className="divide-y divide-border mb-4">
         {material && <Row label="Материал" value={<span className="font-mono">{material}</span>} />}
         {color && <Row label="Цвет" value={color} />}
         {hasAllDims && (
@@ -65,21 +65,20 @@ export function SummaryPanel() {
         className="rounded-xl p-4"
         style={{ background: "linear-gradient(135deg, var(--accent-subtle), #7c3aed1a)" }}
       >
-        <p className="text-xs text-[var(--muted)] mb-1">Ориентировочная стоимость</p>
+        <p className="text-xs text-muted mb-1">Ориентировочная стоимость</p>
         {price !== null ? (
           <>
             <p
-              className="text-2xl font-black"
-              style={{ fontFamily: "Syne, sans-serif", color: "var(--accent)" }}
+              className="text-2xl font-black font-display" style={{ color: "var(--accent)" }}
             >
               {formatPrice(price)}
             </p>
-            <p className="text-[11px] text-[var(--muted)] mt-1 leading-snug">
+            <p className="text-[11px] text-muted mt-1 leading-snug">
               Окончательная цена после согласования
             </p>
           </>
         ) : (
-          <p className="text-sm text-[var(--muted)]">Укажите размеры для расчёта</p>
+          <p className="text-sm text-muted">Укажите размеры для расчёта</p>
         )}
       </div>
     </div>
@@ -89,11 +88,10 @@ export function SummaryPanel() {
     <>
       {/* Desktop sticky sidebar */}
       <aside className="hidden lg:block sticky top-24 self-start">
-        <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] overflow-hidden">
-          <div className="px-5 py-4 border-b border-[var(--border)] bg-[var(--surface-raised)]">
+        <div className="rounded-2xl border border-border bg-surface overflow-hidden">
+          <div className="px-5 py-4 border-b border-border bg-surface-raised">
             <h3
-              className="font-black text-[var(--foreground)]"
-              style={{ fontFamily: "Syne, sans-serif" }}
+              className="font-black text-foreground font-display"
             >
               Ваш заказ
             </h3>
@@ -107,18 +105,17 @@ export function SummaryPanel() {
         <button
           type="button"
           onClick={() => setOpen(!open)}
-          className="w-full flex items-center justify-between px-5 py-3.5 bg-[var(--surface)] border-t border-[var(--border)]"
+          className="w-full flex items-center justify-between px-5 py-3.5 bg-surface border-t border-border"
         >
           <div className="flex items-center gap-2.5">
             <div
               className="w-2 h-2 rounded-full"
               style={{ background: "linear-gradient(135deg, var(--accent), #7c3aed)" }}
             />
-            <span className="text-sm font-semibold text-[var(--foreground)]">Ваш заказ</span>
+            <span className="text-sm font-semibold text-foreground">Ваш заказ</span>
             {price !== null && (
               <span
-                className="text-sm font-black"
-                style={{ color: "var(--accent)", fontFamily: "Syne, sans-serif" }}
+                className="text-sm font-black font-display" style={{ color: "var(--accent)" }}
               >
                 {formatPrice(price)}
               </span>
@@ -126,14 +123,14 @@ export function SummaryPanel() {
           </div>
           <svg
             width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"
-            className={cn("text-[var(--muted)] transition-transform duration-200", open && "rotate-180")}
+            className={cn("text-muted transition-transform duration-200", open && "rotate-180")}
           >
             <path strokeLinecap="round" strokeLinejoin="round" d="M5 15l7-7 7 7" />
           </svg>
         </button>
 
         {open && (
-          <div className="bg-[var(--surface)] border-t border-[var(--border)] px-5 pt-5 pb-6 max-h-[55vh] overflow-y-auto">
+          <div className="bg-surface border-t border-border px-5 pt-5 pb-6 max-h-[55vh] overflow-y-auto">
             {content}
           </div>
         )}

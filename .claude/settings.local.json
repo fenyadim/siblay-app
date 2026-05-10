@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(powershell -Command ':*)",
+      "Bash(ls *.json)",
+      "Bash(git commit -m ' *)",
+      "Bash(pnpm --version)",
+      "Bash(docker build *)",
+      "Bash(docker run *)"
+    ]
+  }
+}

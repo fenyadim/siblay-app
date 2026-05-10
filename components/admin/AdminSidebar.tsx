@@ -1,15 +1,19 @@
-"use client"
+﻿'use client'
 
-import { signOut } from "@/lib/auth-client"
-import { cn } from "@/lib/utils"
-import Link from "next/link"
-import { usePathname, useRouter } from "next/navigation"
+import { LogOut, MoveUpRight } from 'lucide-react'
+import Link from 'next/link'
+import { usePathname, useRouter } from 'next/navigation'
+
+import { Button } from '@/components/ui/button'
+import { Logo } from '@/components/ui/logo'
+import { signOut } from '@/lib/auth-client'
+import { cn } from '@/lib/utils'
 
 const NAV = [
-  { href: "/admin", label: "Дашборд", icon: "⬡" },
-  { href: "/admin/orders", label: "Заказы", icon: "◫" },
-  { href: "/admin/portfolio", label: "Портфолио", icon: "◈" },
-  { href: "/admin/materials", label: "Материалы", icon: "◉" },
+  { href: '/admin', label: 'Дашборд', icon: '⬡' },
+  { href: '/admin/orders', label: 'Заказы', icon: '◫' },
+  { href: '/admin/portfolio', label: 'Портфолио', icon: '◈' },
+  { href: '/admin/materials', label: 'Материалы', icon: '◉' },
 ]
 
 export function AdminSidebar() {
@@ -18,40 +22,32 @@ export function AdminSidebar() {
 
   async function handleSignOut() {
     await signOut()
-    router.push("/admin/login")
+    router.push('/admin/login')
   }
 
   return (
-    <aside className="w-56 shrink-0 border-r border-[var(--border)] bg-[var(--surface)] flex flex-col min-h-screen">
+    <aside className="w-56 shrink-0 border-r border-border bg-surface flex flex-col min-h-screen">
       {/* Logo */}
-      <div className="h-16 flex items-center px-5 border-b border-[var(--border)]">
-        <Link href="/admin" className="flex items-center gap-2">
-          <div className="w-6 h-6 rounded-md bg-[var(--accent)] flex items-center justify-center">
-            <svg width="12" height="12" fill="none" viewBox="0 0 24 24">
-              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </div>
-          <span className="font-black text-sm text-[var(--foreground)]" style={{ fontFamily: "Syne, sans-serif" }}>
-            Siblay
-          </span>
+      <div className="h-16 flex items-center px-5 border-b border-border">
+        <Link href="/admin" aria-label="Siblay Admin">
+          <Logo className="text-sm" markClassName="h-5" />
         </Link>
       </div>
 
       {/* Nav */}
       <nav className="flex-1 px-3 py-4 space-y-0.5">
         {NAV.map((item) => {
-          const active = item.href === "/admin"
-            ? pathname === "/admin"
-            : pathname.startsWith(item.href)
+          const active =
+            item.href === '/admin' ? pathname === '/admin' : pathname.startsWith(item.href)
           return (
             <Link
               key={item.href}
               href={item.href}
               className={cn(
-                "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
+                'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors',
                 active
-                  ? "bg-[var(--accent-subtle)] text-[var(--accent)]"
-                  : "text-[var(--muted)] hover:text-[var(--foreground)] hover:bg-[var(--background)]",
+                  ? 'bg-(--accent-subtle) text-accent'
+                  : 'text-muted hover:text-foreground hover:bg-background'
               )}
             >
               <span className="text-base">{item.icon}</span>
@@ -62,19 +58,19 @@ export function AdminSidebar() {
       </nav>
 
       {/* Bottom */}
-      <div className="px-3 pb-4 border-t border-[var(--border)] pt-3">
-        <Link
-          href="/"
-          className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-[var(--muted)] hover:text-[var(--foreground)] hover:bg-[var(--background)] transition-colors"
-        >
-          <span>↗</span> На сайт
-        </Link>
-        <button
+      <div className="px-3 pb-4 border-t border-border pt-3">
+        <Button variant="ghost" className="w-full text-muted" asChild>
+          <Link href="/">
+            <MoveUpRight /> На сайт
+          </Link>
+        </Button>
+        <Button
+          variant="ghost"
           onClick={handleSignOut}
-          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-[var(--muted)] hover:text-[var(--error)] hover:bg-[var(--background)] transition-colors"
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-muted hover:text-destructive hover:bg-background transition-colors"
         >
-          <span>⏻</span> Выйти
-        </button>
+          <LogOut /> Выйти
+        </Button>
       </div>
     </aside>
   )

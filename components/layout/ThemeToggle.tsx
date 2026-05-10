@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useTheme } from "next-themes"
 import { useEffect, useState } from "react"
@@ -16,7 +16,7 @@ export function ThemeToggle() {
       variant="ghost"
       size="icon"
       onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-      className="rounded-full text-[var(--muted)] hover:text-[var(--foreground)]"
+      className="rounded-full text-muted hover:text-foreground"
       aria-label="Переключить тему"
     >
       {theme === "dark" ? (
