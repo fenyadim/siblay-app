@@ -70,6 +70,12 @@ model Material {
   best        String
   available   Boolean         @default(true)
   sortOrder   Int             @default(0)
+  fullName    String          @default("")
+  tempLimit   String          @default("")
+  strength    String          @default("")
+  longDesc    String          @default("")
+  props       String[]        @default([])
+  color       String          @default("#a7a7a7")
   colors      MaterialColor[]
 }
 

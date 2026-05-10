@@ -65,6 +65,20 @@ export function formatDate(date: Date | string): string {
   }).format(new Date(date))
 }
 
+// ── Material price ───────────────────────────────────────────────────
+// Stored value is the bare number as a string ("2", "2.5"). Older records
+// may contain pre-formatted strings ("от 2 ₽/г") — extract the first number
+// so display stays consistent without a migration.
+export function parseMaterialPrice(stored: string): string {
+  const match = stored.match(/[\d]+([.,][\d]+)?/)
+  return match ? match[0].replace(",", ".") : ""
+}
+
+export function formatMaterialPrice(stored: string): string {
+  const n = parseMaterialPrice(stored)
+  return n ? `от ${n} ₽/г` : stored
+}
+
 export function formatFileSize(bytes: number): string {
   if (bytes < 1024) return `${bytes} Б`
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} КБ`

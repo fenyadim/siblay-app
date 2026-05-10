@@ -13,6 +13,8 @@ import {
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import { formatMaterialPrice, parseMaterialPrice } from '@/lib/utils'
 
 interface Props {
   materials: MaterialWithColors[]
@@ -94,6 +96,251 @@ function EditableField({
           onSave(draft)
           setEditing(false)
         }}
+        className="text-accent text-xs font-medium whitespace-nowrap"
+      >
+        ✓
+      </Button>
+      <Button
+        type="button"
+        variant="ghost"
+        size="xs"
+        onClick={() => setEditing(false)}
+        className="text-muted text-xs"
+      >
+        ✕
+      </Button>
+    </div>
+  )
+}
+
+function MultilineField({
+  value,
+  onSave,
+  placeholder,
+}: {
+  value: string
+  onSave: (v: string) => void
+  placeholder?: string
+}) {
+  const [editing, setEditing] = useState(false)
+  const [draft, setDraft] = useState(value)
+
+  if (!editing) {
+    return (
+      <Button
+        type="button"
+        variant="ghost"
+        onClick={() => {
+          setDraft(value)
+          setEditing(true)
+        }}
+        className="h-auto w-full justify-start whitespace-pre-wrap p-0 text-left font-normal leading-relaxed hover:bg-transparent hover:text-accent transition-colors"
+      >
+        {value || <span className="text-muted italic">{placeholder ?? 'Не задано'}</span>}
+      </Button>
+    )
+  }
+
+  function commit() {
+    onSave(draft)
+    setEditing(false)
+  }
+
+  return (
+    <div className="flex flex-col gap-1.5">
+      <Textarea
+        autoFocus
+        value={draft}
+        onChange={(e) => setDraft(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+            e.preventDefault()
+            commit()
+          }
+          if (e.key === 'Escape') setEditing(false)
+        }}
+        placeholder={placeholder}
+        className="border border-accent rounded-md bg-background text-foreground min-h-24"
+      />
+      <div className="flex items-center gap-2">
+        <Button
+          type="button"
+          variant="ghost"
+          size="xs"
+          onClick={commit}
+          className="text-accent text-xs font-medium"
+        >
+          ✓ Сохранить
+        </Button>
+        <Button
+          type="button"
+          variant="ghost"
+          size="xs"
+          onClick={() => setEditing(false)}
+          className="text-muted text-xs"
+        >
+          ✕ Отмена
+        </Button>
+        <span className="ml-auto text-[10px] text-muted font-mono">Ctrl+Enter</span>
+      </div>
+    </div>
+  )
+}
+
+function ColorPickerField({
+  value,
+  onSave,
+}: {
+  value: string
+  onSave: (v: string) => void
+}) {
+  const [draft, setDraft] = useState(value || '#a7a7a7')
+  const [isPending, startTransition] = useTransition()
+
+  function commit() {
+    if (draft === value) return
+    startTransition(() => onSave(draft))
+  }
+
+  return (
+    <div className="flex items-center gap-2">
+      <Input
+        type="color"
+        value={toColorInputValue(draft, '#a7a7a7')}
+        onChange={(e) => setDraft(e.target.value)}
+        onBlur={commit}
+        className="h-8 w-10 cursor-pointer rounded p-0 shrink-0"
+        aria-label="Цвет акцента"
+      />
+      <Input
+        value={draft}
+        onChange={(e) => setDraft(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') commit()
+        }}
+        onBlur={commit}
+        placeholder="#hex"
+        className="font-mono text-xs border border-border rounded px-2 py-1 bg-background text-foreground focus:outline-none focus:border-accent w-24"
+      />
+      <span
+        className="w-3 h-3 rounded-full shrink-0 border border-black/10"
+        style={{ background: draft, boxShadow: `0 0 8px ${draft}66` }}
+      />
+      {isPending && <span className="text-xs text-muted">…</span>}
+    </div>
+  )
+}
+
+function PropsField({
+  value,
+  onSave,
+}: {
+  value: string[]
+  onSave: (v: string[]) => void
+}) {
+  const initial = [value[0] ?? '', value[1] ?? '', value[2] ?? '']
+  const [draft, setDraft] = useState<[string, string, string]>([
+    initial[0],
+    initial[1],
+    initial[2],
+  ])
+  const [isPending, startTransition] = useTransition()
+
+  function update(i: number, v: string) {
+    setDraft((prev) => {
+      const next = [...prev] as [string, string, string]
+      next[i] = v
+      return next
+    })
+  }
+
+  function commit() {
+    const cleaned = draft.map((p) => p.trim()).filter(Boolean)
+    const same =
+      cleaned.length === value.length && cleaned.every((p, i) => p === value[i])
+    if (same) return
+    startTransition(() => onSave(cleaned))
+  }
+
+  return (
+    <div className="flex flex-wrap items-center gap-2">
+      {[0, 1, 2].map((i) => (
+        <Input
+          key={i}
+          value={draft[i]}
+          onChange={(e) => update(i, e.target.value)}
+          onBlur={commit}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault()
+              commit()
+            }
+          }}
+          placeholder={`Тег ${i + 1}`}
+          className="border border-border rounded px-2 py-1 text-xs bg-background text-foreground focus:outline-none focus:border-accent w-32"
+        />
+      ))}
+      {isPending && <span className="text-xs text-muted">…</span>}
+    </div>
+  )
+}
+
+function PriceField({
+  value,
+  onSave,
+}: {
+  value: string
+  onSave: (v: string) => void
+}) {
+  const [editing, setEditing] = useState(false)
+  const [draft, setDraft] = useState(parseMaterialPrice(value))
+
+  if (!editing) {
+    return (
+      <Button
+        type="button"
+        variant="ghost"
+        onClick={() => {
+          setDraft(parseMaterialPrice(value))
+          setEditing(true)
+        }}
+        className="h-auto w-full justify-start p-0 text-left font-mono font-normal hover:bg-transparent hover:text-accent transition-colors"
+      >
+        {value
+          ? formatMaterialPrice(value)
+          : <span className="text-muted italic">Цена не указана</span>}
+      </Button>
+    )
+  }
+
+  function commit() {
+    const trimmed = draft.trim().replace(",", ".")
+    onSave(trimmed)
+    setEditing(false)
+  }
+
+  return (
+    <div className="flex items-center gap-1.5">
+      <Input
+        autoFocus
+        type="number"
+        inputMode="decimal"
+        min="0"
+        step="0.1"
+        value={draft}
+        onChange={(e) => setDraft(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') commit()
+          if (e.key === 'Escape') setEditing(false)
+        }}
+        className="font-mono border border-accent rounded px-2 py-0.5 text-sm bg-background text-foreground focus:outline-none w-20 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+      />
+      <span className="font-mono text-xs text-muted whitespace-nowrap">₽/г</span>
+      <Button
+        type="button"
+        variant="ghost"
+        size="xs"
+        onClick={commit}
         className="text-accent text-xs font-medium whitespace-nowrap"
       >
         ✓
@@ -427,17 +674,27 @@ function AddColorForm({ materialId }: { materialId: string }) {
 
 function MaterialCard({ material }: { material: MaterialWithColors }) {
   const [isPending, startTransition] = useTransition()
-  const [open, setOpen] = useState(false)
+  const [colorsOpen, setColorsOpen] = useState(false)
+  const [detailsOpen, setDetailsOpen] = useState(false)
 
   function save(data: Parameters<typeof updateMaterial>[1]) {
     startTransition(() => updateMaterial(material.id, data))
   }
 
+  const dotColor = material.color || 'var(--muted)'
+
   return (
     <div className="rounded-xl border border-border bg-surface overflow-hidden">
       {/* Header */}
       <div className="flex items-center gap-3 px-5 py-4 border-b border-border">
-        <div className="w-3 h-3 rounded-full shrink-0" />
+        <div
+          className="w-3 h-3 rounded-full shrink-0"
+          style={
+            material.color
+              ? { background: dotColor, boxShadow: `0 0 8px ${dotColor}66` }
+              : { background: dotColor }
+          }
+        />
         <span className="font-black text-lg text-foreground font-display">{material.name}</span>
 
         {/* Available toggle */}
@@ -454,17 +711,6 @@ function MaterialCard({ material }: { material: MaterialWithColors }) {
         >
           {material.available ? 'Активен' : 'Скоро'}
         </Button>
-
-        {/* Expand/collapse colors */}
-        <Button
-          type="button"
-          variant="ghost"
-          size="xs"
-          onClick={() => setOpen((v) => !v)}
-          className="text-muted hover:bg-transparent hover:text-foreground transition-colors text-sm"
-        >
-          {open ? '▲' : '▼'}
-        </Button>
       </div>
 
       {/* Editable fields */}
@@ -478,7 +724,7 @@ function MaterialCard({ material }: { material: MaterialWithColors }) {
         </div>
         <div>
           <p className="label-mono mb-1">Цена</p>
-          <EditableField value={material.price} onSave={(price) => save({ price })} mono />
+          <PriceField value={material.price} onSave={(price) => save({ price })} />
         </div>
         <div>
           <p className="label-mono mb-1">Лучше всего для</p>
@@ -486,18 +732,91 @@ function MaterialCard({ material }: { material: MaterialWithColors }) {
         </div>
       </div>
 
-      {/* Colors (expandable) */}
-      {open && (
-        <div className="px-5 pb-4 border-t border-border pt-3">
-          <p className="label-mono mb-2">Цвета ({material.colors.length})</p>
-          <div>
-            {material.colors.map((c) => (
-              <ColorRow key={c.id} color={c} materialId={material.id} />
-            ))}
+      {/* Details (expandable) */}
+      <div className="border-t border-border">
+        <Button
+          type="button"
+          variant="ghost"
+          onClick={() => setDetailsOpen((v) => !v)}
+          className="w-full px-5 py-3 flex items-center justify-between hover:bg-background transition-colors h-auto rounded-none"
+        >
+          <span className="label-mono">Подробности</span>
+          <span className="text-muted text-sm">{detailsOpen ? '▲' : '▼'}</span>
+        </Button>
+        {detailsOpen && (
+          <div className="px-5 pb-4 grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-3 text-sm">
+            <div>
+              <p className="label-mono mb-1">Полное название</p>
+              <EditableField
+                value={material.fullName}
+                onSave={(fullName) => save({ fullName })}
+                placeholder="Polylactic Acid"
+              />
+            </div>
+            <div>
+              <p className="label-mono mb-1">Цвет акцента</p>
+              <ColorPickerField
+                value={material.color}
+                onSave={(color) => save({ color })}
+              />
+            </div>
+            <div>
+              <p className="label-mono mb-1">Темп. предел</p>
+              <EditableField
+                value={material.tempLimit}
+                onSave={(tempLimit) => save({ tempLimit })}
+                placeholder="до 60°C"
+              />
+            </div>
+            <div>
+              <p className="label-mono mb-1">Прочность</p>
+              <EditableField
+                value={material.strength}
+                onSave={(strength) => save({ strength })}
+                placeholder="Средняя"
+              />
+            </div>
+            <div className="sm:col-span-2">
+              <p className="label-mono mb-1">Теги для лендинга (до 3)</p>
+              <PropsField
+                value={material.props ?? []}
+                onSave={(props) => save({ props })}
+              />
+            </div>
+            <div className="sm:col-span-2">
+              <p className="label-mono mb-1">Развёрнутое описание</p>
+              <MultilineField
+                value={material.longDesc}
+                onSave={(longDesc) => save({ longDesc })}
+                placeholder="Текст для popover на форме заказа и карточки на лендинге"
+              />
+            </div>
           </div>
-          <AddColorForm materialId={material.id} />
-        </div>
-      )}
+        )}
+      </div>
+
+      {/* Colors (expandable) */}
+      <div className="border-t border-border">
+        <Button
+          type="button"
+          variant="ghost"
+          onClick={() => setColorsOpen((v) => !v)}
+          className="w-full px-5 py-3 flex items-center justify-between hover:bg-background transition-colors h-auto rounded-none"
+        >
+          <span className="label-mono">Цвета ({material.colors.length})</span>
+          <span className="text-muted text-sm">{colorsOpen ? '▲' : '▼'}</span>
+        </Button>
+        {colorsOpen && (
+          <div className="px-5 pb-4">
+            <div>
+              {material.colors.map((c) => (
+                <ColorRow key={c.id} color={c} materialId={material.id} />
+              ))}
+            </div>
+            <AddColorForm materialId={material.id} />
+          </div>
+        )}
+      </div>
     </div>
   )
 }
@@ -519,7 +838,10 @@ function AddMaterialForm() {
   function handleAdd() {
     if (!form.name.trim()) return
     startTransition(async () => {
-      await createMaterial(form)
+      await createMaterial({
+        ...form,
+        price: form.price.trim().replace(",", "."),
+      })
       setForm({ name: '', description: '', price: '', best: '' })
       setOpen(false)
     })
@@ -554,13 +876,22 @@ function AddMaterialForm() {
           />
         </div>
         <div>
-          <label className="label-mono mb-1 block">Цена</label>
-          <Input
-            value={form.price}
-            onChange={(e) => set('price', e.target.value)}
-            placeholder="от 3 ₽/г"
-            className="w-full border border-border rounded-lg px-3 py-2 text-sm font-mono bg-background text-foreground focus:outline-none focus:border-accent"
-          />
+          <label className="label-mono mb-1 block">Цена за грамм</label>
+          <div className="relative">
+            <Input
+              type="number"
+              inputMode="decimal"
+              min="0"
+              step="0.1"
+              value={form.price}
+              onChange={(e) => set('price', e.target.value)}
+              placeholder="3"
+              className="w-full border border-border rounded-lg px-3 py-2 pr-12 text-sm font-mono bg-background text-foreground focus:outline-none focus:border-accent [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+            />
+            <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted font-mono">
+              ₽/г
+            </span>
+          </div>
         </div>
         <div>
           <label className="label-mono mb-1 block">Описание</label>

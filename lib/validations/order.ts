@@ -1,7 +1,10 @@
 import { z } from "zod"
 
 export const step1Schema = z.object({
-  material: z.enum(["PLA", "ABS", "PETG", "Nylon", "Resin", "TPU"], "Выберите материал"),
+  material: z
+    .string({ error: "Выберите материал" })
+    .min(1, "Выберите материал")
+    .max(64),
 }).passthrough()
 
 export const step2Schema = z.object({
