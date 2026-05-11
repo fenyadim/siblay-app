@@ -7,10 +7,26 @@ import { OrderStatus } from '@/app/generated/prisma/client'
 import { auth } from '@/lib/auth'
 import { orderEmailTemplate, sendEmail, sendTelegram } from '@/lib/notifications'
 import { prisma } from '@/lib/prisma'
+import { createRateLimiter, getClientId } from '@/lib/rate-limit'
 import { deleteS3Object } from '@/lib/s3'
 import { fullOrderSchema, type OrderFormData } from '@/lib/validations/order'
 
+const orderLimiter = createRateLimiter({
+  limit: 5,
+  windowMs: 60 * 60 * 1000,
+  name: 'createOrder',
+})
+
 export async function createOrder(data: OrderFormData) {
+  const clientId = getClientId(await headers())
+  const { allowed, retryAfter } = orderLimiter(clientId)
+  if (!allowed) {
+    const minutes = Math.ceil(retryAfter / 60)
+    return {
+      error: `Слишком много заявок. Попробуйте через ${minutes} мин.`,
+    }
+  }
+
   const parsed = fullOrderSchema.safeParse(data)
   if (!parsed.success) {
     return { error: 'Ошибка валидации данных' }

@@ -16,6 +16,19 @@ export const auth = betterAuth({
     disableSignUp: true,
   },
   trustedOrigins: [authOrigin],
+  rateLimit: {
+    // Built-in limiter only runs in production by default; force-enable so
+    // brute-force attempts against the single admin login are throttled
+    // everywhere (including staging).
+    enabled: true,
+    window: 60,
+    max: 60,
+    customRules: {
+      // Tight bucket on the password endpoint — 5 attempts per 5 minutes is
+      // enough for a forgetful admin but expensive for an attacker.
+      "/sign-in/email": { window: 300, max: 5 },
+    },
+  },
 })
 
 export type Session = typeof auth.$Infer.Session

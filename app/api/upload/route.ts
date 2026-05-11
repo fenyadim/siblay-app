@@ -3,40 +3,14 @@ import { s3, getS3Url } from "@/lib/s3"
 import { PutObjectCommand } from "@aws-sdk/client-s3"
 import { nanoid } from "nanoid"
 import { auth } from "@/lib/auth"
+import { generateBlurDataURL } from "@/lib/blur"
+import { createRateLimiter, getClientId } from "@/lib/rate-limit"
 
-// ── Rate limiting (in-memory, per IP) ────────────────────────────────────────
-const RATE_LIMIT = 20
-const WINDOW_MS = 60 * 60 * 1000
-
-const rateLimitMap = new Map<string, { count: number; resetAt: number }>()
-
-function checkRateLimit(clientId: string): { allowed: boolean; retryAfter: number } {
-  const now = Date.now()
-  const entry = rateLimitMap.get(clientId)
-  if (!entry || entry.resetAt < now) {
-    rateLimitMap.set(clientId, { count: 1, resetAt: now + WINDOW_MS })
-    return { allowed: true, retryAfter: 0 }
-  }
-  if (entry.count >= RATE_LIMIT) {
-    return {
-      allowed: false,
-      retryAfter: Math.max(1, Math.ceil((entry.resetAt - now) / 1000)),
-    }
-  }
-  entry.count++
-  return { allowed: true, retryAfter: 0 }
-}
-
-function getClientIdentifier(req: NextRequest): string {
-  const realIp = req.headers.get("x-real-ip")?.trim()
-  if (realIp) return realIp
-
-  const forwardedIp = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim()
-  if (forwardedIp) return forwardedIp
-
-  // Fallback prevents every unknown client from sharing one global bucket.
-  return req.headers.get("user-agent")?.trim() || "unknown"
-}
+const uploadLimiter = createRateLimiter({
+  limit: 20,
+  windowMs: 60 * 60 * 1000,
+  name: "upload",
+})
 
 // ── Allowed types ─────────────────────────────────────────────────────────────
 // Server-side mapping: extension → Content-Type. Client-supplied MIME is ignored
@@ -69,8 +43,7 @@ const MAX_IMAGE_SIZE = 20 * 1024 * 1024  // 20 MB
 const MAX_MODEL_SIZE = 100 * 1024 * 1024 // 100 MB
 
 export async function POST(req: NextRequest) {
-  const clientId = getClientIdentifier(req)
-  const rateLimit = checkRateLimit(clientId)
+  const rateLimit = uploadLimiter(getClientId(req.headers))
 
   if (!rateLimit.allowed) {
     return NextResponse.json(
@@ -138,19 +111,24 @@ export async function POST(req: NextRequest) {
     const key = `${folder}/${nanoid()}/${Date.now()}.${ext}`
     const body = Buffer.from(await file.arrayBuffer())
 
-    await s3.send(
-      new PutObjectCommand({
-        Bucket: process.env.AWS_S3_BUCKET,
-        Key: key,
-        Body: body,
-        ContentType: serverContentType,
-        ContentLength: file.size,
-        ACL: "public-read",
-      }),
-    )
+    // Generate blur placeholder for portfolio images in parallel with the
+    // S3 upload — the blur is independent of the upload result.
+    const [, blurDataURL] = await Promise.all([
+      s3.send(
+        new PutObjectCommand({
+          Bucket: process.env.AWS_S3_BUCKET,
+          Key: key,
+          Body: body,
+          ContentType: serverContentType,
+          ContentLength: file.size,
+          ACL: "public-read",
+        }),
+      ),
+      folder === "portfolio" && isImage ? generateBlurDataURL(body) : Promise.resolve(null),
+    ])
 
     const fileUrl = getS3Url(key)
-    return NextResponse.json({ fileUrl, key })
+    return NextResponse.json({ fileUrl, key, blurDataURL })
   } catch (err) {
     console.error("[upload]", err)
     return NextResponse.json({ error: "Ошибка загрузки файла" }, { status: 500 })

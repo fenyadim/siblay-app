@@ -6,9 +6,10 @@ import { PORTFOLIO_CATEGORY_LABELS } from '@/lib/validations/portfolio'
 
 interface PortfolioCardProps {
   item: PortfolioItem
+  priority?: boolean
 }
 
-export function PortfolioCard({ item }: PortfolioCardProps) {
+export function PortfolioCard({ item, priority = false }: PortfolioCardProps) {
   return (
     <Link
       href={`/portfolio/${item.id}`}
@@ -22,6 +23,10 @@ export function PortfolioCard({ item }: PortfolioCardProps) {
             fill
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
             className="object-cover group-hover:scale-105 transition-transform duration-500"
+            priority={priority}
+            {...(item.imageBlurs[0]
+              ? { placeholder: "blur" as const, blurDataURL: item.imageBlurs[0] }
+              : {})}
           />
         ) : (
           <div className="absolute inset-0 flex items-center justify-center text-5xl text-muted opacity-20">

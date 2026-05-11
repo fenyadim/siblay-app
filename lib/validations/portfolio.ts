@@ -9,6 +9,9 @@ export const portfolioSchema = z.object({
   ),
   material: z.string().min(1, "Укажите материал"),
   images: z.array(z.string().url()).min(1, "Добавьте хотя бы одно изображение"),
+  // Parallel to `images` — same length, same order. Slot is the literal
+  // string "" when a blur couldn't be computed.
+  imageBlurs: z.array(z.string()).default([]),
   params: z.record(z.string(), z.string()).optional(),
   published: z.boolean().default(true),
 })

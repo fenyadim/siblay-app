@@ -1,5 +1,6 @@
 ﻿"use client"
 
+import Image from "next/image"
 import { useState, useTransition, useRef, useCallback } from "react"
 import { useForm, type Resolver } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -26,6 +27,7 @@ interface PortfolioItem {
   category: string
   material: string
   images: string[]
+  imageBlurs: string[]
   params?: Record<string, string>
   published: boolean
   createdAt: Date
@@ -64,18 +66,22 @@ const PARAMETER_OPTIONS = [
   "Модуль",
 ] as const
 
+type UploadedImage = { url: string; blur: string }
+
 function ImageUploader({
   images,
+  blurs,
   onChange,
 }: {
   images: string[]
-  onChange: (urls: string[]) => void
+  blurs: string[]
+  onChange: (urls: string[], blurs: string[]) => void
 }) {
   const [uploading, setUploading] = useState<UploadingFile[]>([])
   const [dragOver, setDragOver] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
 
-  const uploadFile = useCallback(async (file: File): Promise<string | null> => {
+  const uploadFile = useCallback(async (file: File): Promise<UploadedImage | null> => {
     const id = Math.random().toString(36).slice(2)
     setUploading((prev) => [...prev, { id, name: file.name, progress: 30 }])
 
@@ -94,7 +100,7 @@ function ImageUploader({
         throw new Error(data.error || "Ошибка загрузки")
       }
 
-      const { fileUrl } = await res.json()
+      const { fileUrl, blurDataURL } = await res.json()
 
       setUploading((prev) =>
         prev.map((f) => (f.id === id ? { ...f, progress: 100, url: fileUrl } : f)),
@@ -104,7 +110,7 @@ function ImageUploader({
         setUploading((prev) => prev.filter((f) => f.id !== id))
       }, 500)
 
-      return fileUrl
+      return { url: fileUrl, blur: blurDataURL ?? "" }
     } catch (err) {
       const message = err instanceof Error ? err.message : "Ошибка"
       setUploading((prev) =>
@@ -122,12 +128,15 @@ function ImageUploader({
       if (imageFiles.length === 0) return
 
       const results = await Promise.all(imageFiles.map(uploadFile))
-      const newUrls = results.filter((u): u is string => u !== null)
-      if (newUrls.length > 0) {
-        onChange([...images, ...newUrls])
+      const succeeded = results.filter((r): r is UploadedImage => r !== null)
+      if (succeeded.length > 0) {
+        onChange(
+          [...images, ...succeeded.map((r) => r.url)],
+          [...blurs, ...succeeded.map((r) => r.blur)],
+        )
       }
     },
-    [images, onChange, uploadFile],
+    [images, blurs, onChange, uploadFile],
   )
 
   const handleDrop = useCallback(
@@ -140,7 +149,10 @@ function ImageUploader({
   )
 
   const removeImage = (index: number) => {
-    onChange(images.filter((_, i) => i !== index))
+    onChange(
+      images.filter((_, i) => i !== index),
+      blurs.filter((_, i) => i !== index),
+    )
   }
 
   const removeUploadError = (id: string) => {
@@ -158,9 +170,12 @@ function ImageUploader({
         <div className="flex flex-wrap gap-2 mb-3">
           {images.map((url, i) => (
             <div key={i} className="relative group">
-              <img
+              <Image
                 src={url}
                 alt=""
+                width={80}
+                height={80}
+                sizes="80px"
                 className="w-20 h-20 rounded-xl object-cover border border-border"
               />
               <Button
@@ -299,16 +314,21 @@ function PortfolioForm({
       material: defaultValues?.material ?? "",
       published: true,
       images: [],
+      imageBlurs: [],
       ...(typeof defaultValues?.published === "boolean"
         ? { published: defaultValues.published }
         : {}),
       ...(Array.isArray(defaultValues?.images)
         ? { images: defaultValues.images }
         : {}),
+      ...(Array.isArray(defaultValues?.imageBlurs)
+        ? { imageBlurs: defaultValues.imageBlurs }
+        : {}),
     },
   })
 
   const images = watch("images") ?? []
+  const imageBlurs = watch("imageBlurs") ?? []
   const category = watch("category")
   const published = watch("published")
   const [paramRows, setParamRows] = useState<ParamRow[]>(() => {
@@ -488,7 +508,11 @@ function PortfolioForm({
       {/* Image uploader */}
       <ImageUploader
         images={Array.isArray(images) ? images : []}
-        onChange={(urls) => setValue("images", urls, { shouldValidate: true })}
+        blurs={Array.isArray(imageBlurs) ? imageBlurs : []}
+        onChange={(urls, blurs) => {
+          setValue("images", urls, { shouldValidate: true })
+          setValue("imageBlurs", blurs, { shouldValidate: false })
+        }}
       />
       {errors.images && <p className="text-xs text-red-500 mt-1">{errors.images.message}</p>}
 
@@ -614,9 +638,12 @@ export function PortfolioAdminClient({ items: initialItems, categoryLabels }: Pr
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-3">
                             {item.images[0] && (
-                              <img
+                              <Image
                                 src={item.images[0]}
                                 alt=""
+                                width={40}
+                                height={40}
+                                sizes="40px"
                                 className="w-10 h-10 rounded-md object-cover border border-border"
                               />
                             )}
@@ -705,6 +732,7 @@ export function PortfolioAdminClient({ items: initialItems, categoryLabels }: Pr
                     category: editingItem.category as PortfolioFormData["category"],
                     material: editingItem.material,
                     images: editingItem.images,
+                    imageBlurs: editingItem.imageBlurs,
                     params: editingItem.params,
                     published: editingItem.published,
                   }

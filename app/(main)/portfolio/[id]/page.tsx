@@ -142,7 +142,11 @@ export default async function PortfolioDetailPage({ params }: Props) {
         </nav>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
-          <PortfolioGallery images={item.images} title={item.title} />
+          <PortfolioGallery
+            images={item.images}
+            imageBlurs={item.imageBlurs}
+            title={item.title}
+          />
 
           <div className="flex flex-col">
             <div className="flex gap-2 mb-4 flex-wrap">

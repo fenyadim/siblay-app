@@ -43,5 +43,6 @@ next-env.d.ts
 
 /app/generated/prisma
 .playwright-cli
+.playwright-mcp
 output
 docs
