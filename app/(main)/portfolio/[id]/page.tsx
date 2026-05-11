@@ -1,6 +1,5 @@
 import { ArrowLeft, ArrowRight } from "lucide-react"
 import type { Metadata } from "next"
-import Image from "next/image"
 import Link from "next/link"
 import { notFound } from "next/navigation"
 
@@ -8,8 +7,8 @@ import {
   getPortfolioItem,
   getPublishedPortfolioIds,
 } from "@/actions/portfolio"
+import { PortfolioGallery } from "@/components/portfolio/PortfolioGallery"
 import { Button } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
 import { PORTFOLIO_CATEGORY_LABELS } from "@/lib/validations/portfolio"
 
 export const revalidate = 300
@@ -143,45 +142,7 @@ export default async function PortfolioDetailPage({ params }: Props) {
         </nav>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
-          <div className="flex flex-col gap-3">
-            {item.images[0] ? (
-              <div className="relative aspect-square rounded-2xl border border-border bg-surface overflow-hidden">
-                <Image
-                  src={item.images[0]}
-                  alt={item.title}
-                  fill
-                  priority
-                  sizes="(max-width: 1024px) 100vw, 50vw"
-                  className="object-cover"
-                />
-              </div>
-            ) : (
-              <div className="aspect-square rounded-2xl border border-border bg-surface flex items-center justify-center">
-                <span className="text-7xl opacity-10">◈</span>
-              </div>
-            )}
-
-            {item.images.length > 1 && (
-              <div className="grid grid-cols-4 gap-3">
-                {item.images.slice(1).map((img, i) => (
-                  <div
-                    key={i}
-                    className={cn(
-                      "relative aspect-square rounded-xl border border-border bg-surface overflow-hidden"
-                    )}
-                  >
-                    <Image
-                      src={img}
-                      alt={`${item.title} — фото ${i + 2}`}
-                      fill
-                      sizes="(max-width: 1024px) 25vw, 12vw"
-                      className="object-cover"
-                    />
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+          <PortfolioGallery images={item.images} title={item.title} />
 
           <div className="flex flex-col">
             <div className="flex gap-2 mb-4 flex-wrap">
