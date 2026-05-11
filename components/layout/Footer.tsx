@@ -1,4 +1,4 @@
-﻿import { Mail, Phone } from 'lucide-react'
+﻿import { Mail, MapPin, Phone } from 'lucide-react'
 import Link from 'next/link'
 
 import { ConsentSettingsButton } from '@/components/analytics/ConsentSettingsButton'
@@ -70,6 +70,10 @@ export function Footer() {
               <li className="flex items-center gap-2 text-sm text-muted">
                 <Mail className="text-accent" size={14} />
                 info@siblay.ru
+              </li>
+              <li className="flex items-start gap-2 text-sm text-muted">
+                <MapPin className="text-accent shrink-0 mt-0.5" size={14} />
+                г. Иркутск, проезд Юрия Тена
               </li>
             </ul>
             <div className="mt-5">
