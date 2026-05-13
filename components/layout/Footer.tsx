@@ -2,6 +2,7 @@
 import Link from 'next/link'
 
 import { ConsentSettingsButton } from '@/components/analytics/ConsentSettingsButton'
+import { OrderCtaLink } from '@/components/order-cta/OrderCtaDialog'
 import { Logo } from '@/components/ui/logo'
 
 export function Footer() {
@@ -42,18 +43,22 @@ export function Footer() {
           <div>
             <h4 className="text-xs font-mono uppercase tracking-widest text-muted mb-4">Услуги</h4>
             <ul className="space-y-2.5">
-              {['3D-моделирование', '3D-печать FDM', 'Постобработка', 'Серийное производство'].map(
-                (s) => (
-                  <li key={s}>
-                    <Link
-                      href="/order"
-                      className="text-sm text-muted hover:text-accent transition-colors"
-                    >
-                      {s}
-                    </Link>
-                  </li>
-                )
-              )}
+              {[
+                { label: '3D-печать FDM', href: '/order' },
+                { label: '3D-моделирование', href: '/quote?service=modeling' },
+                { label: '3D-сканирование', href: '/quote?service=scanning' },
+                { label: 'Реверс-инжиниринг', href: '/quote?service=scanning' },
+                { label: 'Постобработка', href: '/#services' },
+              ].map(({ label, href }) => (
+                <li key={label}>
+                  <Link
+                    href={href}
+                    className="text-sm text-muted hover:text-accent transition-colors"
+                  >
+                    {label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
@@ -77,10 +82,7 @@ export function Footer() {
               </li>
             </ul>
             <div className="mt-5">
-              <Link
-                href="/order"
-                className="inline-flex items-center gap-1.5 text-sm font-medium text-accent hover:text-(--accent-hover) transition-colors"
-              >
+              <OrderCtaLink className="inline-flex items-center gap-1.5 text-sm font-medium text-accent hover:text-(--accent-hover) transition-colors">
                 Оформить заказ
                 <svg
                   width="12"
@@ -92,7 +94,7 @@ export function Footer() {
                 >
                   <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14M12 5l7 7-7 7" />
                 </svg>
-              </Link>
+              </OrderCtaLink>
             </div>
           </div>
         </div>

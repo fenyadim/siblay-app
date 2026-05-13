@@ -12,6 +12,7 @@ import { cn } from '@/lib/utils'
 const NAV = [
   { href: '/admin', label: 'Дашборд', icon: '⬡' },
   { href: '/admin/orders', label: 'Заказы', icon: '◫' },
+  { href: '/admin/quotes', label: 'Заявки', icon: '✎' },
   { href: '/admin/portfolio', label: 'Портфолио', icon: '◈' },
   { href: '/admin/materials', label: 'Материалы', icon: '◉' },
 ]

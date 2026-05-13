@@ -203,6 +203,173 @@ export function customerOrderEmailTemplate(order: CustomerOrderEmailInput) {
   `
 }
 
+// ── Quote (заявка на моделирование/сканирование) ─────────────────────
+
+const QUOTE_TYPE_LABELS: Record<string, string> = {
+  MODELING: "3D-моделирование",
+  SCANNING: "3D-сканирование",
+}
+
+const MODELING_SOURCE_LABELS: Record<string, string> = {
+  sketch: "По эскизу / описанию",
+  photo: "По фотографиям",
+  drawing: "По чертежу (CAD/CAM)",
+  revise: "Доработка существующей модели",
+}
+
+const SCAN_LOCATION_LABELS: Record<string, string> = {
+  pickup: "Заберём у клиента",
+  bring: "Клиент привезёт",
+  onsite: "Выезд специалиста",
+}
+
+interface QuoteInput {
+  id: string
+  type: string
+  status?: string
+  description: string
+  desiredFormat?: string | null
+  sourceType?: string | null
+  objectWidth?: number | null
+  objectHeight?: number | null
+  objectLength?: number | null
+  location?: string | null
+  needsReverse?: boolean | null
+  fullName: string
+  phone: string
+  email: string
+  estimatedPrice?: number | null
+}
+
+export function adminQuoteTelegramText(quote: QuoteInput) {
+  // Без персональных данных: только тип услуги, сводка и ссылка в админку.
+  const short = escapeHtml(shortOrderId(quote.id))
+  const typeLabel = escapeHtml(QUOTE_TYPE_LABELS[quote.type] ?? quote.type)
+  const adminUrl = `${siteUrl()}/admin/quotes/${encodeURIComponent(quote.id)}`
+
+  const lines: string[] = [`<b>🆕 Новая заявка #${short}</b>`, "", typeLabel]
+
+  if (quote.type === "MODELING" && quote.sourceType) {
+    lines.push(MODELING_SOURCE_LABELS[quote.sourceType] ?? quote.sourceType)
+  }
+  if (quote.type === "SCANNING") {
+    const dims = [quote.objectLength, quote.objectWidth, quote.objectHeight]
+    if (dims.every((v) => typeof v === "number")) {
+      lines.push(`${dims[0]}×${dims[1]}×${dims[2]} мм`)
+    }
+    if (quote.location) {
+      lines.push(SCAN_LOCATION_LABELS[quote.location] ?? quote.location)
+    }
+    if (quote.needsReverse) {
+      lines.push("+ реверс-инжиниринг")
+    }
+  }
+  if (quote.desiredFormat) {
+    lines.push(`Формат: ${escapeHtml(quote.desiredFormat)}`)
+  }
+
+  lines.push("", `👉 <a href="${escapeHtml(adminUrl)}">Открыть в админке</a>`)
+
+  return lines.join("\n")
+}
+
+export function adminQuoteEmailTemplate(quote: QuoteInput) {
+  const fullName = escapeHtml(quote.fullName)
+  const phone = escapeHtml(quote.phone)
+  const email = escapeHtml(quote.email)
+  const typeLabel = escapeHtml(QUOTE_TYPE_LABELS[quote.type] ?? quote.type)
+  const description = escapeHtml(quote.description).replaceAll(/\r?\n/g, "<br/>")
+  const adminUrl = `${siteUrl()}/admin/quotes/${encodeURIComponent(quote.id)}`
+
+  const rows: string[] = [
+    `<tr><td style="padding:8px;border-bottom:1px solid #eee"><b>Клиент</b></td><td style="padding:8px;border-bottom:1px solid #eee">${fullName}</td></tr>`,
+    `<tr><td style="padding:8px;border-bottom:1px solid #eee"><b>Телефон</b></td><td style="padding:8px;border-bottom:1px solid #eee">${phone}</td></tr>`,
+    `<tr><td style="padding:8px;border-bottom:1px solid #eee"><b>Email</b></td><td style="padding:8px;border-bottom:1px solid #eee">${email}</td></tr>`,
+    `<tr><td style="padding:8px;border-bottom:1px solid #eee"><b>Услуга</b></td><td style="padding:8px;border-bottom:1px solid #eee">${typeLabel}</td></tr>`,
+  ]
+
+  if (quote.type === "MODELING" && quote.sourceType) {
+    rows.push(
+      `<tr><td style="padding:8px;border-bottom:1px solid #eee"><b>Тип исходника</b></td><td style="padding:8px;border-bottom:1px solid #eee">${escapeHtml(MODELING_SOURCE_LABELS[quote.sourceType] ?? quote.sourceType)}</td></tr>`,
+    )
+  }
+
+  if (quote.type === "SCANNING") {
+    const dims = [quote.objectLength, quote.objectWidth, quote.objectHeight]
+    if (dims.every((v) => typeof v === "number")) {
+      rows.push(
+        `<tr><td style="padding:8px;border-bottom:1px solid #eee"><b>Габариты объекта</b></td><td style="padding:8px;border-bottom:1px solid #eee">${dims[0]}×${dims[1]}×${dims[2]} мм</td></tr>`,
+      )
+    }
+    if (quote.location) {
+      rows.push(
+        `<tr><td style="padding:8px;border-bottom:1px solid #eee"><b>Расположение</b></td><td style="padding:8px;border-bottom:1px solid #eee">${escapeHtml(SCAN_LOCATION_LABELS[quote.location] ?? quote.location)}</td></tr>`,
+      )
+    }
+    rows.push(
+      `<tr><td style="padding:8px;border-bottom:1px solid #eee"><b>Реверс-инжиниринг</b></td><td style="padding:8px;border-bottom:1px solid #eee">${quote.needsReverse ? "Да" : "Нет"}</td></tr>`,
+    )
+  }
+
+  if (quote.desiredFormat) {
+    rows.push(
+      `<tr><td style="padding:8px;border-bottom:1px solid #eee"><b>Желаемый формат</b></td><td style="padding:8px;border-bottom:1px solid #eee">${escapeHtml(quote.desiredFormat)}</td></tr>`,
+    )
+  }
+
+  rows.push(
+    `<tr><td style="padding:8px"><b>Описание</b></td><td style="padding:8px">${description}</td></tr>`,
+  )
+
+  return `
+    <div style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:24px 16px">
+      <h2 style="color:#2563EB;margin:0 0 12px">Новая заявка #${escapeHtml(shortOrderId(quote.id))} — ${typeLabel}</h2>
+      <p style="margin:0 0 16px">
+        <a href="${escapeHtml(adminUrl)}"
+           style="display:inline-block;padding:10px 18px;background:#2563EB;color:#fff;text-decoration:none;border-radius:8px;font-weight:600">
+          Открыть в админке →
+        </a>
+      </p>
+      <table style="width:100%;border-collapse:collapse">
+        ${rows.join("")}
+      </table>
+    </div>
+  `
+}
+
+export function customerQuoteEmailTemplate(quote: QuoteInput) {
+  const fullName = escapeHtml(quote.fullName)
+  const typeLabel = escapeHtml(QUOTE_TYPE_LABELS[quote.type] ?? quote.type)
+  const short = escapeHtml(shortOrderId(quote.id))
+
+  return `
+    <div style="font-family:sans-serif;max-width:600px;margin:0 auto;background:#f8fafc;padding:24px 16px">
+      <div style="background:#fff;border-radius:16px;padding:32px 24px;box-shadow:0 1px 3px rgba(0,0,0,0.05)">
+        <div style="font-size:12px;letter-spacing:0.15em;color:#64748b;text-transform:uppercase;margin-bottom:8px">Siblay · ${typeLabel}</div>
+        <h2 style="margin:0 0 16px;font-size:24px;color:#0f172a">Заявка #${short} принята</h2>
+
+        <p style="margin:0 0 16px;font-size:15px;line-height:1.6;color:#334155">
+          Здравствуйте, ${fullName}! Спасибо за обращение. Менеджер изучит детали и свяжется
+          с вами в течение 2 часов в рабочее время, чтобы согласовать стоимость и сроки.
+        </p>
+
+        <div style="margin-top:24px;padding:16px;background:#f1f5f9;border-radius:12px">
+          <div style="font-size:13px;color:#64748b;margin-bottom:8px">Если хотите ускорить — напишите нам напрямую:</div>
+          <div style="font-size:14px;color:#0f172a;line-height:1.8">
+            📞 <a href="tel:+79140004653" style="color:#2563EB;text-decoration:none">+7 (914) 000-46-53</a><br/>
+            ✈️ <a href="https://t.me/siblay_print" style="color:#2563EB;text-decoration:none">@siblay_print</a> в Telegram<br/>
+            ✉️ <a href="mailto:info@siblay.ru" style="color:#2563EB;text-decoration:none">info@siblay.ru</a>
+          </div>
+        </div>
+
+        <p style="margin:24px 0 0;font-size:13px;color:#94a3b8">
+          С уважением, команда Siblay
+        </p>
+      </div>
+    </div>
+  `
+}
+
 export function adminOrderTelegramText(order: {
   id: string
   material: string

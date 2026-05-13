@@ -49,6 +49,59 @@ enum OrderStatus {
   CANCELLED
 }
 
+model Quote {
+  id             String      @id @default(cuid())
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+  status         QuoteStatus @default(NEW)
+  type           QuoteType
+
+  description    String
+  desiredFormat  String?
+
+  // Modeling-specific
+  sourceType     String?
+
+  // Scanning-specific
+  objectWidth    Float?
+  objectHeight   Float?
+  objectLength   Float?
+  location       String?
+  needsReverse   Boolean     @default(false)
+
+  files          QuoteFile[]
+
+  fullName       String
+  phone          String
+  email          String
+
+  estimatedPrice Float?
+}
+
+model QuoteFile {
+  id        String   @id @default(cuid())
+  quoteId   String
+  quote     Quote    @relation(fields: [quoteId], references: [id], onDelete: Cascade)
+  fileName  String
+  fileUrl   String
+  fileType  String
+  fileSize  Int
+  createdAt DateTime @default(now())
+}
+
+enum QuoteType {
+  MODELING
+  SCANNING
+}
+
+enum QuoteStatus {
+  NEW
+  IN_REVIEW
+  QUOTED
+  ACCEPTED
+  REJECTED
+}
+
 model PortfolioItem {
   id          String   @id @default(cuid())
   title       String

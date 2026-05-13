@@ -101,3 +101,38 @@ export const ORDER_STATUS_COLORS: Record<string, string> = {
   DELIVERED: "bg-slate-600 text-white",
   CANCELLED: "bg-red-500 text-white",
 }
+
+// ── Quote (заявка) labels ───────────────────────────────────────────
+export const QUOTE_TYPE_LABELS: Record<string, string> = {
+  MODELING: "3D-моделирование",
+  SCANNING: "3D-сканирование",
+}
+
+export const QUOTE_STATUS_LABELS: Record<string, string> = {
+  NEW: "Новая",
+  IN_REVIEW: "Изучаем",
+  QUOTED: "Цена озвучена",
+  ACCEPTED: "Принято",
+  REJECTED: "Отклонена",
+}
+
+export const QUOTE_STATUS_COLORS: Record<string, string> = {
+  NEW: "bg-blue-500 text-white",
+  IN_REVIEW: "bg-amber-500 text-white",
+  QUOTED: "bg-purple-500 text-white",
+  ACCEPTED: "bg-emerald-500 text-white",
+  REJECTED: "bg-red-500 text-white",
+}
+
+export const MODELING_SOURCE_LABELS: Record<string, string> = {
+  sketch: "По эскизу / описанию",
+  photo: "По фотографиям",
+  drawing: "По чертежу (CAD/CAM)",
+  revise: "Доработка существующей модели",
+}
+
+export const SCAN_LOCATION_LABELS: Record<string, string> = {
+  pickup: "Заберём у клиента",
+  bring: "Клиент привезёт",
+  onsite: "Выезд специалиста",
+}

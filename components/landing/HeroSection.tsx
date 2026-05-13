@@ -1,5 +1,6 @@
 ﻿import Link from 'next/link'
 
+import { OrderCtaButton } from '@/components/order-cta/OrderCtaDialog'
 import { Button } from '@/components/ui/button'
 
 export function HeroSection() {
@@ -29,13 +30,12 @@ export function HeroSection() {
             </p>
 
             <div className="flex flex-wrap gap-3">
-              <Button
-                asChild
+              <OrderCtaButton
                 size="lg"
                 className="bg-accent hover:bg-(--accent-hover) text-white rounded-xl px-8 font-semibold"
               >
-                <Link href="/order">Оформить заказ</Link>
-              </Button>
+                Оформить заказ
+              </OrderCtaButton>
               <Button
                 asChild
                 variant="outline"
@@ -63,7 +63,7 @@ export function HeroSection() {
 
           {/* Right: Printer Visual */}
           <div className="hidden lg:flex items-center justify-center relative border-l border-border">
-            <div className="absolute inset-0 bg-gradient-to-br from-[var(--accent-subtle)] via-transparent to-transparent opacity-50" />
+            <div className="absolute inset-0 bg-linear-to-br from-(--accent-subtle) via-transparent to-transparent opacity-50" />
             <PrinterVisual />
           </div>
         </div>

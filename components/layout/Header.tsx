@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation'
 import { useState } from 'react'
 import { createPortal } from 'react-dom'
 
+import { OrderCtaButton } from '@/components/order-cta/OrderCtaDialog'
 import { Button } from '@/components/ui/button'
 import { Logo } from '@/components/ui/logo'
 import { useScroll } from '@/hooks/use-scroll'
@@ -82,13 +83,12 @@ export function Header() {
           {/* Right side */}
           <div className="flex items-center gap-1.5">
             <ThemeToggle />
-            <Button
+            <OrderCtaButton
               size="sm"
               className="hidden md:flex text-white bg-accent hover:bg-(--accent-hover) rounded-full h-8 px-4"
-              asChild
             >
-              <Link href="/order">Оформить заказ</Link>
-            </Button>
+              Оформить заказ
+            </OrderCtaButton>
 
             {/* Mobile burger */}
             <Button
@@ -158,14 +158,12 @@ function MobileMenu({ links, onClose }: { links: typeof NAV_LINKS; onClose: () =
           ))}
         </nav>
         <div className="flex flex-col gap-3 pt-6 border-t border-border">
-          <Button
-            asChild
+          <OrderCtaButton
+            onSelect={onClose}
             className="w-full rounded-xl bg-accent hover:bg-(--accent-hover) text-white h-12 text-base"
           >
-            <Link href="/order" onClick={onClose}>
-              Оформить заказ
-            </Link>
-          </Button>
+            Оформить заказ
+          </OrderCtaButton>
         </div>
       </div>
     </div>,
