@@ -1,13 +1,20 @@
 import nodemailer from "nodemailer"
 
+const SMTP_PORT = Number(process.env.SMTP_PORT ?? 465)
+
 const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST ?? "smtp.yandex.ru",
-  port: Number(process.env.SMTP_PORT ?? 465),
-  secure: true,
+  host: process.env.SMTP_HOST ?? "mail.hosting.reg.ru",
+  port: SMTP_PORT,
+  // 465 = SSL (implicit TLS), 587 = STARTTLS (upgrade from plain).
+  secure: SMTP_PORT === 465,
+  requireTLS: SMTP_PORT !== 465,
   auth: {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS,
   },
+  connectionTimeout: 10_000,
+  greetingTimeout: 10_000,
+  socketTimeout: 15_000,
 })
 
 interface EmailOptions {
