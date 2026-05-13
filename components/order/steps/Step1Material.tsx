@@ -64,14 +64,14 @@ export function Step1Material({ materials }: Props) {
             >
               <Field
                 className={cn(
-                  'h-auto w-full rounded-xl border-2 text-left transition-all relative select-none bg-surface cursor-pointer hover:bg-background',
+                  'h-full w-full rounded-xl border-2 text-left transition-all relative select-none bg-surface cursor-pointer hover:bg-background',
                   {
                     'border-accent bg-(--accent-subtle)!': selected === mat.name,
                     'opacity-60 cursor-not-allowed': !mat.available,
                   }
                 )}
               >
-                <FieldContent className="flex flex-col gap-2 items-start">
+                <FieldContent className="flex flex-col gap-2 items-start h-full">
                   <FieldTitle className="flex items-center gap-3">
                     <span
                       className="w-3 h-3 rounded-full shrink-0"
@@ -91,9 +91,9 @@ export function Step1Material({ materials }: Props) {
                       )}
                     </div>
                   </FieldTitle>
-                  <p className="text-sm text-muted mb-2">{mat.description}</p>
-                  <p className="text-xs font-mono text-muted mb-1">Лучше всего для: {mat.best}</p>
-                  <p className="text-sm font-mono font-semibold text-accent">{formatMaterialPrice(mat.price)}</p>
+                  <p className="text-sm text-muted">{mat.description}</p>
+                  <p className="text-xs font-mono text-muted">Лучше всего для: {mat.best}</p>
+                  <p className="text-sm font-mono font-semibold text-accent mt-auto">{formatMaterialPrice(mat.price)}</p>
                 </FieldContent>
                 <RadioGroupItem
                   id={mat.id}
