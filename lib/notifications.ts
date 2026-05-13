@@ -17,6 +17,9 @@ interface EmailOptions {
 }
 
 export async function sendEmail({ to, subject, html }: EmailOptions) {
+  if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
+    throw new Error("SMTP_USER/SMTP_PASS не заданы — письмо не отправлено")
+  }
   await transporter.sendMail({
     from: `"Siblay" <${process.env.SMTP_USER}>`,
     to,
@@ -194,9 +197,6 @@ export function customerOrderEmailTemplate(order: CustomerOrderEmailInput) {
 
 export function adminOrderTelegramText(order: {
   id: string
-  fullName: string
-  phone: string
-  email: string
   material: string
   color: string
   quantity: number
@@ -205,28 +205,20 @@ export function adminOrderTelegramText(order: {
   length: number
   infill: number
   hasModel: boolean
-  delivery: string
-  address?: string | null
 }) {
+  // Без персональных данных (152-ФЗ): только техническая сводка + ссылка на админку.
   const short = escapeHtml(shortOrderId(order.id))
-  const fullName = escapeHtml(order.fullName)
-  const phone = escapeHtml(order.phone)
-  const email = escapeHtml(order.email)
   const material = escapeHtml(order.material)
   const color = escapeHtml(order.color)
-  const delivery = escapeHtml(DELIVERY_LABELS[order.delivery] ?? order.delivery)
-  const address = order.address ? escapeHtml(order.address) : null
   const adminUrl = `${siteUrl()}/admin/orders/${encodeURIComponent(order.id)}`
 
   const modelWarning = order.hasModel ? "" : "\n⚠️ Нет 3D-модели (нужно моделирование)"
 
   return (
     `<b>🆕 Новый заказ #${short}</b>\n\n` +
-    `<b>Клиент</b>\n${fullName}\n📞 ${phone}\n✉️ ${email}\n\n` +
-    `<b>Заказ</b>\n${material}, ${color}\n` +
+    `${material}, ${color}\n` +
     `${order.length}×${order.width}×${order.height} мм × ${order.quantity} шт.\n` +
     `Infill: ${order.infill}%${modelWarning}\n\n` +
-    `<b>Доставка</b>: ${delivery}${address ? ` — ${address}` : ""}\n\n` +
     `👉 <a href="${escapeHtml(adminUrl)}">Открыть в админке</a>`
   )
 }

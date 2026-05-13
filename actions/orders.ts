@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { headers } from 'next/headers'
+import { after } from 'next/server'
 
 import { OrderStatus } from '@/app/generated/prisma/client'
 import { auth } from '@/lib/auth'
@@ -62,24 +63,46 @@ export async function createOrder(data: OrderFormData) {
 
   const notificationEmail = process.env.NOTIFICATION_EMAIL
   const shortId = order.id.slice(0, 8)
-  await Promise.allSettled([
-    notificationEmail
-      ? sendEmail({
+
+  // Отправка уведомлений после ответа клиенту: server action возвращает
+  // orderId сразу после записи в БД, чтобы пользователь не ждал SMTP.
+  after(async () => {
+    const channels: Array<[string, Promise<unknown>]> = [
+      [
+        'telegram-admin',
+        sendTelegram(adminOrderTelegramText(order), {
+          parseMode: 'HTML',
+          disableWebPagePreview: true,
+        }),
+      ],
+      [
+        'email-customer',
+        sendEmail({
+          to: order.email,
+          subject: `Ваш заказ #${shortId} принят — Siblay`,
+          html: customerOrderEmailTemplate(order),
+        }),
+      ],
+    ]
+    if (notificationEmail) {
+      channels.push([
+        'email-admin',
+        sendEmail({
           to: notificationEmail,
           subject: `Новый заказ #${shortId} — ${order.fullName}`,
           html: orderEmailTemplate(order),
-        })
-      : Promise.resolve(),
-    sendTelegram(adminOrderTelegramText(order), {
-      parseMode: 'HTML',
-      disableWebPagePreview: true,
-    }),
-    sendEmail({
-      to: order.email,
-      subject: `Ваш заказ #${shortId} принят — Siblay`,
-      html: customerOrderEmailTemplate(order),
-    }),
-  ])
+        }),
+      ])
+    }
+
+    const results = await Promise.allSettled(channels.map(([, p]) => p))
+    results.forEach((result, idx) => {
+      const [name] = channels[idx]
+      if (result.status === 'rejected') {
+        console.error(`[order:${shortId}] ${name} failed:`, result.reason)
+      }
+    })
+  })
 
   return { orderId: order.id }
 }
