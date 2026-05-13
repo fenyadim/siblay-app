@@ -97,16 +97,18 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="mt-10 pt-6 border-t border-border flex flex-col sm:flex-row justify-between items-center gap-3">
+        <div className="mt-10 pt-6 border-t border-border flex flex-col sm:flex-row sm:justify-between items-center gap-4 text-center sm:text-left">
           <p className="text-xs text-muted">
             © {new Date().getFullYear()} Siblay. Все права защищены.
           </p>
-          <div className="flex items-center gap-4 text-xs">
+          <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-xs">
             <Link href="/privacy" className="text-muted hover:text-accent transition-colors">
               Политика ПДн
             </Link>
             <ConsentSettingsButton />
-            <span className="text-muted font-mono">3D-печать · Моделирование · Постобработка</span>
+            <span className="hidden lg:inline text-muted font-mono">
+              3D-печать · Моделирование · Постобработка
+            </span>
           </div>
         </div>
       </div>
