@@ -5,7 +5,13 @@ import { headers } from 'next/headers'
 
 import { OrderStatus } from '@/app/generated/prisma/client'
 import { auth } from '@/lib/auth'
-import { orderEmailTemplate, sendEmail, sendTelegram } from '@/lib/notifications'
+import {
+  adminOrderTelegramText,
+  customerOrderEmailTemplate,
+  orderEmailTemplate,
+  sendEmail,
+  sendTelegram,
+} from '@/lib/notifications'
 import { prisma } from '@/lib/prisma'
 import { createRateLimiter, getClientId } from '@/lib/rate-limit'
 import { deleteS3Object } from '@/lib/s3'
@@ -55,21 +61,24 @@ export async function createOrder(data: OrderFormData) {
   })
 
   const notificationEmail = process.env.NOTIFICATION_EMAIL
+  const shortId = order.id.slice(0, 8)
   await Promise.allSettled([
     notificationEmail
       ? sendEmail({
           to: notificationEmail,
-          subject: `Новый заказ #${order.id} — ${order.fullName}`,
+          subject: `Новый заказ #${shortId} — ${order.fullName}`,
           html: orderEmailTemplate(order),
         })
       : Promise.resolve(),
-    sendTelegram(
-      `Новый заказ #${order.id}\n` +
-        `Материал: ${order.material}, ${order.color}\n` +
-        `Количество: ${order.quantity} шт. | Infill: ${order.infill}%\n` +
-        `${!order.hasModel ? 'Нет 3D-модели (нужно моделирование)\n' : ''}` +
-        `Доставка: ${order.delivery}`
-    ),
+    sendTelegram(adminOrderTelegramText(order), {
+      parseMode: 'HTML',
+      disableWebPagePreview: true,
+    }),
+    sendEmail({
+      to: order.email,
+      subject: `Ваш заказ #${shortId} принят — Siblay`,
+      html: customerOrderEmailTemplate(order),
+    }),
   ])
 
   return { orderId: order.id }
