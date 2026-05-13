@@ -64,17 +64,22 @@ export async function createOrder(data: OrderFormData) {
   const notificationEmail = process.env.NOTIFICATION_EMAIL
   const shortId = order.id.slice(0, 8)
 
-  // Отправка уведомлений после ответа клиенту: server action возвращает
-  // orderId сразу после записи в БД, чтобы пользователь не ждал SMTP.
+  // Telegram быстрый (<1s) и с собственным 4s таймаутом — отправляем синхронно,
+  // чтобы админ получил пинг до того, как клиент уйдёт со страницы.
+  const telegramResult = await Promise.allSettled([
+    sendTelegram(adminOrderTelegramText(order), {
+      parseMode: 'HTML',
+      disableWebPagePreview: true,
+    }),
+  ])
+  if (telegramResult[0].status === 'rejected') {
+    console.error(`[order:${shortId}] telegram-admin failed:`, telegramResult[0].reason)
+  }
+
+  // Email (SMTP) медленный и может зависнуть — уходит в фон через after(),
+  // чтобы server action отвечал клиенту мгновенно.
   after(async () => {
     const channels: Array<[string, Promise<unknown>]> = [
-      [
-        'telegram-admin',
-        sendTelegram(adminOrderTelegramText(order), {
-          parseMode: 'HTML',
-          disableWebPagePreview: true,
-        }),
-      ],
       [
         'email-customer',
         sendEmail({

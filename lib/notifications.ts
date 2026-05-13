@@ -47,6 +47,7 @@ export async function sendTelegram(text: string, options: TelegramOptions = {}) 
       ...(options.parseMode ? { parse_mode: options.parseMode } : {}),
       ...(options.disableWebPagePreview ? { disable_web_page_preview: true } : {}),
     }),
+    signal: AbortSignal.timeout(4000),
   })
 
   if (!response.ok) {
