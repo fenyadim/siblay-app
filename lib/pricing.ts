@@ -101,6 +101,3 @@ export function calculateOrderCost(inputs: CostInputs): CostBreakdown {
     total,
   }
 }
-
-// Re-export for Task 3 usage
-export { PRINT_SPEED_GRAMS_PER_HOUR, MODELING_SURCHARGE }
