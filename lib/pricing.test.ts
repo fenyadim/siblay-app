@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
-import { DEFAULT_COST_PARAMS, calculateOrderCost } from './pricing'
+import {
+  DEFAULT_COST_PARAMS,
+  calculateOrderCost,
+  estimateOrderPrice,
+  estimateWeightKg,
+} from './pricing'
 
 describe('calculateOrderCost', () => {
   it('считает полную себестоимость с браком, наценкой и налогом', () => {
@@ -54,5 +59,65 @@ describe('calculateOrderCost', () => {
     expect(result.printHour).toBe(0)
     expect(result.costPrice).toBe(620)
     expect(result.total).toBe(620)
+  })
+})
+
+describe('estimateWeightKg', () => {
+  it('оценивает вес из габаритного объёма', () => {
+    const weight = estimateWeightKg({
+      material: 'PLA',
+      width: 50,
+      height: 50,
+      length: 50,
+      quantity: 1,
+      infill: 100,
+    })
+
+    expect(weight).toBeCloseTo(0.155, 3)
+  })
+
+  it('масштабирует вес по количеству', () => {
+    const base = {
+      material: 'PLA',
+      width: 50,
+      height: 50,
+      length: 50,
+      infill: 100,
+    }
+    const one = estimateWeightKg({ ...base, quantity: 1 })
+    const three = estimateWeightKg({ ...base, quantity: 3 })
+
+    expect(three).toBeCloseTo(one * 3, 6)
+  })
+})
+
+describe('estimateOrderPrice', () => {
+  it('возвращает положительную цену', () => {
+    const price = estimateOrderPrice({
+      material: 'PLA',
+      width: 50,
+      height: 50,
+      length: 50,
+      quantity: 1,
+      infill: 100,
+      hasModel: true,
+    })
+
+    expect(price).toBeGreaterThan(0)
+  })
+
+  it('добавляет наценку за моделирование при hasModel=false', () => {
+    const base = {
+      material: 'PLA',
+      width: 50,
+      height: 50,
+      length: 50,
+      quantity: 1,
+      infill: 100,
+    }
+    const withModel = estimateOrderPrice({ ...base, hasModel: true })
+    const noModel = estimateOrderPrice({ ...base, hasModel: false })
+
+    expect(noModel).toBe(Math.round(withModel * 1.5))
   })
 })

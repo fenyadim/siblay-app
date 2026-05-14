@@ -71,6 +71,15 @@ const PRINT_SPEED_GRAMS_PER_HOUR = 15
 /** Наценка за моделирование, если у клиента нет готовой 3D-модели. */
 const MODELING_SURCHARGE = 1.5
 
+export interface OrderDimensions {
+  material: string
+  width: number
+  height: number
+  length: number
+  quantity: number
+  infill: number
+}
+
 /** Полная себестоимость заказа с разбивкой по статьям. */
 export function calculateOrderCost(inputs: CostInputs): CostBreakdown {
   const { filamentPricePerKg, weightKg, hours, params } = inputs
@@ -101,4 +110,31 @@ export function calculateOrderCost(inputs: CostInputs): CostBreakdown {
     withMarkup,
     total,
   }
+}
+
+/** Оценка веса заказа из габаритного объёма, кг. */
+export function estimateWeightKg(dims: OrderDimensions): number {
+  const density = MATERIAL_DENSITY[dims.material] ?? 1.24
+  const volumeCm3 = (dims.width * dims.height * dims.length) / 1000
+  const weightGrams =
+    volumeCm3 * density * (dims.infill / 100) * dims.quantity
+  return weightGrams / 1000
+}
+
+/** Клиентская ориентировочная цена — только итоговое число. */
+export function estimateOrderPrice(
+  dims: OrderDimensions & { hasModel: boolean }
+): number {
+  const weightKg = estimateWeightKg(dims)
+  const hours = (weightKg * 1000) / PRINT_SPEED_GRAMS_PER_HOUR
+  const filamentPricePerKg = FILAMENT_PRICE_PER_KG[dims.material] ?? 1200
+
+  const { total } = calculateOrderCost({
+    filamentPricePerKg,
+    weightKg,
+    hours,
+    params: DEFAULT_COST_PARAMS,
+  })
+
+  return dims.hasModel ? total : Math.round(total * MODELING_SURCHARGE)
 }
