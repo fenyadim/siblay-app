@@ -1,7 +1,8 @@
 ﻿"use client"
 
 import { useFormContext } from "react-hook-form"
-import { calculatePrice, formatPrice, formatFileSize } from "@/lib/utils"
+import { formatPrice, formatFileSize } from "@/lib/utils"
+import { estimateOrderPrice } from "@/lib/pricing"
 import type { OrderFormData } from "@/lib/validations/order"
 import { cn } from "@/lib/utils"
 import { useState } from "react"
@@ -24,7 +25,7 @@ export function SummaryPanel() {
 
   const hasAllDims = Number(width) > 0 && Number(height) > 0 && Number(length) > 0
   const price = hasAllDims && material
-    ? calculatePrice({
+    ? estimateOrderPrice({
         material,
         width: Number(width),
         height: Number(height),
