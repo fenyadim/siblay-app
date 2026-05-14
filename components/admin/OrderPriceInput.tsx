@@ -1,6 +1,6 @@
-﻿"use client"
+"use client"
 
-import { useState, useTransition } from "react"
+import { useEffect, useState, useTransition } from "react"
 import { updateOrderPrice } from "@/actions/orders"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -8,12 +8,17 @@ import { Input } from "@/components/ui/input"
 interface Props {
   orderId: string
   currentPrice: number | null
+  value: string
+  onValueChange: (value: string) => void
 }
 
-export function OrderPriceInput({ orderId, currentPrice }: Props) {
-  const [value, setValue] = useState(currentPrice?.toString() ?? "")
+export function OrderPriceInput({ orderId, currentPrice, value, onValueChange }: Props) {
   const [isPending, startTransition] = useTransition()
   const [saved, setSaved] = useState(false)
+
+  useEffect(() => {
+    setSaved(false)
+  }, [value])
 
   const parsed = value.trim() === "" ? null : parseFloat(value.replace(",", "."))
   const isValid = value.trim() === "" || (!isNaN(parsed!) && parsed! >= 0)
@@ -35,7 +40,7 @@ export function OrderPriceInput({ orderId, currentPrice }: Props) {
           min="0"
           step="1"
           value={value}
-          onChange={(e) => { setValue(e.target.value); setSaved(false) }}
+          onChange={(e) => onValueChange(e.target.value)}
           disabled={isPending}
           placeholder="Введите сумму..."
           className="w-full rounded-lg border border-border bg-background text-foreground px-3 py-2 pr-10 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent disabled:opacity-50 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
