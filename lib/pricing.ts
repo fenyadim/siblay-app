@@ -84,7 +84,8 @@ export function calculateOrderCost(inputs: CostInputs): CostBreakdown {
 
   const costPrice =
     material + electricity + consumables + depreciation + printHour + operator
-  const withDefect = costPrice / (1 - params.defectRatePercent / 100)
+  const safeDefectRate = Math.min(Math.max(params.defectRatePercent, 0), 99)
+  const withDefect = costPrice / (1 - safeDefectRate / 100)
   const withMarkup = withDefect * params.markup
   const total = Math.round(withMarkup * (1 + params.taxPercent / 100))
 

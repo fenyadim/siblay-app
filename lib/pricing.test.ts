@@ -23,6 +23,18 @@ describe('calculateOrderCost', () => {
     expect(result.total).toBe(2191)
   })
 
+  it('не делит на ноль при шансе брака 100% и выше', () => {
+    const result = calculateOrderCost({
+      filamentPricePerKg: 1200,
+      weightKg: 0.1,
+      hours: 1,
+      params: { ...DEFAULT_COST_PARAMS, defectRatePercent: 100 },
+    })
+
+    expect(Number.isFinite(result.total)).toBe(true)
+    expect(result.total).toBeGreaterThan(0)
+  })
+
   it('обнуляет почасовые статьи при времени 0', () => {
     const result = calculateOrderCost({
       filamentPricePerKg: 1200,
