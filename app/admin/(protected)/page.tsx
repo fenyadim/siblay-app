@@ -150,7 +150,7 @@ export default async function AdminDashboard() {
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-foreground truncate">{quote.fullName}</p>
                   <p className="text-xs text-muted font-mono">
-                    {QUOTE_TYPE_LABELS[quote.type]} · <FormattedDate date={quote.createdAt} />
+                    {QUOTE_TYPE_LABELS[quote.type] ?? quote.type} · <FormattedDate date={quote.createdAt} />
                   </p>
                 </div>
                 <Badge className={QUOTE_STATUS_COLORS[quote.status]}>
