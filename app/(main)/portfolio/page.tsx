@@ -7,13 +7,13 @@ import { getPortfolioItems } from "@/actions/portfolio"
 export const revalidate = 300
 
 export const metadata: Metadata = {
-  title: "Портфолио",
+  title: "Портфолио 3D-печати в Иркутске",
   description:
-    "Примеры выполненных работ Siblay по 3D-печати и моделированию: прототипы, детали, фигурки, архитектурные макеты, промышленные изделия.",
+    "Примеры выполненных работ Siblay по 3D-печати и моделированию в Иркутске: прототипы, детали, фигурки, архитектурные макеты, промышленные изделия.",
   alternates: { canonical: "/portfolio" },
   openGraph: {
-    title: "Портфолио — Siblay",
-    description: "Примеры выполненных работ по 3D-печати и моделированию",
+    title: "Портфолио 3D-печати в Иркутске — Siblay",
+    description: "Примеры выполненных работ по 3D-печати и моделированию в Иркутске",
     url: "/portfolio",
   },
 }

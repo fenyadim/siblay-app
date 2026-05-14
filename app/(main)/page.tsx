@@ -10,14 +10,14 @@ import { ServicesSection } from "@/components/landing/ServicesSection"
 export const revalidate = 300
 
 export const metadata: Metadata = {
-  title: "Siblay — 3D-моделирование и 3D-печать на заказ",
+  title: "3D-печать и 3D-моделирование в Иркутске — Siblay",
   description:
-    "Печатаем прототипы, детали, фигурки и серийные изделия. PLA, PETG, TPU. Расчёт стоимости онлайн, срок от 24 часов, доставка по России.",
+    "3D-печать в Иркутске на заказ: прототипы, детали, фигурки и серийные изделия. PLA, PETG, TPU. Расчёт стоимости онлайн, срок от 24 часов, доставка по России.",
   alternates: { canonical: "/" },
   openGraph: {
-    title: "Siblay — 3D-моделирование и 3D-печать на заказ",
+    title: "3D-печать и 3D-моделирование в Иркутске — Siblay",
     description:
-      "Печатаем прототипы, детали, фигурки и серийные изделия. PLA, PETG, TPU.",
+      "3D-печать в Иркутске на заказ: прототипы, детали, фигурки и серийные изделия. PLA, PETG, TPU.",
     url: "/",
   },
 }

@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import { Inter, JetBrains_Mono, Manrope } from 'next/font/google'
 
 import { ThemeProvider } from '@/components/layout/ThemeProvider'
+import { getBusinessJsonLd, siteUrl, websiteJsonLd } from '@/lib/seo'
 
 import './globals.css'
 
@@ -23,18 +24,22 @@ const jetBrainsMono = JetBrains_Mono({
   display: 'swap',
 })
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://siblay.ru'
-
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: 'Siblay — 3D-моделирование и 3D-печать на заказ',
-    template: '%s | Siblay',
+    default: 'Siblay — 3D-печать и 3D-моделирование в Иркутске на заказ',
+    template: '%s | Siblay — 3D-печать в Иркутске',
   },
   description:
-    'Профессиональные услуги 3D-моделирования и 3D-печати на заказ. PLA, PETG, TPU. Прототипы, серийное производство, постобработка. Расчёт стоимости онлайн.',
+    'Студия 3D-печати и 3D-моделирования в Иркутске. PLA, PETG, TPU. Прототипы, серийное производство, постобработка, 3D-сканирование. Расчёт стоимости онлайн.',
   applicationName: 'Siblay',
   keywords: [
+    '3D печать Иркутск',
+    '3D печать в Иркутске',
+    '3D печать на заказ Иркутск',
+    '3D моделирование Иркутск',
+    '3D сканирование Иркутск',
+    'печать на 3D принтере Иркутск',
     '3D печать',
     '3D моделирование',
     '3D печать на заказ',
@@ -45,6 +50,7 @@ export const metadata: Metadata = {
     'TPU',
     'постобработка 3D-печати',
     'серийное производство',
+    'реверс-инжиниринг',
     'Siblay',
   ],
   authors: [{ name: 'Siblay' }],
@@ -63,14 +69,17 @@ export const metadata: Metadata = {
     locale: 'ru_RU',
     url: siteUrl,
     siteName: 'Siblay',
-    title: 'Siblay — 3D-моделирование и 3D-печать на заказ',
+    title: 'Siblay — 3D-печать и 3D-моделирование в Иркутске на заказ',
     description:
-      'Профессиональные услуги 3D-печати под заказ. PLA, PETG, TPU — от прототипа до серии.',
+      'Студия 3D-печати в Иркутске. PLA, PETG, TPU — от прототипа до серии. Расчёт онлайн.',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Siblay — 3D-моделирование и 3D-печать на заказ',
-    description: 'Профессиональные услуги 3D-печати под заказ. PLA, PETG, TPU.',
+    title: 'Siblay — 3D-печать и 3D-моделирование в Иркутске',
+    description: 'Студия 3D-печати в Иркутске. PLA, PETG, TPU — от прототипа до серии.',
+  },
+  verification: {
+    yandex: process.env.NEXT_PUBLIC_YANDEX_VERIFICATION,
   },
   robots: {
     index: true,
@@ -94,31 +103,8 @@ export const viewport: Viewport = {
   colorScheme: 'light dark',
 }
 
-const organizationJsonLd = {
-  '@context': 'https://schema.org',
-  '@type': 'Organization',
-  '@id': `${siteUrl}#organization`,
-  name: 'Siblay',
-  url: siteUrl,
-  logo: `${siteUrl}/siblay-logo.svg`,
-  description:
-    'Профессиональные услуги 3D-моделирования и 3D-печати на заказ. PLA, PETG, TPU.',
-  email: 'info@siblay.ru',
-  areaServed: 'RU',
-  sameAs: [] as string[],
-}
-
-const websiteJsonLd = {
-  '@context': 'https://schema.org',
-  '@type': 'WebSite',
-  '@id': `${siteUrl}#website`,
-  url: siteUrl,
-  name: 'Siblay',
-  inLanguage: 'ru-RU',
-  publisher: { '@id': `${siteUrl}#organization` },
-}
-
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  const { organization, localBusiness } = getBusinessJsonLd()
   return (
     <html
       lang="ru"
@@ -129,7 +115,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="min-h-screen flex flex-col">
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organization) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusiness) }}
         />
         <script
           type="application/ld+json"

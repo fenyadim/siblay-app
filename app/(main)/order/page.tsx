@@ -7,12 +7,12 @@ import { getSeedMaterialsPreview } from "@/actions/materials"
 import { OrderFormClient } from "@/components/order/OrderFormClient"
 
 export const metadata: Metadata = {
-  title: "Оформить заказ на 3D-печать",
+  title: "Заказать 3D-печать в Иркутске",
   description:
-    "Оформите заказ на 3D-печать онлайн. Загрузите модель или фотографии, выберите материал и цвет, рассчитайте стоимость автоматически.",
+    "Закажите 3D-печать в Иркутске онлайн. Загрузите модель или фотографии, выберите материал и цвет, рассчитайте стоимость автоматически.",
   alternates: { canonical: "/order" },
   openGraph: {
-    title: "Оформить заказ на 3D-печать — Siblay",
+    title: "Заказать 3D-печать в Иркутске — Siblay",
     description:
       "Загрузите модель или фотографии, выберите материал и цвет, рассчитайте стоимость онлайн.",
     url: "/order",

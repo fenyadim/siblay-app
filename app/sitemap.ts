@@ -1,11 +1,15 @@
 import { MetadataRoute } from 'next'
 
 import { prisma } from '@/lib/prisma'
+import { siteUrl } from '@/lib/seo'
 
 export const dynamic = 'force-dynamic'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.BETTER_AUTH_URL ?? 'https://siblay.ru'
+  // Канонический адрес сайта. Раньше тут был BETTER_AUTH_URL, который на
+  // проде указывает на localhost/домен авторизации — из-за этого sitemap мог
+  // отдавать неверные URL.
+  const baseUrl = siteUrl
 
   let portfolioItems: { id: string; updatedAt: Date }[] = []
   try {
@@ -26,6 +30,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
     {
       url: `${baseUrl}/order`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.9,
+    },
+    {
+      url: `${baseUrl}/quote`,
       lastModified: new Date(),
       changeFrequency: 'monthly',
       priority: 0.9,
