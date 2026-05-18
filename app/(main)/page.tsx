@@ -5,6 +5,7 @@ import { HeroSection } from "@/components/landing/HeroSection"
 import { HowItWorksSection } from "@/components/landing/HowItWorksSection"
 import { MaterialsSection } from "@/components/landing/MaterialsSection"
 import { PortfolioPreviewSection } from "@/components/landing/PortfolioPreviewSection"
+import { ReviewsSection } from "@/components/landing/ReviewsSection"
 import { ServicesSection } from "@/components/landing/ServicesSection"
 
 export const revalidate = 300
@@ -29,6 +30,7 @@ export default function HomePage() {
       <ServicesSection />
       <HowItWorksSection />
       <PortfolioPreviewSection />
+      <ReviewsSection />
       <MaterialsSection />
       <FAQSection />
     </>
