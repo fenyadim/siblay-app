@@ -14,6 +14,8 @@ async function requireAdmin() {
   }
 }
 
+// Публичный экшен: используется на главной для server-render секции отзывов.
+// Без requireAdmin() — отдаёт только опубликованные записи.
 export async function getPublishedReviews() {
   return prisma.review.findMany({
     where: { published: true },

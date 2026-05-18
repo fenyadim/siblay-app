@@ -8,6 +8,10 @@ export const reviewSchema = z.object({
     .max(100, "Максимум 100 символов"),
   reviewDate: z.coerce
     .date({ error: "Укажите дату отзыва" })
+    // Без min пустое поле <input type="date"> придёт как null, и
+    // z.coerce.date() превратит его в эпоху 1970-01-01 — отзыв сохранится
+    // с этой датой. Нижняя граница ловит этот кейс и даёт внятную ошибку.
+    .min(new Date("2000-01-01"), "Укажите корректную дату")
     .refine((d) => d.getTime() <= Date.now(), "Дата не может быть в будущем"),
   rating: z.coerce
     .number()

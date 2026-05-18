@@ -4,13 +4,16 @@
  * LocalBusiness JSON-LD по совпадающему `@id`.
  */
 
+// Цвета подобраны так, чтобы белый текст инициала проходил WCAG AA
+// для крупного текста (≥3:1). amber-500/red-500 не проходили, поэтому
+// палитра целиком сдвинута на 600-е варианты для визуального единства.
 export const AVATAR_PALETTE = [
-  '#0ea5e9', // sky-500
-  '#10b981', // emerald-500
-  '#f59e0b', // amber-500
-  '#ef4444', // red-500
-  '#8b5cf6', // violet-500
-  '#ec4899', // pink-500
+  '#0284c7', // sky-600
+  '#059669', // emerald-600
+  '#d97706', // amber-600
+  '#dc2626', // red-600
+  '#7c3aed', // violet-600
+  '#db2777', // pink-600
 ] as const
 
 const dateFormatter = new Intl.DateTimeFormat('ru-RU', {
