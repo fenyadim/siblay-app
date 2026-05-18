@@ -25,6 +25,7 @@ model Order {
   fullName       String
   phone          String
   email          String
+  telegram       String?
   delivery       String
   address        String?
   estimatedPrice Float?
@@ -74,6 +75,7 @@ model Quote {
   fullName       String
   phone          String
   email          String
+  telegram       String?
 
   estimatedPrice Float?
 }

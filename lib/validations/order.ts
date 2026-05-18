@@ -60,6 +60,14 @@ export const step6Schema = z.object({
     .min(10, "Укажите телефон")
     .regex(/^\+?[0-9\s\-\(\)]{10,20}$/, "Неверный формат телефона"),
   email: z.string().email("Неверный email"),
+  telegram: z.preprocess(
+    (value) => {
+      if (typeof value !== "string") return value
+      const trimmed = value.trim()
+      return trimmed === "" ? undefined : trimmed
+    },
+    z.string().max(64, "Максимум 64 символа").optional(),
+  ),
   delivery: z.enum(["pickup", "courier", "sdek", "pochta"], "Выберите способ доставки"),
   address: z.string().optional(),
   personalDataConsent: z

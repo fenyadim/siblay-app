@@ -84,6 +84,7 @@ export function orderEmailTemplate(order: {
   fullName: string
   phone: string
   email: string
+  telegram?: string | null
   material: string
   color: string
   quantity: number
@@ -100,6 +101,7 @@ export function orderEmailTemplate(order: {
   const fullName = escapeHtml(order.fullName)
   const phone = escapeHtml(order.phone)
   const email = escapeHtml(order.email)
+  const telegram = order.telegram ? escapeHtml(order.telegram) : null
   const material = escapeHtml(order.material)
   const color = escapeHtml(order.color)
   const delivery = escapeHtml(order.delivery)
@@ -121,6 +123,7 @@ export function orderEmailTemplate(order: {
         <tr><td style="padding:8px;border-bottom:1px solid #eee"><b>Клиент</b></td><td style="padding:8px;border-bottom:1px solid #eee">${fullName}</td></tr>
         <tr><td style="padding:8px;border-bottom:1px solid #eee"><b>Телефон</b></td><td style="padding:8px;border-bottom:1px solid #eee">${phone}</td></tr>
         <tr><td style="padding:8px;border-bottom:1px solid #eee"><b>Email</b></td><td style="padding:8px;border-bottom:1px solid #eee">${email}</td></tr>
+        ${telegram ? `<tr><td style="padding:8px;border-bottom:1px solid #eee"><b>Telegram</b></td><td style="padding:8px;border-bottom:1px solid #eee">${telegram}</td></tr>` : ""}
         <tr><td style="padding:8px;border-bottom:1px solid #eee"><b>Материал</b></td><td style="padding:8px;border-bottom:1px solid #eee">${material}</td></tr>
         <tr><td style="padding:8px;border-bottom:1px solid #eee"><b>Цвет</b></td><td style="padding:8px;border-bottom:1px solid #eee">${color}</td></tr>
         <tr><td style="padding:8px;border-bottom:1px solid #eee"><b>Размеры</b></td><td style="padding:8px;border-bottom:1px solid #eee">${order.length}×${order.width}×${order.height} мм</td></tr>
@@ -238,6 +241,7 @@ interface QuoteInput {
   fullName: string
   phone: string
   email: string
+  telegram?: string | null
   estimatedPrice?: number | null
 }
 
@@ -281,10 +285,17 @@ export function adminQuoteEmailTemplate(quote: QuoteInput) {
   const description = escapeHtml(quote.description).replaceAll(/\r?\n/g, "<br/>")
   const adminUrl = `${siteUrl()}/admin/quotes/${encodeURIComponent(quote.id)}`
 
+  const telegram = quote.telegram ? escapeHtml(quote.telegram) : null
+
   const rows: string[] = [
     `<tr><td style="padding:8px;border-bottom:1px solid #eee"><b>Клиент</b></td><td style="padding:8px;border-bottom:1px solid #eee">${fullName}</td></tr>`,
     `<tr><td style="padding:8px;border-bottom:1px solid #eee"><b>Телефон</b></td><td style="padding:8px;border-bottom:1px solid #eee">${phone}</td></tr>`,
     `<tr><td style="padding:8px;border-bottom:1px solid #eee"><b>Email</b></td><td style="padding:8px;border-bottom:1px solid #eee">${email}</td></tr>`,
+    ...(telegram
+      ? [
+          `<tr><td style="padding:8px;border-bottom:1px solid #eee"><b>Telegram</b></td><td style="padding:8px;border-bottom:1px solid #eee">${telegram}</td></tr>`,
+        ]
+      : []),
     `<tr><td style="padding:8px;border-bottom:1px solid #eee"><b>Услуга</b></td><td style="padding:8px;border-bottom:1px solid #eee">${typeLabel}</td></tr>`,
   ]
 

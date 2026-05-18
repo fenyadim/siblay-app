@@ -85,6 +85,21 @@ export function Step6Contacts() {
             />
           </Field>
         </div>
+
+        <Field
+          label="Telegram"
+          error={(errors.telegram as { message?: string } | undefined)?.message}
+        >
+          <Input
+            {...register('telegram')}
+            placeholder="@username или ссылка t.me/..."
+            className={inputClass}
+            autoComplete="off"
+          />
+          <p className="text-xs text-muted mt-1">
+            Необязательно — добавьте, если так удобнее держать связь.
+          </p>
+        </Field>
       </div>
 
       {/* Delivery */}

@@ -138,6 +138,7 @@ export function QuoteFormClient({ initialType }: Props) {
       fullName: '',
       phone: '',
       email: '',
+      telegram: '',
       personalDataConsent: false,
     },
     mode: 'onBlur',
@@ -638,6 +639,19 @@ function ContactsSection() {
           />
         </Field>
       </div>
+
+      <Field
+        label="Telegram"
+        error={(errors.telegram as { message?: string } | undefined)?.message}
+        hint="Необязательно — добавьте, если так удобнее держать связь."
+      >
+        <Input
+          {...register('telegram')}
+          placeholder="@username или ссылка t.me/..."
+          className={inputClass}
+          autoComplete="off"
+        />
+      </Field>
 
       <div className="rounded-xl border border-border bg-surface-raised p-4">
         <label className="flex items-start gap-3 cursor-pointer">

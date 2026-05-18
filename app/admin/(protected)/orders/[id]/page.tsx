@@ -9,6 +9,27 @@ import { FormattedDate } from "@/components/admin/FormattedDate"
 import { OrderStatus } from "@/app/generated/prisma/client"
 import Link from "next/link"
 
+function telegramHref(value: string): string {
+  const v = value.trim()
+  if (/^https?:\/\//i.test(v)) return v
+  if (v.startsWith("@")) return `https://t.me/${v.slice(1)}`
+  if (/^t\.me\//i.test(v)) return `https://${v}`
+  return `https://t.me/${v.replace(/^\/+/, "")}`
+}
+
+function TelegramLink({ value }: { value: string }) {
+  return (
+    <a
+      href={telegramHref(value)}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="font-mono text-accent truncate max-w-45"
+    >
+      {value}
+    </a>
+  )
+}
+
 interface Props {
   params: Promise<{ id: string }>
 }
@@ -73,6 +94,12 @@ export default async function AdminOrderDetailPage({ params }: Props) {
               <span className="text-muted">Email</span>
               <a href={`mailto:${order.email}`} className="font-mono text-accent truncate max-w-[180px]">{order.email}</a>
             </div>
+            {order.telegram && (
+              <div className="flex justify-between">
+                <span className="text-muted">Telegram</span>
+                <TelegramLink value={order.telegram} />
+              </div>
+            )}
           </div>
         </div>
 
