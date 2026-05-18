@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma"
 import { ORDER_STATUS_LABELS, ORDER_STATUS_COLORS, formatPrice, formatFileSize } from "@/lib/utils"
 import { Badge } from "@/components/ui/badge"
 import { OrderStatusSelect } from "@/components/admin/OrderStatusSelect"
-import { OrderPriceInput } from "@/components/admin/OrderPriceInput"
+import { OrderPricing } from "@/components/admin/OrderPricing"
 import { DeleteOrderButton } from "@/components/admin/DeleteOrderButton"
 import { FormattedDate } from "@/components/admin/FormattedDate"
 import { OrderStatus } from "@/app/generated/prisma/client"
@@ -87,7 +87,18 @@ export default async function AdminOrderDetailPage({ params }: Props) {
           {!order.hasModel && (
             <p className="text-xs text-muted mb-3">Включает моделирование</p>
           )}
-          <OrderPriceInput orderId={order.id} currentPrice={order.estimatedPrice} />
+          <OrderPricing
+            orderId={order.id}
+            currentPrice={order.estimatedPrice}
+            orderParams={{
+              material: order.material,
+              width: order.width,
+              height: order.height,
+              length: order.length,
+              quantity: order.quantity,
+              infill: order.infill,
+            }}
+          />
         </div>
       </div>
 
