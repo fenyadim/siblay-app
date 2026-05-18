@@ -146,6 +146,20 @@ model MaterialColor {
   sortOrder  Int      @default(0)
 }
 
+model Review {
+  id         String   @id @default(cuid())
+  authorName String
+  reviewDate DateTime
+  rating     Int
+  text       String
+  sourceUrl  String?
+  published  Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([published, reviewDate])
+}
+
 // Better Auth required models
 model User {
   id            String    @id

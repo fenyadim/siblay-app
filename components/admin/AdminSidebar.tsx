@@ -15,6 +15,7 @@ const NAV = [
   { href: '/admin/quotes', label: 'Заявки', icon: '✎' },
   { href: '/admin/portfolio', label: 'Портфолио', icon: '◈' },
   { href: '/admin/materials', label: 'Материалы', icon: '◉' },
+  { href: '/admin/reviews', label: 'Отзывы', icon: '★' },
 ]
 
 export function AdminSidebar() {
