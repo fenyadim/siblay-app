@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { ConsentSettingsButton } from '@/components/analytics/ConsentSettingsButton'
 import { OrderCtaLink } from '@/components/order-cta/OrderCtaDialog'
 import { Logo } from '@/components/ui/logo'
+import { business } from '@/lib/seo'
 
 export function Footer() {
   return (
@@ -64,24 +65,43 @@ export function Footer() {
 
           {/* Contacts */}
           <div>
-            <h4 className="text-xs font-mono uppercase tracking-widest text-muted mb-4">
+            <Link
+              href="/contacts"
+              className="block text-xs font-mono uppercase tracking-widest text-muted hover:text-accent transition-colors mb-4"
+            >
               Контакты
-            </h4>
+            </Link>
             <ul className="space-y-3">
-              <li className="flex items-center gap-2 text-sm text-muted">
-                <Phone className="text-accent" size={14} />
-                +7 (914) 000-46-53
+              <li>
+                <a
+                  href={`tel:${business.phone}`}
+                  className="flex items-center gap-2 text-sm text-muted hover:text-accent transition-colors"
+                >
+                  <Phone className="text-accent" size={14} />
+                  {business.phoneDisplay}
+                </a>
               </li>
-              <li className="flex items-center gap-2 text-sm text-muted">
-                <Mail className="text-accent" size={14} />
-                info@siblay.ru
+              <li>
+                <a
+                  href={`mailto:${business.email}`}
+                  className="flex items-center gap-2 text-sm text-muted hover:text-accent transition-colors"
+                >
+                  <Mail className="text-accent" size={14} />
+                  {business.email}
+                </a>
               </li>
               <li className="flex items-start gap-2 text-sm text-muted">
                 <MapPin className="text-accent shrink-0 mt-0.5" size={14} />
-                г. Иркутск, проезд Юрия Тена
+                г. {business.address.city}, {business.address.street}
               </li>
             </ul>
-            <div className="mt-5">
+            <div className="mt-5 flex flex-col items-start gap-2">
+              <Link
+                href="/contacts"
+                className="inline-flex items-center gap-1.5 text-sm font-medium text-muted hover:text-accent transition-colors"
+              >
+                Все контакты
+              </Link>
               <OrderCtaLink className="inline-flex items-center gap-1.5 text-sm font-medium text-accent hover:text-(--accent-hover) transition-colors">
                 Оформить заказ
                 <svg

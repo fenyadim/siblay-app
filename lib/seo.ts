@@ -4,8 +4,7 @@
  * в UI. Меняйте значения здесь — они подхватятся везде.
  */
 
-export const siteUrl =
-  process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') ?? 'https://siblay.ru'
+export const siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') ?? 'https://siblay.ru'
 
 export const business = {
   name: 'Siblay',
@@ -19,30 +18,20 @@ export const business = {
     region: 'Иркутская область',
     city: 'Иркутск',
     street: 'проезд Юрия Тена',
-    // TODO: уточните номер дома и индекс — нужны для Яндекс.Бизнеса и Google.
-    postalCode: '',
+    postalCode: '664082',
   },
-  /**
-   * Координаты района «проезд Юрия Тена», Иркутск — приблизительные.
-   * TODO: замените на точные из Яндекс.Карт (правый клик → «Что здесь?»).
-   */
   geo: {
-    latitude: 52.2864,
-    longitude: 104.2807,
+    latitude: 52.25347,
+    longitude: 104.258487,
   },
   /**
    * Часы работы в формате schema.org. Скорректируйте под реальный график.
    */
   openingHours: ['Mo-Fr 09:00-18:00', 'Sa 10:00-15:00'],
-  sameAs: [
-    'https://t.me/siblay_print',
-    'https://vk.com/dima_orlov1',
-  ],
+  sameAs: ['https://t.me/siblay_print', 'https://vk.com/dima_orlov1'],
 } as const
 
-const fullAddress = [business.address.street, business.address.city]
-  .filter(Boolean)
-  .join(', ')
+const fullAddress = [business.address.street, business.address.city].filter(Boolean).join(', ')
 
 /**
  * Organization + LocalBusiness разметка. LocalBusiness с адресом, телефоном

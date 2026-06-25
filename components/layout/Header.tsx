@@ -17,6 +17,7 @@ const NAV_LINKS = [
   { href: '/#services', label: 'Услуги' },
   { href: '/#how-it-works', label: 'Как мы работаем' },
   { href: '/portfolio', label: 'Портфолио' },
+  { href: '/contacts', label: 'Контакты' },
 ]
 
 export function Header() {
