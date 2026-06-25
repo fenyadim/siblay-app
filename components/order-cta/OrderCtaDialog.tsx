@@ -1,15 +1,20 @@
 'use client'
 
-import { ArrowRight } from 'lucide-react'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { ArrowLeft, ArrowRight, Check, Loader2, Mail } from 'lucide-react'
 import Link from 'next/link'
 import {
-  useState,
   type ComponentProps,
   type ComponentType,
   type ReactNode,
   type SVGProps,
+  useState,
 } from 'react'
+import type { Resolver } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 
+import { createInquiry } from '@/actions/inquiries'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -18,8 +23,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
+import { cn } from '@/lib/utils'
+import { type InquiryFormData, inquirySchema } from '@/lib/validations/inquiry'
 
 type IconComponent = ComponentType<SVGProps<SVGSVGElement>>
+type DialogView = 'options' | 'inquiry'
 
 function IconBase({ children, ...props }: SVGProps<SVGSVGElement> & { children: ReactNode }) {
   return (
@@ -104,6 +115,12 @@ const OPTIONS: Option[] = [
   },
 ]
 
+const optionClass =
+  'group flex items-start gap-3 p-4 rounded-xl border border-border hover:border-(--accent-border) hover:bg-(--accent-subtle) transition-all text-left'
+
+const inputClass =
+  'bg-background border-border text-foreground focus-visible:ring-0 focus-visible:border-accent transition-colors'
+
 interface ChooserProps {
   open: boolean
   onOpenChange: (value: boolean) => void
@@ -111,41 +128,267 @@ interface ChooserProps {
 }
 
 function Chooser({ open, onOpenChange, onSelect }: ChooserProps) {
+  const [view, setView] = useState<DialogView>('options')
+
   function handlePick() {
     onOpenChange(false)
     onSelect?.()
   }
 
+  function handleOpenChange(value: boolean) {
+    onOpenChange(value)
+    if (!value) setView('options')
+  }
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg">
-        <DialogHeader>
-          <DialogTitle className="text-2xl font-display">Что нужно сделать?</DialogTitle>
-          <DialogDescription>
-            Выберите услугу — рассчитаем стоимость и сроки.
-          </DialogDescription>
-        </DialogHeader>
-        <div className="grid gap-2 mt-2">
-          {OPTIONS.map(({ title, hint, href, Icon }) => (
-            <Link
-              key={href}
-              href={href}
-              onClick={handlePick}
-              className="group flex items-start gap-3 p-4 rounded-xl border border-border hover:border-(--accent-border) hover:bg-(--accent-subtle) transition-all"
-            >
-              <span className="flex items-center justify-center w-10 h-10 rounded-lg bg-(--accent-subtle) text-accent shrink-0">
-                <Icon className="size-5" />
-              </span>
-              <div className="flex-1 min-w-0">
-                <p className="text-base font-semibold text-foreground">{title}</p>
-                <p className="text-xs text-muted mt-0.5 leading-relaxed">{hint}</p>
-              </div>
-              <ArrowRight className="size-4 text-muted group-hover:text-accent group-hover:translate-x-0.5 transition-all shrink-0 mt-2.5" />
-            </Link>
-          ))}
-        </div>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
+      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg">
+        {view === 'options' ? (
+          <>
+            <DialogHeader>
+              <DialogTitle className="text-2xl font-display">Что нужно сделать?</DialogTitle>
+              <DialogDescription>Выберите услугу — рассчитаем стоимость и сроки.</DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-2 mt-2">
+              {OPTIONS.map(({ title, hint, href, Icon }) => (
+                <Link key={href} href={href} onClick={handlePick} className={optionClass}>
+                  <OptionContent title={title} hint={hint} Icon={Icon} />
+                </Link>
+              ))}
+              <button type="button" onClick={() => setView('inquiry')} className={optionClass}>
+                <OptionContent
+                  title="Нужна помощь с выбором"
+                  hint="Оставьте контакты и описание задачи — подскажем, как лучше оформить заказ."
+                  Icon={Mail}
+                />
+              </button>
+            </div>
+          </>
+        ) : (
+          <InquiryForm
+            onBack={() => setView('options')}
+            onDone={() => {
+              setView('options')
+              handlePick()
+            }}
+          />
+        )}
       </DialogContent>
     </Dialog>
+  )
+}
+
+function OptionContent({
+  title,
+  hint,
+  Icon,
+}: {
+  title: string
+  hint: string
+  Icon: IconComponent
+}) {
+  return (
+    <>
+      <span className="flex items-center justify-center w-10 h-10 rounded-lg bg-(--accent-subtle) text-accent shrink-0">
+        <Icon className="size-5" />
+      </span>
+      <div className="flex-1 min-w-0">
+        <p className="text-base font-semibold text-foreground">{title}</p>
+        <p className="text-xs text-muted mt-0.5 leading-relaxed">{hint}</p>
+      </div>
+      <ArrowRight className="size-4 text-muted group-hover:text-accent group-hover:translate-x-0.5 transition-all shrink-0 mt-2.5" />
+    </>
+  )
+}
+
+function Field({
+  label,
+  required,
+  error,
+  children,
+  hint,
+}: {
+  label: string
+  required?: boolean
+  error?: string
+  hint?: string
+  children: ReactNode
+}) {
+  return (
+    <div>
+      <Label className="text-sm font-medium text-foreground mb-1.5 block">
+        {label}
+        {required && <span className="text-destructive ml-0.5">*</span>}
+      </Label>
+      {children}
+      {hint && !error && <p className="text-xs text-muted mt-1">{hint}</p>}
+      {error && <p className="text-xs text-destructive mt-1">{error}</p>}
+    </div>
+  )
+}
+
+function InquiryForm({ onBack, onDone }: { onBack: () => void; onDone: () => void }) {
+  const [submitting, setSubmitting] = useState(false)
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<InquiryFormData>({
+    resolver: zodResolver(inquirySchema) as Resolver<InquiryFormData>,
+    defaultValues: {
+      fullName: '',
+      phone: '',
+      email: '',
+      telegram: '',
+      description: '',
+      personalDataConsent: false,
+    },
+    mode: 'onBlur',
+  })
+
+  async function submit(values: InquiryFormData) {
+    setSubmitting(true)
+    try {
+      const result = await createInquiry(values)
+      if ('error' in result) {
+        toast.error(result.error)
+        return
+      }
+
+      toast.success('Заявка отправлена! Мы свяжемся и подскажем, как лучше оформить заказ.')
+      reset()
+      onDone()
+    } catch {
+      toast.error('Произошла ошибка. Попробуйте ещё раз.')
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  return (
+    <>
+      <DialogHeader>
+        <button
+          type="button"
+          onClick={onBack}
+          className="mb-2 inline-flex w-fit items-center gap-1 text-sm text-muted transition-colors hover:text-foreground"
+        >
+          <ArrowLeft className="size-4" />
+          Назад
+        </button>
+        <DialogTitle className="text-2xl font-display">Расскажите о задаче</DialogTitle>
+        <DialogDescription>
+          Оставьте контакты и короткое описание — мы разберёмся и предложим следующий шаг.
+        </DialogDescription>
+      </DialogHeader>
+
+      <form onSubmit={handleSubmit(submit)} className="mt-2 space-y-4">
+        <Field label="ФИО" required error={errors.fullName?.message}>
+          <Input
+            {...register('fullName')}
+            placeholder="Иванов Иван Иванович"
+            className={inputClass}
+            aria-invalid={Boolean(errors.fullName)}
+          />
+        </Field>
+
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <Field label="Телефон" required error={errors.phone?.message}>
+            <Input
+              {...register('phone')}
+              placeholder="+7 (999) 123-45-67"
+              type="tel"
+              className={inputClass}
+              aria-invalid={Boolean(errors.phone)}
+            />
+          </Field>
+          <Field label="Email" required error={errors.email?.message}>
+            <Input
+              {...register('email')}
+              placeholder="ivan@example.ru"
+              type="email"
+              className={inputClass}
+              aria-invalid={Boolean(errors.email)}
+            />
+          </Field>
+        </div>
+
+        <Field
+          label="Telegram"
+          error={(errors.telegram as { message?: string } | undefined)?.message}
+          hint="Необязательно — добавьте, если так удобнее держать связь."
+        >
+          <Input
+            {...register('telegram')}
+            placeholder="@username или ссылка t.me/..."
+            className={inputClass}
+            autoComplete="off"
+            aria-invalid={Boolean(errors.telegram)}
+          />
+        </Field>
+
+        <Field
+          label="Описание заказа"
+          required
+          error={errors.description?.message}
+          hint="Что нужно получить, какие есть исходные данные, примерные размеры, материал или назначение."
+        >
+          <Textarea
+            {...register('description')}
+            rows={5}
+            placeholder="Например: есть сломанная деталь, хочу понять, можно ли напечатать замену. Фото и размеры могу прислать позже."
+            className={cn(inputClass, 'resize-none placeholder:text-(--placeholder)')}
+            aria-invalid={Boolean(errors.description)}
+          />
+        </Field>
+
+        <div className="rounded-xl border border-border bg-surface-raised p-4">
+          <label className="flex cursor-pointer items-start gap-3">
+            <input
+              {...register('personalDataConsent')}
+              type="checkbox"
+              className="mt-0.5 size-4 rounded border-border text-accent focus:ring-accent"
+            />
+            <span className="text-sm leading-relaxed text-foreground">
+              Я даю согласие на обработку моих персональных данных в целях рассмотрения заявки, а
+              также ознакомлен(а) с{' '}
+              <Link
+                href="/privacy"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-accent underline-offset-2 hover:underline"
+              >
+                политикой обработки персональных данных
+              </Link>
+              .
+            </span>
+          </label>
+          {errors.personalDataConsent && (
+            <p className="text-xs text-destructive mt-2">{errors.personalDataConsent.message}</p>
+          )}
+        </div>
+
+        <Button
+          type="submit"
+          disabled={submitting}
+          className="w-full rounded-xl px-6 py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-60"
+          style={{ background: 'linear-gradient(135deg, var(--accent), #7c3aed)' }}
+        >
+          {submitting ? (
+            <>
+              <Loader2 className="size-4 animate-spin" />
+              Отправка...
+            </>
+          ) : (
+            <>
+              Отправить заявку
+              <Check className="size-3.5" />
+            </>
+          )}
+        </Button>
+      </form>
+    </>
   )
 }
 
