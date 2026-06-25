@@ -17,6 +17,8 @@ jobs:
   deploy:
     name: Typecheck and deploy
     runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/siblay_ci
 
     steps:
       - name: Checkout
