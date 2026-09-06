@@ -1,9 +1,11 @@
 import { getMaterialsWithColors } from '@/actions/materials'
+import { readPublicSection } from '@/lib/public-section-data'
 
 import { MaterialsCarousel } from './MaterialsCarousel'
 
 export async function MaterialsSection() {
-  const materials = await getMaterialsWithColors()
+  const materials = await readPublicSection('materials', getMaterialsWithColors)
+  if (materials === null) return null
 
   return (
     <section className="py-14 sm:py-24 bg-surface border-y border-border overflow-hidden">

@@ -1,13 +1,14 @@
-import { getPublishedReviews } from "@/actions/reviews"
-import { buildReviewsJsonLdForLocalBusiness } from "@/lib/reviews"
-import { siteUrl } from "@/lib/seo"
+import { getPublishedReviews } from '@/actions/reviews'
+import { readPublicSection } from '@/lib/public-section-data'
+import { buildReviewsJsonLdForLocalBusiness } from '@/lib/reviews'
+import { siteUrl } from '@/lib/seo'
 
-import { ReviewsCarousel } from "./ReviewsCarousel"
+import { ReviewsCarousel } from './ReviewsCarousel'
 
 export async function ReviewsSection() {
-  const reviews = await getPublishedReviews()
+  const reviews = await readPublicSection('reviews', getPublishedReviews)
 
-  if (reviews.length === 0) return null
+  if (reviews === null || reviews.length === 0) return null
 
   const jsonLd = buildReviewsJsonLdForLocalBusiness(reviews, siteUrl)
 

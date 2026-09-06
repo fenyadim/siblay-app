@@ -64,7 +64,7 @@ function EditableField({
           setDraft(value)
           setEditing(true)
         }}
-        className={`h-auto w-full justify-start p-0 text-left font-normal hover:bg-transparent hover:text-accent transition-colors ${mono ? 'font-mono' : ''}`}
+        className={`h-auto min-w-0 w-full justify-start whitespace-normal break-words p-0 text-left font-normal hover:bg-transparent hover:text-accent transition-colors ${mono ? 'font-mono' : ''}`}
       >
         {value || <span className="text-muted italic">{placeholder ?? '—'}</span>}
       </Button>
@@ -72,7 +72,7 @@ function EditableField({
   }
 
   return (
-    <div className="flex items-center gap-1.5">
+    <div className="flex min-w-0 flex-wrap items-center gap-1.5">
       <Input
         autoFocus
         value={draft}
@@ -134,7 +134,7 @@ function MultilineField({
           setDraft(value)
           setEditing(true)
         }}
-        className="h-auto w-full justify-start whitespace-pre-wrap p-0 text-left font-normal leading-relaxed hover:bg-transparent hover:text-accent transition-colors"
+        className="h-auto min-w-0 w-full justify-start break-words whitespace-pre-wrap p-0 text-left font-normal leading-relaxed hover:bg-transparent hover:text-accent transition-colors"
       >
         {value || <span className="text-muted italic">{placeholder ?? 'Не задано'}</span>}
       </Button>
@@ -187,13 +187,7 @@ function MultilineField({
   )
 }
 
-function ColorPickerField({
-  value,
-  onSave,
-}: {
-  value: string
-  onSave: (v: string) => void
-}) {
+function ColorPickerField({ value, onSave }: { value: string; onSave: (v: string) => void }) {
   const [draft, setDraft] = useState(value || '#a7a7a7')
   const [isPending, startTransition] = useTransition()
 
@@ -231,19 +225,9 @@ function ColorPickerField({
   )
 }
 
-function PropsField({
-  value,
-  onSave,
-}: {
-  value: string[]
-  onSave: (v: string[]) => void
-}) {
+function PropsField({ value, onSave }: { value: string[]; onSave: (v: string[]) => void }) {
   const initial = [value[0] ?? '', value[1] ?? '', value[2] ?? '']
-  const [draft, setDraft] = useState<[string, string, string]>([
-    initial[0],
-    initial[1],
-    initial[2],
-  ])
+  const [draft, setDraft] = useState<[string, string, string]>([initial[0], initial[1], initial[2]])
   const [isPending, startTransition] = useTransition()
 
   function update(i: number, v: string) {
@@ -256,8 +240,7 @@ function PropsField({
 
   function commit() {
     const cleaned = draft.map((p) => p.trim()).filter(Boolean)
-    const same =
-      cleaned.length === value.length && cleaned.every((p, i) => p === value[i])
+    const same = cleaned.length === value.length && cleaned.every((p, i) => p === value[i])
     if (same) return
     startTransition(() => onSave(cleaned))
   }
@@ -285,13 +268,7 @@ function PropsField({
   )
 }
 
-function PriceField({
-  value,
-  onSave,
-}: {
-  value: string
-  onSave: (v: string) => void
-}) {
+function PriceField({ value, onSave }: { value: string; onSave: (v: string) => void }) {
   const [editing, setEditing] = useState(false)
   const [draft, setDraft] = useState(parseMaterialPrice(value))
 
@@ -304,23 +281,25 @@ function PriceField({
           setDraft(parseMaterialPrice(value))
           setEditing(true)
         }}
-        className="h-auto w-full justify-start p-0 text-left font-mono font-normal hover:bg-transparent hover:text-accent transition-colors"
+        className="h-auto min-w-0 w-full justify-start whitespace-normal break-words p-0 text-left font-mono font-normal hover:bg-transparent hover:text-accent transition-colors"
       >
-        {value
-          ? formatMaterialPrice(value)
-          : <span className="text-muted italic">Цена не указана</span>}
+        {value ? (
+          formatMaterialPrice(value)
+        ) : (
+          <span className="text-muted italic">Цена не указана</span>
+        )}
       </Button>
     )
   }
 
   function commit() {
-    const trimmed = draft.trim().replace(",", ".")
+    const trimmed = draft.trim().replace(',', '.')
     onSave(trimmed)
     setEditing(false)
   }
 
   return (
-    <div className="flex items-center gap-1.5">
+    <div className="flex min-w-0 flex-wrap items-center gap-1.5">
       <Input
         autoFocus
         type="number"
@@ -379,10 +358,10 @@ function ColorRow({
   return (
     <div className="flex items-center gap-3 py-2 border-b border-border last:border-0 flex-wrap">
       {/* Color dot + hex editor */}
-      <div className="flex items-center gap-1.5">
+      <div className="flex min-w-0 flex-wrap items-center gap-1.5">
         <ColorDot hex={color.hex} hex2={color.hex2} />
         {editingHex ? (
-          <div className="flex items-center gap-1">
+          <div className="flex min-w-0 flex-wrap items-center gap-1">
             <Input
               autoFocus
               value={hexDraft}
@@ -442,10 +421,10 @@ function ColorRow({
       </div>
 
       {/* Hex2 editor */}
-      <div className="flex items-center gap-1.5">
+      <div className="flex min-w-0 flex-wrap items-center gap-1.5">
         {showHex2 ? (
           editingHex2 ? (
-            <div className="flex items-center gap-1">
+            <div className="flex min-w-0 flex-wrap items-center gap-1">
               <Input
                 autoFocus
                 value={hex2Draft}
@@ -521,7 +500,7 @@ function ColorRow({
       </div>
 
       {/* Name */}
-      <div className="flex-1 min-w-0">
+      <div className="basis-full min-w-0 sm:basis-auto sm:flex-1">
         <EditableField
           value={color.name}
           onSave={(name) => save({ name })}
@@ -686,7 +665,7 @@ function MaterialCard({ material }: { material: MaterialWithColors }) {
   return (
     <div className="rounded-xl border border-border bg-surface overflow-hidden">
       {/* Header */}
-      <div className="flex items-center gap-3 px-5 py-4 border-b border-border">
+      <div className="flex flex-wrap items-center gap-3 px-4 sm:px-5 py-4 border-b border-border">
         <div
           className="w-3 h-3 rounded-full shrink-0"
           style={
@@ -695,7 +674,9 @@ function MaterialCard({ material }: { material: MaterialWithColors }) {
               : { background: dotColor }
           }
         />
-        <span className="font-black text-lg text-foreground font-display">{material.name}</span>
+        <span className="min-w-0 break-words font-black text-lg text-foreground font-display">
+          {material.name}
+        </span>
 
         {/* Available toggle */}
         <Button
@@ -714,7 +695,7 @@ function MaterialCard({ material }: { material: MaterialWithColors }) {
       </div>
 
       {/* Editable fields */}
-      <div className="px-5 py-3 grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
+      <div className="px-4 sm:px-5 py-3 grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
         <div>
           <p className="label-mono mb-1">Описание</p>
           <EditableField
@@ -744,7 +725,7 @@ function MaterialCard({ material }: { material: MaterialWithColors }) {
           <span className="text-muted text-sm">{detailsOpen ? '▲' : '▼'}</span>
         </Button>
         {detailsOpen && (
-          <div className="px-5 pb-4 grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-3 text-sm">
+          <div className="px-4 sm:px-5 pb-4 grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-3 text-sm">
             <div>
               <p className="label-mono mb-1">Полное название</p>
               <EditableField
@@ -755,10 +736,7 @@ function MaterialCard({ material }: { material: MaterialWithColors }) {
             </div>
             <div>
               <p className="label-mono mb-1">Цвет акцента</p>
-              <ColorPickerField
-                value={material.color}
-                onSave={(color) => save({ color })}
-              />
+              <ColorPickerField value={material.color} onSave={(color) => save({ color })} />
             </div>
             <div>
               <p className="label-mono mb-1">Темп. предел</p>
@@ -778,10 +756,7 @@ function MaterialCard({ material }: { material: MaterialWithColors }) {
             </div>
             <div className="sm:col-span-2">
               <p className="label-mono mb-1">Теги для лендинга (до 3)</p>
-              <PropsField
-                value={material.props ?? []}
-                onSave={(props) => save({ props })}
-              />
+              <PropsField value={material.props ?? []} onSave={(props) => save({ props })} />
             </div>
             <div className="sm:col-span-2">
               <p className="label-mono mb-1">Развёрнутое описание</p>
@@ -807,7 +782,7 @@ function MaterialCard({ material }: { material: MaterialWithColors }) {
           <span className="text-muted text-sm">{colorsOpen ? '▲' : '▼'}</span>
         </Button>
         {colorsOpen && (
-          <div className="px-5 pb-4">
+          <div className="px-4 sm:px-5 pb-4">
             <div>
               {material.colors.map((c) => (
                 <ColorRow key={c.id} color={c} materialId={material.id} />
@@ -840,7 +815,7 @@ function AddMaterialForm() {
     startTransition(async () => {
       await createMaterial({
         ...form,
-        price: form.price.trim().replace(",", "."),
+        price: form.price.trim().replace(',', '.'),
       })
       setForm({ name: '', description: '', price: '', best: '' })
       setOpen(false)

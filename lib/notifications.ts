@@ -215,35 +215,44 @@ interface InquiryInput {
   email: string
   telegram?: string | null
   description: string
+  files?: Array<{ fileName: string; fileUrl: string }>
 }
 
 export function adminInquiryTelegramText(inquiry: InquiryInput) {
   const short = escapeHtml(shortOrderId(inquiry.id))
-  const description = escapeHtml(inquiry.description)
+  const adminUrl = `${siteUrl()}/admin/orders/${encodeURIComponent(inquiry.id)}`
 
   return (
-    `<b>🆕 Короткая заявка #${short}</b>\n\n` +
-    `${description}\n\n` +
-    'Контакты клиента отправлены на почту.'
+    `<b>🆕 Заявка на заказ #${short}</b>\n\n` +
+    `Вложений: ${inquiry.files?.length ?? 0}.\n` +
+    `👉 <a href="${escapeHtml(adminUrl)}">Открыть заказ в админке</a>`
   )
 }
 
 export function adminInquiryEmailTemplate(inquiry: InquiryInput) {
+  const adminUrl = `${siteUrl()}/admin/orders/${encodeURIComponent(inquiry.id)}`
   const fullName = escapeHtml(inquiry.fullName)
   const phone = escapeHtml(inquiry.phone)
   const email = escapeHtml(inquiry.email)
   const telegram = inquiry.telegram ? escapeHtml(inquiry.telegram) : null
   const description = escapeHtml(inquiry.description).replaceAll(/\r?\n/g, '<br/>')
+  const files = (inquiry.files ?? [])
+    .map(
+      (file) => `<li><a href="${escapeHtml(file.fileUrl)}">${escapeHtml(file.fileName)}</a></li>`
+    )
+    .join('')
 
   return `
     <div style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:24px 16px">
-      <h2 style="color:#2563EB;margin:0 0 12px">Короткая заявка #${escapeHtml(shortOrderId(inquiry.id))}</h2>
+      <h2 style="color:#2563EB;margin:0 0 12px">Заявка на заказ #${escapeHtml(shortOrderId(inquiry.id))}</h2>
+      <p><a href="${escapeHtml(adminUrl)}">Открыть заказ в админке →</a></p>
       <table style="width:100%;border-collapse:collapse">
         <tr><td style="padding:8px;border-bottom:1px solid #eee"><b>Клиент</b></td><td style="padding:8px;border-bottom:1px solid #eee">${fullName}</td></tr>
         <tr><td style="padding:8px;border-bottom:1px solid #eee"><b>Телефон</b></td><td style="padding:8px;border-bottom:1px solid #eee">${phone}</td></tr>
         <tr><td style="padding:8px;border-bottom:1px solid #eee"><b>Email</b></td><td style="padding:8px;border-bottom:1px solid #eee">${email}</td></tr>
         ${telegram ? `<tr><td style="padding:8px;border-bottom:1px solid #eee"><b>Telegram</b></td><td style="padding:8px;border-bottom:1px solid #eee">${telegram}</td></tr>` : ''}
         <tr><td style="padding:8px"><b>Описание</b></td><td style="padding:8px">${description}</td></tr>
+        <tr><td style="padding:8px"><b>Файлы</b></td><td style="padding:8px">${files ? `<ul style="margin:0;padding-left:20px">${files}</ul>` : 'Без вложений'}</td></tr>
       </table>
     </div>
   `
@@ -256,12 +265,12 @@ export function customerInquiryEmailTemplate(inquiry: InquiryInput) {
   return `
     <div style="font-family:sans-serif;max-width:600px;margin:0 auto;background:#f8fafc;padding:24px 16px">
       <div style="background:#fff;border-radius:16px;padding:32px 24px;box-shadow:0 1px 3px rgba(0,0,0,0.05)">
-        <div style="font-size:12px;letter-spacing:0.15em;color:#64748b;text-transform:uppercase;margin-bottom:8px">Siblay · обращение</div>
-        <h2 style="margin:0 0 16px;font-size:24px;color:#0f172a">Обращение #${short} принято</h2>
+        <div style="font-size:12px;letter-spacing:0.15em;color:#64748b;text-transform:uppercase;margin-bottom:8px">Siblay · заказ</div>
+        <h2 style="margin:0 0 16px;font-size:24px;color:#0f172a">Заявка #${short} принята</h2>
 
         <p style="margin:0 0 16px;font-size:15px;line-height:1.6;color:#334155">
           Здравствуйте, ${fullName}! Спасибо за обращение. Мы разберём задачу и свяжемся
-          с вами в течение 2 часов в рабочее время, чтобы подсказать следующий шаг.
+          с вами в течение 2 часов в рабочее время, чтобы согласовать стоимость и сроки.
         </p>
 
         <div style="margin-top:24px;padding:16px;background:#f1f5f9;border-radius:12px">

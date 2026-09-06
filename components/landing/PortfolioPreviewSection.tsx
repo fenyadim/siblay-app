@@ -4,6 +4,7 @@ import Link from 'next/link'
 
 import { getPortfolioItems } from '@/actions/portfolio'
 import { Button } from '@/components/ui/button'
+import { readPublicSection } from '@/lib/public-section-data'
 import { PORTFOLIO_CATEGORY_LABELS } from '@/lib/validations/portfolio'
 
 const ButtonLink = ({ className }: { className?: string }) => (
@@ -15,7 +16,10 @@ const ButtonLink = ({ className }: { className?: string }) => (
 )
 
 export async function PortfolioPreviewSection() {
-  const items = await getPortfolioItems(undefined, true)
+  const items = await readPublicSection('portfolio-preview', () =>
+    getPortfolioItems(undefined, true)
+  )
+  if (items === null) return null
   const preview = items.slice(0, 6)
 
   return (
@@ -56,7 +60,7 @@ export async function PortfolioPreviewSection() {
                         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                         className="object-cover group-hover:scale-105 transition-transform duration-500"
                         {...(item.imageBlurs[0]
-                          ? { placeholder: "blur" as const, blurDataURL: item.imageBlurs[0] }
+                          ? { placeholder: 'blur' as const, blurDataURL: item.imageBlurs[0] }
                           : {})}
                       />
                       <div className="absolute inset-0 bg-linear-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />

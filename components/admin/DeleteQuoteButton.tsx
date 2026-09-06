@@ -1,10 +1,10 @@
-"use client"
+'use client'
 
-import { useRouter } from "next/navigation"
-import { useState, useTransition } from "react"
+import { useRouter } from 'next/navigation'
+import { useState, useTransition } from 'react'
 
-import { deleteQuote } from "@/actions/quotes"
-import { Button } from "@/components/ui/button"
+import { deleteQuote } from '@/actions/quotes'
+import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogClose,
@@ -14,7 +14,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
+} from '@/components/ui/dialog'
 
 interface Props {
   quoteId: string
@@ -33,10 +33,10 @@ export function DeleteQuoteButton({ quoteId, customerName }: Props) {
       try {
         await deleteQuote(quoteId)
         setOpen(false)
-        router.replace("/admin/quotes")
+        router.replace('/admin/orders')
         router.refresh()
       } catch (e) {
-        setError(e instanceof Error ? e.message : "Ошибка при удалении")
+        setError(e instanceof Error ? e.message : 'Ошибка при удалении')
       }
     })
   }
@@ -51,12 +51,12 @@ export function DeleteQuoteButton({ quoteId, customerName }: Props) {
           Удалить заявку
         </Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="max-h-[85dvh] overflow-y-auto [&_button]:min-h-11 [&_button]:min-w-11">
         <DialogHeader>
           <DialogTitle>Удалить заявку?</DialogTitle>
           <DialogDescription>
-            Заявка клиента <span className="font-medium text-foreground">{customerName}</span>{" "}
-            будет удалена вместе с прикреплёнными файлами. Действие необратимо.
+            Заявка клиента <span className="font-medium text-foreground">{customerName}</span> будет
+            удалена вместе с прикреплёнными файлами. Действие необратимо.
           </DialogDescription>
         </DialogHeader>
         {error && <p className="text-sm text-red-500">{error}</p>}
@@ -72,7 +72,7 @@ export function DeleteQuoteButton({ quoteId, customerName }: Props) {
             disabled={isPending}
             className="bg-red-500 text-white hover:bg-red-600 disabled:opacity-50"
           >
-            {isPending ? "Удаление…" : "Удалить"}
+            {isPending ? 'Удаление…' : 'Удалить'}
           </Button>
         </DialogFooter>
       </DialogContent>

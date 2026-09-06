@@ -1,10 +1,10 @@
-"use client"
+'use client'
 
-import { useState, useTransition } from "react"
+import { useState, useTransition } from 'react'
 
-import { updateQuotePrice } from "@/actions/quotes"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import { updateQuotePrice } from '@/actions/quotes'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 
 interface Props {
   quoteId: string
@@ -12,12 +12,12 @@ interface Props {
 }
 
 export function QuotePriceInput({ quoteId, currentPrice }: Props) {
-  const [value, setValue] = useState(currentPrice?.toString() ?? "")
+  const [value, setValue] = useState(currentPrice?.toString() ?? '')
   const [isPending, startTransition] = useTransition()
   const [saved, setSaved] = useState(false)
 
-  const parsed = value.trim() === "" ? null : parseFloat(value.replace(",", "."))
-  const isValid = value.trim() === "" || (!isNaN(parsed!) && parsed! >= 0)
+  const parsed = value.trim() === '' ? null : parseFloat(value.replace(',', '.'))
+  const isValid = value.trim() === '' || (!isNaN(parsed!) && parsed! >= 0)
   const hasChange = (parsed ?? null) !== currentPrice
 
   function handleSave() {
@@ -29,8 +29,8 @@ export function QuotePriceInput({ quoteId, currentPrice }: Props) {
   }
 
   return (
-    <div className="flex items-center gap-3">
-      <div className="relative flex-1">
+    <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
+      <div className="relative min-w-0 flex-1">
         <Input
           type="number"
           min="0"
@@ -54,7 +54,7 @@ export function QuotePriceInput({ quoteId, currentPrice }: Props) {
         disabled={isPending || !isValid || !hasChange}
         className="px-4 py-2 rounded-lg bg-accent text-white text-sm font-medium hover:bg-(--accent-hover) transition-colors disabled:opacity-40 disabled:cursor-not-allowed whitespace-nowrap"
       >
-        {isPending ? "Сохранение…" : saved ? "Сохранено ✓" : "Сохранить"}
+        {isPending ? 'Сохранение…' : saved ? 'Сохранено ✓' : 'Сохранить'}
       </Button>
     </div>
   )

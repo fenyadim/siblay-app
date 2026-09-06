@@ -1,22 +1,18 @@
-"use client"
+'use client'
 
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useState, useTransition } from "react"
-import { useForm, type Resolver } from "react-hook-form"
-import { toast } from "sonner"
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useState, useTransition } from 'react'
+import { type Resolver, useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 
-import {
-  createReview,
-  deleteReview,
-  updateReview,
-} from "@/actions/reviews"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { formatReviewDate } from "@/lib/reviews"
-import { reviewSchema, type ReviewFormData } from "@/lib/validations/review"
+import { createReview, deleteReview, updateReview } from '@/actions/reviews'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import { formatReviewDate } from '@/lib/reviews'
+import { type ReviewFormData, reviewSchema } from '@/lib/validations/review'
 
 interface ReviewListItem {
   id: string
@@ -55,7 +51,7 @@ function ReviewForm({
 }) {
   const initialDate = defaultValues?.reviewDate
     ? new Date(defaultValues.reviewDate).toISOString().slice(0, 10)
-    : ""
+    : ''
 
   const {
     register,
@@ -66,28 +62,25 @@ function ReviewForm({
   } = useForm<ReviewFormData>({
     resolver: zodResolver(reviewSchema) as Resolver<ReviewFormData>,
     defaultValues: {
-      authorName: defaultValues?.authorName ?? "",
+      authorName: defaultValues?.authorName ?? '',
       rating: defaultValues?.rating ?? 5,
-      text: defaultValues?.text ?? "",
-      sourceUrl: defaultValues?.sourceUrl ?? "",
+      text: defaultValues?.text ?? '',
+      sourceUrl: defaultValues?.sourceUrl ?? '',
       published: defaultValues?.published ?? true,
       reviewDate: initialDate ? new Date(initialDate) : undefined,
     },
   })
 
-  const rating = watch("rating") ?? 5
-  const published = watch("published")
+  const rating = watch('rating') ?? 5
+  const published = watch('published')
 
   return (
-    <form
-      onSubmit={handleSubmit((data) => onSubmit(data))}
-      className="space-y-4"
-    >
+    <form onSubmit={handleSubmit((data) => onSubmit(data))} className="space-y-4">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className="block text-xs text-muted mb-1">Имя автора *</label>
           <Input
-            {...register("authorName")}
+            {...register('authorName')}
             className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
           />
           {errors.authorName && (
@@ -100,7 +93,7 @@ function ReviewForm({
           <Input
             type="date"
             defaultValue={initialDate}
-            {...register("reviewDate", { valueAsDate: true })}
+            {...register('reviewDate', { valueAsDate: true })}
             className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
           />
           {errors.reviewDate && (
@@ -118,12 +111,8 @@ function ReviewForm({
               <button
                 key={n}
                 type="button"
-                onClick={() =>
-                  setValue("rating", n, { shouldDirty: true, shouldValidate: true })
-                }
-                className={`text-2xl leading-none ${
-                  active ? "text-amber-500" : "text-border"
-                }`}
+                onClick={() => setValue('rating', n, { shouldDirty: true, shouldValidate: true })}
+                className={`text-2xl leading-none ${active ? 'text-amber-500' : 'text-border'}`}
                 aria-label={`${n} из 5`}
               >
                 ★
@@ -131,21 +120,17 @@ function ReviewForm({
             )
           })}
         </div>
-        {errors.rating && (
-          <p className="text-xs text-red-500 mt-1">{errors.rating.message}</p>
-        )}
+        {errors.rating && <p className="text-xs text-red-500 mt-1">{errors.rating.message}</p>}
       </div>
 
       <div>
         <label className="block text-xs text-muted mb-1">Текст отзыва *</label>
         <Textarea
-          {...register("text")}
+          {...register('text')}
           rows={5}
           className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent resize-none"
         />
-        {errors.text && (
-          <p className="text-xs text-red-500 mt-1">{errors.text.message}</p>
-        )}
+        {errors.text && <p className="text-xs text-red-500 mt-1">{errors.text.message}</p>}
       </div>
 
       <div>
@@ -153,7 +138,7 @@ function ReviewForm({
           Ссылка на отзыв на Avito (необязательно)
         </label>
         <Input
-          {...register("sourceUrl")}
+          {...register('sourceUrl')}
           placeholder="https://www.avito.ru/..."
           className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
         />
@@ -167,7 +152,7 @@ function ReviewForm({
           id="published"
           checked={Boolean(published)}
           onCheckedChange={(checked) =>
-            setValue("published", Boolean(checked), {
+            setValue('published', Boolean(checked), {
               shouldDirty: true,
               shouldValidate: true,
             })
@@ -178,13 +163,13 @@ function ReviewForm({
         </label>
       </div>
 
-      <div className="flex gap-3 pt-2">
+      <div className="flex flex-col gap-3 pt-2 sm:flex-row">
         <Button
           type="submit"
           disabled={isPending}
           className="px-5 py-2 rounded-lg bg-accent text-white text-sm font-medium hover:bg-(--accent-hover) transition-colors disabled:opacity-50"
         >
-          {isPending ? "Сохранение…" : "Сохранить"}
+          {isPending ? 'Сохранение…' : 'Сохранить'}
         </Button>
         <Button
           type="button"
@@ -203,7 +188,7 @@ function ReviewForm({
 
 export function ReviewsAdminClient({ items: initialItems }: Props) {
   const [items, setItems] = useState(initialItems)
-  const [mode, setMode] = useState<"list" | "create" | "edit">("list")
+  const [mode, setMode] = useState<'list' | 'create' | 'edit'>('list')
   const [editingId, setEditingId] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
@@ -214,8 +199,8 @@ export function ReviewsAdminClient({ items: initialItems }: Props) {
     setError(null)
     startTransition(async () => {
       const result = await createReview(data)
-      if ("error" in result) {
-        setError(result.error ?? "Неизвестная ошибка")
+      if ('error' in result) {
+        setError(result.error ?? 'Неизвестная ошибка')
         return
       }
       setItems((prev) => [
@@ -231,8 +216,8 @@ export function ReviewsAdminClient({ items: initialItems }: Props) {
         },
         ...prev,
       ])
-      setMode("list")
-      toast.success("Отзыв добавлен")
+      setMode('list')
+      toast.success('Отзыв добавлен')
     })
   }
 
@@ -241,8 +226,8 @@ export function ReviewsAdminClient({ items: initialItems }: Props) {
     setError(null)
     startTransition(async () => {
       const result = await updateReview(editingId, data)
-      if ("error" in result) {
-        setError(result.error ?? "Неизвестная ошибка")
+      if ('error' in result) {
+        setError(result.error ?? 'Неизвестная ошибка')
         return
       }
       setItems((prev) =>
@@ -258,33 +243,33 @@ export function ReviewsAdminClient({ items: initialItems }: Props) {
                 published: result.review.published,
                 updatedAt: result.review.updatedAt.toISOString(),
               }
-            : item,
-        ),
+            : item
+        )
       )
-      setMode("list")
+      setMode('list')
       setEditingId(null)
-      toast.success("Отзыв обновлён")
+      toast.success('Отзыв обновлён')
     })
   }
 
   function handleDelete(id: string) {
-    if (!confirm("Удалить отзыв?")) return
+    if (!confirm('Удалить отзыв?')) return
     startTransition(async () => {
       await deleteReview(id)
       setItems((prev) => prev.filter((item) => item.id !== id))
-      toast.success("Отзыв удалён")
+      toast.success('Отзыв удалён')
     })
   }
 
   return (
     <div>
-      {mode === "list" && (
+      {mode === 'list' && (
         <>
           <div className="mb-4">
             <Button
               type="button"
               onClick={() => {
-                setMode("create")
+                setMode('create')
                 setError(null)
               }}
               className="px-4 py-2 rounded-lg bg-accent text-white text-sm font-medium hover:bg-(--accent-hover) transition-colors"
@@ -298,12 +283,12 @@ export function ReviewsAdminClient({ items: initialItems }: Props) {
               Отзывов пока нет
             </div>
           ) : (
-            <div className="rounded-xl border border-border bg-surface overflow-hidden">
+            <div className="admin-table-wrapper rounded-xl border border-border bg-surface overflow-hidden">
               <div className="overflow-x-auto">
-                <table className="w-full text-sm">
+                <table role="table" className="admin-table w-full text-sm">
                   <thead>
                     <tr className="border-b border-border bg-background">
-                      {["Автор", "Оценка", "Дата отзыва", "Статус", "Обновлён", ""].map((h) => (
+                      {['Автор', 'Оценка', 'Дата отзыва', 'Статус', 'Обновлён', ''].map((h) => (
                         <th key={h} className="text-left px-4 py-3 label-mono font-normal">
                           {h}
                         </th>
@@ -313,29 +298,35 @@ export function ReviewsAdminClient({ items: initialItems }: Props) {
                   <tbody className="divide-y divide-border">
                     {items.map((item) => (
                       <tr key={item.id} className="hover:bg-background transition-colors">
-                        <td className="px-4 py-3 font-medium text-foreground">
+                        <td data-label="Автор" className="px-4 py-3 font-medium text-foreground">
                           {item.authorName}
                         </td>
-                        <td className="px-4 py-3 text-amber-500 font-mono">
-                          {"★".repeat(item.rating)}
-                          <span className="text-border">{"★".repeat(5 - item.rating)}</span>
+                        <td data-label="Оценка" className="px-4 py-3 text-amber-500 font-mono">
+                          {'★'.repeat(item.rating)}
+                          <span className="text-border">{'★'.repeat(5 - item.rating)}</span>
                         </td>
-                        <td className="px-4 py-3 text-xs text-muted font-mono whitespace-nowrap">
+                        <td
+                          data-label="Дата отзыва"
+                          className="px-4 py-3 text-xs text-muted font-mono whitespace-nowrap"
+                        >
                           {formatReviewDate(item.reviewDate)}
                         </td>
-                        <td className="px-4 py-3">
+                        <td data-label="Статус" className="px-4 py-3">
                           <Badge
                             className={
                               item.published
-                                ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
-                                : "bg-surface text-muted border border-border"
+                                ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                                : 'bg-surface text-muted border border-border'
                             }
                           >
-                            {item.published ? "Опубликовано" : "Скрыто"}
+                            {item.published ? 'Опубликовано' : 'Скрыто'}
                           </Badge>
                         </td>
-                        <td className="px-4 py-3 text-xs text-muted font-mono whitespace-nowrap">
-                          {new Date(item.updatedAt).toLocaleDateString("ru-RU")}
+                        <td
+                          data-label="Обновлён"
+                          className="px-4 py-3 text-xs text-muted font-mono whitespace-nowrap"
+                        >
+                          {new Date(item.updatedAt).toLocaleDateString('ru-RU')}
                         </td>
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-3">
@@ -345,7 +336,7 @@ export function ReviewsAdminClient({ items: initialItems }: Props) {
                               size="sm"
                               onClick={() => {
                                 setEditingId(item.id)
-                                setMode("edit")
+                                setMode('edit')
                                 setError(null)
                               }}
                               className="text-xs text-accent hover:bg-transparent hover:underline"
@@ -374,10 +365,10 @@ export function ReviewsAdminClient({ items: initialItems }: Props) {
         </>
       )}
 
-      {(mode === "create" || mode === "edit") && (
-        <div className="rounded-xl border border-border bg-surface p-6">
+      {(mode === 'create' || mode === 'edit') && (
+        <div className="rounded-xl border border-border bg-surface p-4 sm:p-6">
           <h2 className="text-lg font-bold text-foreground mb-5 font-display">
-            {mode === "create" ? "Новый отзыв" : "Редактировать отзыв"}
+            {mode === 'create' ? 'Новый отзыв' : 'Редактировать отзыв'}
           </h2>
 
           {error && (
@@ -399,9 +390,9 @@ export function ReviewsAdminClient({ items: initialItems }: Props) {
                   }
                 : undefined
             }
-            onSubmit={mode === "create" ? handleCreate : handleUpdate}
+            onSubmit={mode === 'create' ? handleCreate : handleUpdate}
             onCancel={() => {
-              setMode("list")
+              setMode('list')
               setEditingId(null)
               setError(null)
             }}

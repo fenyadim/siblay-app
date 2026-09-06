@@ -1,20 +1,21 @@
-import { notFound } from "next/navigation"
-import { prisma } from "@/lib/prisma"
-import { ORDER_STATUS_LABELS, ORDER_STATUS_COLORS, formatPrice, formatFileSize } from "@/lib/utils"
-import { Badge } from "@/components/ui/badge"
-import { OrderStatusSelect } from "@/components/admin/OrderStatusSelect"
-import { OrderPricing } from "@/components/admin/OrderPricing"
-import { DeleteOrderButton } from "@/components/admin/DeleteOrderButton"
-import { FormattedDate } from "@/components/admin/FormattedDate"
-import { OrderStatus } from "@/app/generated/prisma/client"
-import Link from "next/link"
+import Link from 'next/link'
+import { notFound } from 'next/navigation'
+
+import { OrderStatus } from '@/app/generated/prisma/client'
+import { DeleteOrderButton } from '@/components/admin/DeleteOrderButton'
+import { FormattedDate } from '@/components/admin/FormattedDate'
+import { OrderPricing } from '@/components/admin/OrderPricing'
+import { OrderStatusSelect } from '@/components/admin/OrderStatusSelect'
+import { Badge } from '@/components/ui/badge'
+import { prisma } from '@/lib/prisma'
+import { formatFileSize, formatPrice, ORDER_STATUS_COLORS, ORDER_STATUS_LABELS } from '@/lib/utils'
 
 function telegramHref(value: string): string {
   const v = value.trim()
   if (/^https?:\/\//i.test(v)) return v
-  if (v.startsWith("@")) return `https://t.me/${v.slice(1)}`
+  if (v.startsWith('@')) return `https://t.me/${v.slice(1)}`
   if (/^t\.me\//i.test(v)) return `https://${v}`
-  return `https://t.me/${v.replace(/^\/+/, "")}`
+  return `https://t.me/${v.replace(/^\/+/, '')}`
 }
 
 function TelegramLink({ value }: { value: string }) {
@@ -23,7 +24,7 @@ function TelegramLink({ value }: { value: string }) {
       href={telegramHref(value)}
       target="_blank"
       rel="noopener noreferrer"
-      className="font-mono text-accent truncate max-w-45"
+      className="min-w-0 max-w-full break-all font-mono text-accent py-2"
     >
       {value}
     </a>
@@ -44,31 +45,36 @@ export default async function AdminOrderDetailPage({ params }: Props) {
   if (!order) notFound()
 
   const DETAILS = [
-    { label: "Материал", value: `${order.material} · ${order.color}` },
-    { label: "Размеры", value: `${order.length}×${order.width}×${order.height} мм` },
-    { label: "Количество", value: `${order.quantity} шт.` },
-    { label: "Заполнение", value: `${order.infill}%` },
-    { label: "Есть модель", value: order.hasModel ? "Да" : "Нет (требует моделирования)" },
-    { label: "Доставка", value: order.delivery },
-    ...(order.address ? [{ label: "Адрес", value: order.address }] : []),
+    ...(order.material ? [{ label: 'Материал', value: order.material }] : []),
+    ...(order.color ? [{ label: 'Цвет', value: order.color }] : []),
+    ...(order.length != null && order.width != null && order.height != null
+      ? [{ label: 'Размеры', value: `${order.length}×${order.width}×${order.height} мм` }]
+      : []),
+    ...(order.quantity != null ? [{ label: 'Количество', value: `${order.quantity} шт.` }] : []),
+    ...(order.infill != null ? [{ label: 'Заполнение', value: `${order.infill}%` }] : []),
+    ...(order.delivery ? [{ label: 'Доставка', value: order.delivery }] : []),
+    ...(order.address ? [{ label: 'Адрес', value: order.address }] : []),
   ]
 
   return (
     <div className="max-w-3xl">
       {/* Breadcrumb */}
       <div className="flex items-center gap-2 text-sm text-muted mb-6">
-        <Link href="/admin/orders" className="hover:text-accent transition-colors">Заказы</Link>
+        <Link href="/admin/orders" className="hover:text-accent transition-colors">
+          Заказы
+        </Link>
         <span>/</span>
         <span className="font-mono">{id.slice(0, 8)}</span>
       </div>
 
       {/* Header */}
-      <div className="flex items-start justify-between mb-6">
+      <div className="flex flex-col items-start gap-3 mb-6 sm:flex-row sm:justify-between">
         <div>
-          <h1 className="text-3xl font-black text-foreground font-display">
-            {order.fullName}
-          </h1>
-          <FormattedDate date={order.createdAt} className="text-sm text-muted font-mono mt-1 block" />
+          <h1 className="text-3xl font-black text-foreground font-display">{order.fullName}</h1>
+          <FormattedDate
+            date={order.createdAt}
+            className="text-sm text-muted font-mono mt-1 block"
+          />
         </div>
         <Badge className={`${ORDER_STATUS_COLORS[order.status]} text-sm px-3 py-1`}>
           {ORDER_STATUS_LABELS[order.status]}
@@ -76,26 +82,43 @@ export default async function AdminOrderDetailPage({ params }: Props) {
       </div>
 
       {/* Status change */}
-      <div className="rounded-xl border border-border bg-surface p-5 mb-4">
+      <div className="rounded-xl border border-border bg-surface p-4 sm:p-5 mb-4">
         <p className="label-mono mb-3">Изменить статус</p>
         <OrderStatusSelect orderId={order.id} currentStatus={order.status as OrderStatus} />
       </div>
 
+      {order.comment && (
+        <div className="rounded-xl border border-border bg-surface p-4 sm:p-5 mb-4">
+          <p className="label-mono mb-2">Описание заказа</p>
+          <p className="text-sm text-foreground whitespace-pre-wrap break-words">{order.comment}</p>
+        </div>
+      )}
+
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {/* Contact info */}
-        <div className="rounded-xl border border-border bg-surface p-5">
+        <div className="rounded-xl border border-border bg-surface p-4 sm:p-5">
           <p className="label-mono mb-3">Контакты</p>
           <div className="space-y-2 text-sm">
-            <div className="flex justify-between">
+            <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
               <span className="text-muted">Телефон</span>
-              <a href={`tel:${order.phone}`} className="font-mono text-accent">{order.phone}</a>
+              <a
+                href={`tel:${order.phone}`}
+                className="min-w-0 break-all py-2 font-mono text-accent"
+              >
+                {order.phone}
+              </a>
             </div>
-            <div className="flex justify-between">
+            <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
               <span className="text-muted">Email</span>
-              <a href={`mailto:${order.email}`} className="font-mono text-accent truncate max-w-[180px]">{order.email}</a>
+              <a
+                href={`mailto:${order.email}`}
+                className="min-w-0 max-w-full break-all font-mono text-accent py-2"
+              >
+                {order.email}
+              </a>
             </div>
             {order.telegram && (
-              <div className="flex justify-between">
+              <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
                 <span className="text-muted">Telegram</span>
                 <TelegramLink value={order.telegram} />
               </div>
@@ -104,55 +127,40 @@ export default async function AdminOrderDetailPage({ params }: Props) {
         </div>
 
         {/* Price */}
-        <div className="rounded-xl border border-border bg-surface p-5">
+        <div className="rounded-xl border border-border bg-surface p-4 sm:p-5">
           <p className="label-mono mb-3">Стоимость</p>
-          {order.estimatedPrice && (
+          {order.estimatedPrice != null && (
             <p className="text-3xl font-black text-accent mb-3 font-display">
               {formatPrice(order.estimatedPrice)}
             </p>
           )}
-          {!order.hasModel && (
-            <p className="text-xs text-muted mb-3">Включает моделирование</p>
+          {order.estimatedPrice == null && (
+            <p className="text-xs text-muted mb-3">Стоимость ещё не согласована</p>
           )}
-          <OrderPricing
-            orderId={order.id}
-            currentPrice={order.estimatedPrice}
-            orderParams={{
-              material: order.material,
-              width: order.width,
-              height: order.height,
-              length: order.length,
-              quantity: order.quantity,
-              infill: order.infill,
-            }}
-          />
+          <OrderPricing orderId={order.id} currentPrice={order.estimatedPrice} />
         </div>
       </div>
 
       {/* Print details */}
-      <div className="mt-4 rounded-xl border border-border bg-surface p-5">
-        <p className="label-mono mb-3">Параметры печати</p>
-        <div className="grid grid-cols-2 gap-3">
-          {DETAILS.map(({ label, value }) => (
-            <div key={label} className="flex flex-col gap-0.5">
-              <span className="text-xs text-muted">{label}</span>
-              <span className="text-sm font-medium text-foreground">{value}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Comment */}
-      {order.comment && (
-        <div className="mt-4 rounded-xl border border-border bg-surface p-5">
-          <p className="label-mono mb-2">Комментарий</p>
-          <p className="text-sm text-muted whitespace-pre-wrap">{order.comment}</p>
-        </div>
+      {DETAILS.length > 0 && (
+        <details className="mt-4 rounded-xl border border-border bg-surface p-4 sm:p-5">
+          <summary className="cursor-pointer text-sm text-muted">
+            Параметры из прежней формы
+          </summary>
+          <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+            {DETAILS.map(({ label, value }) => (
+              <div key={label} className="flex flex-col gap-0.5">
+                <span className="text-xs text-muted">{label}</span>
+                <span className="text-sm font-medium text-foreground break-words">{value}</span>
+              </div>
+            ))}
+          </div>
+        </details>
       )}
 
       {/* Files */}
       {order.files.length > 0 ? (
-        <div className="mt-4 rounded-xl border border-border bg-surface p-5">
+        <div className="mt-4 rounded-xl border border-border bg-surface p-4 sm:p-5">
           <p className="label-mono mb-3">Файлы ({order.files.length})</p>
           <div className="space-y-2">
             {order.files.map((f) => (
@@ -164,29 +172,40 @@ export default async function AdminOrderDetailPage({ params }: Props) {
                 className="flex items-center gap-3 p-3 rounded-lg border border-border hover:border-(--accent-border) transition-colors"
               >
                 <div className="w-8 h-8 rounded-md bg-(--accent-subtle) flex items-center justify-center text-xs font-mono text-accent shrink-0">
-                  {f.fileName.split(".").pop()?.toUpperCase()}
+                  {f.fileName.split('.').pop()?.toUpperCase()}
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-foreground truncate">{f.fileName}</p>
                   <p className="text-xs text-muted">{formatFileSize(f.fileSize)}</p>
                 </div>
-                <svg className="text-accent shrink-0" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                <svg
+                  className="text-accent shrink-0"
+                  width="14"
+                  height="14"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                  />
                 </svg>
               </a>
             ))}
           </div>
         </div>
-      ) : null}
+      ) : (
+        <div className="mt-4 rounded-xl border border-border bg-surface p-4 sm:p-5">
+          <p className="label-mono mb-2">Файлы</p>
+          <p className="text-sm text-muted">Клиент не прикрепил фото или модель.</p>
+        </div>
+      )}
 
       {/* Danger zone */}
-      <div className="mt-6 rounded-xl border border-red-500/30 bg-red-500/5 p-5 flex items-center justify-between gap-4">
-        <div>
-          <p className="label-mono mb-1 text-red-500">Опасная зона</p>
-          <p className="text-xs text-muted">
-            Удаление заказа необратимо. Файлы из хранилища также будут удалены.
-          </p>
-        </div>
+      <div className="mt-6 flex justify-end border-t border-border pt-4">
         <DeleteOrderButton orderId={order.id} customerName={order.fullName} />
       </div>
     </div>

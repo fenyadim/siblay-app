@@ -1,15 +1,9 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { ArrowLeft, ArrowRight, Check, Loader2, Mail } from 'lucide-react'
+import { Check, Loader2, Paperclip, X } from 'lucide-react'
 import Link from 'next/link'
-import {
-  type ComponentProps,
-  type ComponentType,
-  type ReactNode,
-  type SVGProps,
-  useState,
-} from 'react'
+import { type ComponentProps, type ReactNode, useId, useRef, useState } from 'react'
 import type { Resolver } from 'react-hook-form'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -26,188 +20,50 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { cn } from '@/lib/utils'
-import { type InquiryFormData, inquirySchema } from '@/lib/validations/inquiry'
-
-type IconComponent = ComponentType<SVGProps<SVGSVGElement>>
-type DialogView = 'options' | 'inquiry'
-
-function IconBase({ children, ...props }: SVGProps<SVGSVGElement> & { children: ReactNode }) {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={1.6}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      {...props}
-    >
-      {children}
-    </svg>
-  )
-}
-
-// 3D-принтер: рамка с печатающей головкой и слоями детали на платформе.
-const Printer3DIcon: IconComponent = (props) => (
-  <IconBase {...props}>
-    <path d="M4 3h16v5" />
-    <path d="M4 3v15" />
-    <path d="M20 8v10" />
-    <path d="M3 18h18" />
-    <rect x="9" y="6" width="6" height="2" rx="0.4" />
-    <path d="M12 8v1.5" />
-    <path d="M10 13h4" />
-    <path d="M9.5 15h5" />
-    <path d="M10 17h4" />
-  </IconBase>
-)
-
-// Изометрический wireframe-куб: классический символ 3D-моделирования.
-const Cube3DIcon: IconComponent = (props) => (
-  <IconBase {...props}>
-    <path d="M12 2.5 20.5 7v10L12 21.5 3.5 17V7z" />
-    <path d="M12 2.5V12" />
-    <path d="M3.5 7 12 12l8.5-5" />
-    <path d="M12 12v9.5" />
-  </IconBase>
-)
-
-// Сканер: угловой визир + объёмная фигура в центре.
-const Scan3DIcon: IconComponent = (props) => (
-  <IconBase {...props}>
-    <path d="M3 8V5a2 2 0 0 1 2-2h3" />
-    <path d="M16 3h3a2 2 0 0 1 2 2v3" />
-    <path d="M21 16v3a2 2 0 0 1-2 2h-3" />
-    <path d="M8 21H5a2 2 0 0 1-2-2v-3" />
-    <path d="M12 7.5 17 10v4.5L12 17 7 14.5V10z" />
-    <path d="M12 7.5V12" />
-    <path d="M7 10l5 2 5-2" />
-  </IconBase>
-)
-
-interface Option {
-  title: string
-  hint: string
-  href: string
-  Icon: IconComponent
-}
-
-const OPTIONS: Option[] = [
-  {
-    title: '3D-печать',
-    hint: 'Готовая 3D-модель или фото → расчёт стоимости онлайн.',
-    href: '/order',
-    Icon: Printer3DIcon,
-  },
-  {
-    title: '3D-моделирование',
-    hint: 'По эскизу, фото или чертежу — менеджер согласует ТЗ.',
-    href: '/quote?service=modeling',
-    Icon: Cube3DIcon,
-  },
-  {
-    title: '3D-сканирование',
-    hint: 'Цифровая копия физического объекта. + реверс-инжиниринг по запросу.',
-    href: '/quote?service=scanning',
-    Icon: Scan3DIcon,
-  },
-]
-
-const optionClass =
-  'group flex items-start gap-3 p-4 rounded-xl border border-border hover:border-(--accent-border) hover:bg-(--accent-subtle) transition-all text-left'
+import { INQUIRY_FILE_ACCEPT, inquiryFileError, MAX_INQUIRY_FILES } from '@/lib/inquiry-files'
+import { cn, formatFileSize } from '@/lib/utils'
+import { type InquiryFile, type InquiryFormData, inquirySchema } from '@/lib/validations/inquiry'
 
 const inputClass =
   'bg-background border-border text-foreground focus-visible:ring-0 focus-visible:border-accent transition-colors'
 
-interface ChooserProps {
+interface OrderDialogProps {
   open: boolean
   onOpenChange: (value: boolean) => void
   onSelect?: () => void
 }
 
-function Chooser({ open, onOpenChange, onSelect }: ChooserProps) {
-  const [view, setView] = useState<DialogView>('options')
-
-  function handlePick() {
-    onOpenChange(false)
-    onSelect?.()
-  }
-
-  function handleOpenChange(value: boolean) {
-    onOpenChange(value)
-    if (!value) setView('options')
-  }
-
+function OrderDialog({ open, onOpenChange, onSelect }: OrderDialogProps) {
+  const [busy, setBusy] = useState(false)
   return (
-    <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg">
-        {view === 'options' ? (
-          <>
-            <DialogHeader>
-              <DialogTitle className="text-2xl font-display">Что нужно сделать?</DialogTitle>
-              <DialogDescription>Выберите услугу — рассчитаем стоимость и сроки.</DialogDescription>
-            </DialogHeader>
-            <div className="grid gap-2 mt-2">
-              {OPTIONS.map(({ title, hint, href, Icon }) => (
-                <Link key={href} href={href} onClick={handlePick} className={optionClass}>
-                  <OptionContent title={title} hint={hint} Icon={Icon} />
-                </Link>
-              ))}
-              <button type="button" onClick={() => setView('inquiry')} className={optionClass}>
-                <OptionContent
-                  title="Нужна помощь с выбором"
-                  hint="Оставьте контакты и описание задачи — подскажем, как лучше оформить заказ."
-                  Icon={Mail}
-                />
-              </button>
-            </div>
-          </>
-        ) : (
-          <InquiryForm
-            onBack={() => setView('options')}
-            onDone={() => {
-              setView('options')
-              handlePick()
-            }}
-          />
-        )}
+    <Dialog
+      open={open}
+      onOpenChange={(value) => {
+        if (!busy) onOpenChange(value)
+      }}
+    >
+      <DialogContent className="max-h-[90dvh] overflow-y-auto sm:max-w-lg" showCloseButton={!busy}>
+        <InquiryForm
+          onBusyChange={setBusy}
+          onDone={() => {
+            onOpenChange(false)
+            onSelect?.()
+          }}
+        />
       </DialogContent>
     </Dialog>
   )
 }
 
-function OptionContent({
-  title,
-  hint,
-  Icon,
-}: {
-  title: string
-  hint: string
-  Icon: IconComponent
-}) {
-  return (
-    <>
-      <span className="flex items-center justify-center w-10 h-10 rounded-lg bg-(--accent-subtle) text-accent shrink-0">
-        <Icon className="size-5" />
-      </span>
-      <div className="flex-1 min-w-0">
-        <p className="text-base font-semibold text-foreground">{title}</p>
-        <p className="text-xs text-muted mt-0.5 leading-relaxed">{hint}</p>
-      </div>
-      <ArrowRight className="size-4 text-muted group-hover:text-accent group-hover:translate-x-0.5 transition-all shrink-0 mt-2.5" />
-    </>
-  )
-}
-
 function Field({
+  id,
   label,
   required,
   error,
   children,
   hint,
 }: {
+  id: string
   label: string
   required?: boolean
   error?: string
@@ -216,7 +72,7 @@ function Field({
 }) {
   return (
     <div>
-      <Label className="text-sm font-medium text-foreground mb-1.5 block">
+      <Label htmlFor={id} className="text-sm font-medium text-foreground mb-1.5 block">
         {label}
         {required && <span className="text-destructive ml-0.5">*</span>}
       </Label>
@@ -227,7 +83,38 @@ function Field({
   )
 }
 
-function InquiryForm({ onBack, onDone }: { onBack: () => void; onDone: () => void }) {
+function InquiryForm({
+  onDone,
+  onBusyChange,
+}: {
+  onDone: () => void
+  onBusyChange: (busy: boolean) => void
+}) {
+  const id = useId()
+  const [files, setFiles] = useState<File[]>([])
+  const [fileErrors, setFileErrors] = useState<string[]>([])
+  const [progress, setProgress] = useState('')
+  const uploadedFiles = useRef(new Map<File, InquiryFile>())
+  const submittingRef = useRef(false)
+
+  function addFiles(selected: File[]) {
+    if (submittingRef.current) return
+    const next = [...files]
+    const errors: string[] = []
+    for (const file of selected) {
+      const error = inquiryFileError(file)
+      if (error) {
+        errors.push(file.name + ': ' + error)
+      } else if (next.length >= MAX_INQUIRY_FILES) {
+        errors.push('Можно прикрепить максимум ' + MAX_INQUIRY_FILES + ' файлов')
+        break
+      } else {
+        next.push(file)
+      }
+    }
+    setFiles(next)
+    setFileErrors(errors)
+  }
   const [submitting, setSubmitting] = useState(false)
   const {
     register,
@@ -242,151 +129,263 @@ function InquiryForm({ onBack, onDone }: { onBack: () => void; onDone: () => voi
       email: '',
       telegram: '',
       description: '',
+      files: [],
       personalDataConsent: false,
     },
     mode: 'onBlur',
   })
 
   async function submit(values: InquiryFormData) {
+    if (submittingRef.current) return
+    submittingRef.current = true
     setSubmitting(true)
+    onBusyChange(true)
     try {
-      const result = await createInquiry(values)
+      const attachments: InquiryFile[] = []
+      for (const [index, file] of files.entries()) {
+        setProgress('Загрузка файла ' + (index + 1) + ' из ' + files.length + '...')
+        let uploaded = uploadedFiles.current.get(file)
+        if (!uploaded) {
+          const body = new FormData()
+          body.append('file', file)
+          body.append('folder', 'orders')
+          const response = await fetch('/api/upload', { method: 'POST', body })
+          const data = await response.json()
+          if (!response.ok || typeof data.fileUrl !== 'string') {
+            throw new Error(file.name + ': ' + (data.error || 'Ошибка загрузки файла'))
+          }
+          uploaded = {
+            fileName: file.name,
+            fileUrl: data.fileUrl,
+            fileType: file.type,
+            fileSize: file.size,
+          }
+          uploadedFiles.current.set(file, uploaded)
+        }
+        attachments.push(uploaded)
+      }
+      setProgress('Отправка заявки...')
+      const result = await createInquiry({ ...values, files: attachments })
       if ('error' in result) {
         toast.error(result.error)
         return
       }
 
-      toast.success('Заявка отправлена! Мы свяжемся и подскажем, как лучше оформить заказ.')
+      toast.success('Заявка отправлена! Мы свяжемся с вами, чтобы согласовать стоимость и сроки.')
       reset()
+      setFiles([])
+      uploadedFiles.current.clear()
       onDone()
-    } catch {
-      toast.error('Произошла ошибка. Попробуйте ещё раз.')
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Произошла ошибка. Попробуйте ещё раз.')
     } finally {
+      submittingRef.current = false
       setSubmitting(false)
+      onBusyChange(false)
+      setProgress('')
     }
   }
 
   return (
     <>
       <DialogHeader>
-        <button
-          type="button"
-          onClick={onBack}
-          className="mb-2 inline-flex w-fit items-center gap-1 text-sm text-muted transition-colors hover:text-foreground"
-        >
-          <ArrowLeft className="size-4" />
-          Назад
-        </button>
-        <DialogTitle className="text-2xl font-display">Расскажите о задаче</DialogTitle>
+        <DialogTitle className="text-2xl font-display">Оформить заказ</DialogTitle>
         <DialogDescription>
-          Оставьте контакты и короткое описание — мы разберёмся и предложим следующий шаг.
+          Оставьте контакты и опишите заказ. Если есть фото или 3D-модель, прикрепите их — мы
+          согласуем стоимость и сроки.
         </DialogDescription>
       </DialogHeader>
 
-      <form onSubmit={handleSubmit(submit)} className="mt-2 space-y-4">
-        <Field label="ФИО" required error={errors.fullName?.message}>
-          <Input
-            {...register('fullName')}
-            placeholder="Иванов Иван Иванович"
-            className={inputClass}
-            aria-invalid={Boolean(errors.fullName)}
-          />
-        </Field>
-
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <Field label="Телефон" required error={errors.phone?.message}>
+      <form onSubmit={handleSubmit(submit)} className="mt-2" aria-busy={submitting}>
+        <fieldset disabled={submitting} className="min-w-0 space-y-4">
+          <Field id={id + '-fullName'} label="ФИО" required error={errors.fullName?.message}>
             <Input
-              {...register('phone')}
-              placeholder="+7 (999) 123-45-67"
-              type="tel"
+              {...register('fullName')}
+              id={id + '-fullName'}
+              autoComplete="name"
+              placeholder="Иванов Иван Иванович"
               className={inputClass}
-              aria-invalid={Boolean(errors.phone)}
+              aria-invalid={Boolean(errors.fullName)}
             />
           </Field>
-          <Field label="Email" required error={errors.email?.message}>
+
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <Field id={id + '-phone'} label="Телефон" required error={errors.phone?.message}>
+              <Input
+                {...register('phone')}
+                id={id + '-phone'}
+                autoComplete="tel"
+                placeholder="+7 (999) 123-45-67"
+                type="tel"
+                className={inputClass}
+                aria-invalid={Boolean(errors.phone)}
+              />
+            </Field>
+            <Field id={id + '-email'} label="Email" required error={errors.email?.message}>
+              <Input
+                {...register('email')}
+                id={id + '-email'}
+                autoComplete="email"
+                placeholder="ivan@example.ru"
+                type="email"
+                className={inputClass}
+                aria-invalid={Boolean(errors.email)}
+              />
+            </Field>
+          </div>
+
+          <Field
+            id={id + '-telegram'}
+            label="Telegram"
+            error={(errors.telegram as { message?: string } | undefined)?.message}
+            hint="Необязательно — добавьте, если так удобнее держать связь."
+          >
             <Input
-              {...register('email')}
-              placeholder="ivan@example.ru"
-              type="email"
+              {...register('telegram')}
+              id={id + '-telegram'}
+              placeholder="@username или ссылка t.me/..."
               className={inputClass}
-              aria-invalid={Boolean(errors.email)}
+              autoComplete="off"
+              aria-invalid={Boolean(errors.telegram)}
             />
           </Field>
-        </div>
 
-        <Field
-          label="Telegram"
-          error={(errors.telegram as { message?: string } | undefined)?.message}
-          hint="Необязательно — добавьте, если так удобнее держать связь."
-        >
-          <Input
-            {...register('telegram')}
-            placeholder="@username или ссылка t.me/..."
-            className={inputClass}
-            autoComplete="off"
-            aria-invalid={Boolean(errors.telegram)}
-          />
-        </Field>
-
-        <Field
-          label="Описание заказа"
-          required
-          error={errors.description?.message}
-          hint="Что нужно получить, какие есть исходные данные, примерные размеры, материал или назначение."
-        >
-          <Textarea
-            {...register('description')}
-            rows={5}
-            placeholder="Например: есть сломанная деталь, хочу понять, можно ли напечатать замену. Фото и размеры могу прислать позже."
-            className={cn(inputClass, 'resize-none placeholder:text-(--placeholder)')}
-            aria-invalid={Boolean(errors.description)}
-          />
-        </Field>
-
-        <div className="rounded-xl border border-border bg-surface-raised p-4">
-          <label className="flex cursor-pointer items-start gap-3">
-            <input
-              {...register('personalDataConsent')}
-              type="checkbox"
-              className="mt-0.5 size-4 rounded border-border text-accent focus:ring-accent"
+          <Field
+            id={id + '-description'}
+            label="Описание заказа"
+            required
+            error={errors.description?.message}
+            hint="Что нужно получить, какие есть исходные данные, примерные размеры, материал или назначение."
+          >
+            <Textarea
+              {...register('description')}
+              id={id + '-description'}
+              rows={5}
+              placeholder="Например: нужна замена сломанной детали, примерно 5 × 3 см, 2 штуки. Будет использоваться на улице."
+              className={cn(inputClass, 'resize-none placeholder:text-(--placeholder)')}
+              aria-invalid={Boolean(errors.description)}
             />
-            <span className="text-sm leading-relaxed text-foreground">
-              Я даю согласие на обработку моих персональных данных в целях рассмотрения заявки, а
-              также ознакомлен(а) с{' '}
-              <Link
-                href="/privacy"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-accent underline-offset-2 hover:underline"
-              >
-                политикой обработки персональных данных
-              </Link>
-              .
-            </span>
-          </label>
-          {errors.personalDataConsent && (
-            <p className="text-xs text-destructive mt-2">{errors.personalDataConsent.message}</p>
-          )}
-        </div>
+          </Field>
 
-        <Button
-          type="submit"
-          disabled={submitting}
-          className="w-full rounded-xl px-6 py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-60"
-          style={{ background: 'linear-gradient(135deg, var(--accent), #7c3aed)' }}
-        >
-          {submitting ? (
-            <>
-              <Loader2 className="size-4 animate-spin" />
-              Отправка...
-            </>
-          ) : (
-            <>
-              Отправить заявку
-              <Check className="size-3.5" />
-            </>
-          )}
-        </Button>
+          <div>
+            <Label htmlFor={id + '-files'} className="mb-1.5 block text-sm font-medium">
+              Фото или 3D-модель <span className="font-normal text-muted">(необязательно)</span>
+            </Label>
+            <div
+              onDragOver={(event) => event.preventDefault()}
+              onDrop={(event) => {
+                event.preventDefault()
+                addFiles(Array.from(event.dataTransfer.files))
+              }}
+              className="rounded-xl border border-dashed border-border bg-surface p-4"
+            >
+              <div className="mb-3 flex items-center gap-2 text-sm text-muted">
+                <Paperclip className="size-4 shrink-0" />
+                Выберите файлы или перетащите их сюда
+              </div>
+              <Input
+                id={id + '-files'}
+                type="file"
+                accept={INQUIRY_FILE_ACCEPT}
+                multiple
+                aria-describedby={id + '-files-hint'}
+                className={cn(inputClass, 'min-w-0')}
+                onChange={(event) => {
+                  addFiles(Array.from(event.target.files ?? []))
+                  event.target.value = ''
+                }}
+              />
+              <p id={id + '-files-hint'} className="mt-2 text-xs leading-relaxed text-muted">
+                Фото: JPG, PNG, WEBP, HEIC — до 20 МБ. Модели: .stp, .stl — до 100 МБ. Всего до 10
+                файлов. Можно отправить заказ без вложений.
+              </p>
+            </div>
+            {files.length > 0 && (
+              <ul className="mt-2 space-y-2">
+                {files.map((file, index) => (
+                  <li
+                    key={index}
+                    className="flex items-center gap-2 rounded-lg border border-border p-2"
+                  >
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm" title={file.name}>
+                        {file.name}
+                      </p>
+                      <p className="text-xs text-muted">{formatFileSize(file.size)}</p>
+                    </div>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon-sm"
+                      aria-label={'Удалить ' + file.name}
+                      onClick={() => {
+                        setFiles((current) => current.filter((_, i) => i !== index))
+                        setFileErrors([])
+                      }}
+                    >
+                      <X className="size-4" />
+                    </Button>
+                  </li>
+                ))}
+              </ul>
+            )}
+            {fileErrors.length > 0 && (
+              <div role="alert" className="mt-2 space-y-1 text-xs text-destructive">
+                {fileErrors.map((error, index) => (
+                  <p key={index}>{error}</p>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="rounded-xl border border-border bg-surface-raised p-4">
+            <label className="flex cursor-pointer items-start gap-3">
+              <input
+                {...register('personalDataConsent')}
+                type="checkbox"
+                className="mt-0.5 size-4 rounded border-border text-accent focus:ring-accent"
+              />
+              <span className="text-sm leading-relaxed text-foreground">
+                Я даю согласие на обработку моих персональных данных в целях рассмотрения заявки, а
+                также ознакомлен(а) с{' '}
+                <Link
+                  href="/privacy"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-accent underline-offset-2 hover:underline"
+                >
+                  политикой обработки персональных данных
+                </Link>
+                .
+              </span>
+            </label>
+            {errors.personalDataConsent && (
+              <p className="text-xs text-destructive mt-2">{errors.personalDataConsent.message}</p>
+            )}
+          </div>
+
+          <Button
+            type="submit"
+            disabled={submitting}
+            className="w-full rounded-xl px-6 py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-60"
+            style={{ background: 'linear-gradient(135deg, var(--accent), #7c3aed)' }}
+          >
+            {submitting ? (
+              <>
+                <Loader2 className="size-4 animate-spin" />
+                {progress || 'Отправка...'}
+              </>
+            ) : (
+              <>
+                Отправить заявку
+                <Check className="size-3.5" />
+              </>
+            )}
+          </Button>
+        </fieldset>
+        <p role="status" className="sr-only">
+          {progress}
+        </p>
       </form>
     </>
   )
@@ -408,7 +407,7 @@ export function OrderCtaButton({ children, size, className, onSelect }: OrderCta
       <Button type="button" size={size} className={className} onClick={() => setOpen(true)}>
         {children}
       </Button>
-      <Chooser open={open} onOpenChange={setOpen} onSelect={onSelect} />
+      <OrderDialog open={open} onOpenChange={setOpen} onSelect={onSelect} />
     </>
   )
 }
@@ -426,7 +425,7 @@ export function OrderCtaLink({ children, className, onSelect }: OrderCtaLinkProp
       <button type="button" className={className} onClick={() => setOpen(true)}>
         {children}
       </button>
-      <Chooser open={open} onOpenChange={setOpen} onSelect={onSelect} />
+      <OrderDialog open={open} onOpenChange={setOpen} onSelect={onSelect} />
     </>
   )
 }

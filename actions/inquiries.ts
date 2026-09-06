@@ -1,8 +1,8 @@
 'use server'
 
+import { revalidatePath } from 'next/cache'
 import { headers } from 'next/headers'
 import { after } from 'next/server'
-import { randomUUID } from 'node:crypto'
 
 import {
   adminInquiryEmailTemplate,
@@ -11,6 +11,7 @@ import {
   sendEmail,
   sendTelegram,
 } from '@/lib/notifications'
+import { prisma } from '@/lib/prisma'
 import { createRateLimiter, getClientId } from '@/lib/rate-limit'
 import { type InquiryFormData, inquirySchema } from '@/lib/validations/inquiry'
 
@@ -41,10 +42,19 @@ export async function createInquiry(data: InquiryFormData) {
     return { error: 'Требуется согласие на обработку персональных данных' }
   }
 
-  const inquiry = {
-    id: randomUUID(),
-    ...inquiryData,
-  }
+  const { description, files, ...contacts } = inquiryData
+  const order = await prisma.order.create({
+    data: {
+      ...contacts,
+      comment: description,
+      hasModel: files.some((file) => /\.(stp|stl)$/i.test(file.fileName)),
+      files: { create: files },
+    },
+    include: { files: true },
+  })
+  const inquiry = { ...order, description }
+  revalidatePath('/admin/orders')
+  revalidatePath('/admin')
   const notificationEmail = process.env.NOTIFICATION_EMAIL
   const shortId = inquiry.id.slice(0, 8)
 
@@ -64,7 +74,7 @@ export async function createInquiry(data: InquiryFormData) {
         'email-customer',
         sendEmail({
           to: inquiry.email,
-          subject: `Ваше обращение #${shortId} принято — Siblay`,
+          subject: `Ваша заявка #${shortId} принята — Siblay`,
           html: customerInquiryEmailTemplate(inquiry),
         }),
       ],
@@ -74,7 +84,7 @@ export async function createInquiry(data: InquiryFormData) {
         'email-admin',
         sendEmail({
           to: notificationEmail,
-          subject: `Новое обращение #${shortId} — ${inquiry.fullName}`,
+          subject: `Заявка на заказ #${shortId} — ${inquiry.fullName}`,
           html: adminInquiryEmailTemplate(inquiry),
         }),
       ])

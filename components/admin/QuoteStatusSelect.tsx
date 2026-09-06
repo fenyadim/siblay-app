@@ -1,18 +1,18 @@
-"use client"
+'use client'
 
-import { useState, useTransition } from "react"
+import { useState, useTransition } from 'react'
 
-import { QuoteStatus } from "@/app/generated/prisma/client"
-import { updateQuoteStatus } from "@/actions/quotes"
-import { Button } from "@/components/ui/button"
+import { updateQuoteStatus } from '@/actions/quotes'
+import { QuoteStatus } from '@/app/generated/prisma/client'
+import { Button } from '@/components/ui/button'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { QUOTE_STATUS_LABELS } from "@/lib/utils"
+} from '@/components/ui/select'
+import { QUOTE_STATUS_LABELS } from '@/lib/utils'
 
 interface Props {
   quoteId: string
@@ -37,9 +37,9 @@ export function QuoteStatusSelect({ quoteId, currentStatus }: Props) {
   }
 
   return (
-    <div className="flex items-center gap-3">
+    <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
       <Select value={status} onValueChange={handleChange} disabled={isPending}>
-        <SelectTrigger className="flex-1 rounded-lg border-border bg-background text-foreground">
+        <SelectTrigger className="w-full min-w-0 sm:flex-1 rounded-lg border-border bg-background text-foreground">
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
@@ -56,7 +56,7 @@ export function QuoteStatusSelect({ quoteId, currentStatus }: Props) {
         disabled={isPending || status === currentStatus}
         className="px-4 py-2 rounded-lg bg-accent text-white text-sm font-medium hover:bg-(--accent-hover) transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
       >
-        {isPending ? "Сохранение…" : saved ? "Сохранено ✓" : "Сохранить"}
+        {isPending ? 'Сохранение…' : saved ? 'Сохранено ✓' : 'Сохранить'}
       </Button>
     </div>
   )

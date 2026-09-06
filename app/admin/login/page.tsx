@@ -31,7 +31,7 @@ export default function AdminLoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center px-4">
+    <div className="min-h-dvh bg-background flex items-center justify-center px-4 py-8">
       <div className="w-full max-w-sm">
         <div className="flex items-center gap-2.5 mb-8 justify-center">
           <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center">
@@ -45,11 +45,7 @@ export default function AdminLoginPage() {
               />
             </svg>
           </div>
-          <span
-            className="text-xl font-black text-foreground font-display"
-          >
-            Siblay Admin
-          </span>
+          <span className="text-xl font-black text-foreground font-display">Siblay Admin</span>
         </div>
 
         <form

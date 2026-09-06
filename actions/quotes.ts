@@ -16,7 +16,7 @@ import {
 import { prisma } from '@/lib/prisma'
 import { createRateLimiter, getClientId } from '@/lib/rate-limit'
 import { deleteS3Object } from '@/lib/s3'
-import { quoteSchema, type QuoteFormData } from '@/lib/validations/quote'
+import { type QuoteFormData, quoteSchema } from '@/lib/validations/quote'
 
 const quoteLimiter = createRateLimiter({
   limit: 5,
@@ -121,6 +121,7 @@ export async function createQuote(data: QuoteFormData) {
     })
   })
 
+  revalidatePath('/admin/orders')
   return { quoteId: quote.id }
 }
 
@@ -142,6 +143,7 @@ export async function updateQuotePrice(id: string, price: number | null) {
 
   revalidatePath(`/admin/quotes/${id}`)
   revalidatePath('/admin/quotes')
+  revalidatePath('/admin/orders')
   revalidatePath('/admin')
   return quote
 }
@@ -155,6 +157,7 @@ export async function updateQuoteStatus(id: string, status: QuoteStatus) {
   })
 
   revalidatePath('/admin/quotes')
+  revalidatePath('/admin/orders')
   revalidatePath(`/admin/quotes/${id}`)
   return quote
 }
@@ -182,12 +185,13 @@ export async function deleteQuote(id: string) {
     quote.files
       .map((f) => s3KeyFromUrl(f.fileUrl))
       .filter((key): key is string => key !== null)
-      .map((key) => deleteS3Object(key)),
+      .map((key) => deleteS3Object(key))
   )
 
   await prisma.quote.delete({ where: { id } })
 
   revalidatePath('/admin/quotes')
+  revalidatePath('/admin/orders')
   revalidatePath('/admin')
   return { success: true }
 }

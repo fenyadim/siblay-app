@@ -62,12 +62,14 @@ export async function createOrder(data: OrderFormData) {
   })
 
   const notificationEmail = process.env.NOTIFICATION_EMAIL
+  // The detailed form supplies the print parameters that simple orders may omit.
+  const notificationOrder = { ...order, ...rest }
   const shortId = order.id.slice(0, 8)
 
   // Telegram быстрый (<1s) и с собственным 4s таймаутом — отправляем синхронно,
   // чтобы админ получил пинг до того, как клиент уйдёт со страницы.
   const telegramResult = await Promise.allSettled([
-    sendTelegram(adminOrderTelegramText(order), {
+    sendTelegram(adminOrderTelegramText(notificationOrder), {
       parseMode: 'HTML',
       disableWebPagePreview: true,
     }),
@@ -85,7 +87,7 @@ export async function createOrder(data: OrderFormData) {
         sendEmail({
           to: order.email,
           subject: `Ваш заказ #${shortId} принят — Siblay`,
-          html: customerOrderEmailTemplate(order),
+          html: customerOrderEmailTemplate(notificationOrder),
         }),
       ],
     ]
@@ -95,7 +97,7 @@ export async function createOrder(data: OrderFormData) {
         sendEmail({
           to: notificationEmail,
           subject: `Новый заказ #${shortId} — ${order.fullName}`,
-          html: orderEmailTemplate(order),
+          html: orderEmailTemplate(notificationOrder),
         }),
       ])
     }
@@ -144,6 +146,7 @@ export async function updateOrderStatus(id: string, status: OrderStatus) {
 
   revalidatePath('/admin/orders')
   revalidatePath(`/admin/orders/${id}`)
+  revalidatePath('/admin')
   return order
 }
 

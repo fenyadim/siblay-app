@@ -1,9 +1,10 @@
-"use client"
+'use client'
 
-import { useState, useTransition } from "react"
-import { useRouter } from "next/navigation"
-import { deleteOrder } from "@/actions/orders"
-import { Button } from "@/components/ui/button"
+import { useRouter } from 'next/navigation'
+import { useState, useTransition } from 'react'
+
+import { deleteOrder } from '@/actions/orders'
+import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogClose,
@@ -13,7 +14,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
+} from '@/components/ui/dialog'
 
 interface Props {
   orderId: string
@@ -32,10 +33,10 @@ export function DeleteOrderButton({ orderId, customerName }: Props) {
       try {
         await deleteOrder(orderId)
         setOpen(false)
-        router.replace("/admin/orders")
+        router.replace('/admin/orders')
         router.refresh()
       } catch (e) {
-        setError(e instanceof Error ? e.message : "Ошибка при удалении")
+        setError(e instanceof Error ? e.message : 'Ошибка при удалении')
       }
     })
   }
@@ -50,17 +51,15 @@ export function DeleteOrderButton({ orderId, customerName }: Props) {
           Удалить заказ
         </Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="max-h-[85dvh] overflow-y-auto [&_button]:min-h-11 [&_button]:min-w-11">
         <DialogHeader>
           <DialogTitle>Удалить заказ?</DialogTitle>
           <DialogDescription>
-            Заказ клиента <span className="font-medium text-foreground">{customerName}</span>{" "}
-            будет удалён вместе с прикреплёнными файлами. Действие необратимо.
+            Заказ клиента <span className="font-medium text-foreground">{customerName}</span> будет
+            удалён вместе с прикреплёнными файлами. Действие необратимо.
           </DialogDescription>
         </DialogHeader>
-        {error && (
-          <p className="text-sm text-red-500">{error}</p>
-        )}
+        {error && <p className="text-sm text-red-500">{error}</p>}
         <DialogFooter>
           <DialogClose asChild>
             <Button type="button" variant="outline" disabled={isPending}>
@@ -73,7 +72,7 @@ export function DeleteOrderButton({ orderId, customerName }: Props) {
             disabled={isPending}
             className="bg-red-500 text-white hover:bg-red-600 disabled:opacity-50"
           >
-            {isPending ? "Удаление…" : "Удалить"}
+            {isPending ? 'Удаление…' : 'Удалить'}
           </Button>
         </DialogFooter>
       </DialogContent>

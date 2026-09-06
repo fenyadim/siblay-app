@@ -12,13 +12,13 @@ model Order {
   createdAt      DateTime    @default(now())
   updatedAt      DateTime    @updatedAt
   status         OrderStatus @default(NEW)
-  material       String
-  color          String
-  width          Float
-  height         Float
-  length         Float
-  quantity       Int
-  infill         Int
+  material       String?
+  color          String?
+  width          Float?
+  height         Float?
+  length         Float?
+  quantity       Int?
+  infill         Int?
   files          OrderFile[]
   hasModel       Boolean     @default(true)
   comment        String?
@@ -26,7 +26,7 @@ model Order {
   phone          String
   email          String
   telegram       String?
-  delivery       String
+  delivery       String?
   address        String?
   estimatedPrice Float?
 }
