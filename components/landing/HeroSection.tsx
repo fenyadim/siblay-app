@@ -2,7 +2,6 @@
 
 import { OrderCtaButton } from '@/components/order-cta/OrderCtaDialog'
 import { Button } from '@/components/ui/button'
-import { printerModel } from '@/lib/printer'
 
 export function HeroSection() {
   return (
@@ -26,8 +25,8 @@ export function HeroSection() {
             </h1>
 
             <p className="text-muted max-w-md leading-relaxed mb-8">
-              Печатаем на {printerModel} в Иркутске. Сделаем прототип или партию деталей из PLA,
-              PETG или TPU по готовой 3D-модели. Если есть только эскиз, подготовим модель для печати.
+              Печатаем прототипы и партии деталей из PLA, PETG и TPU в Иркутске.
+              Работаем с готовыми 3D-моделями и создаём модели по вашим эскизам.
             </p>
 
             <div className="flex flex-wrap gap-3">

@@ -7,7 +7,7 @@ import { useFormContext } from 'react-hook-form'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Slider } from '@/components/ui/slider'
-import { printArea, printerModel } from '@/lib/printer'
+import { printArea } from '@/lib/printer'
 import { cn } from '@/lib/utils'
 import type { OrderFormData } from '@/lib/validations/order'
 
@@ -63,7 +63,7 @@ export function Step3Params() {
           ))}
         </div>
         <p className="text-xs text-muted mt-2 font-mono">
-          Область печати {printerModel} — {printArea}. Для сборного изделия укажите полный размер.
+          Область печати — {printArea}. Для сборного изделия укажите полный размер.
         </p>
       </div>
 

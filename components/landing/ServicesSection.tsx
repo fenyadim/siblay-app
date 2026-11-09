@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { printArea, printerModel } from '@/lib/printer'
+import { printArea } from '@/lib/printer'
 
 interface Service {
   num: string
@@ -24,7 +24,7 @@ const SERVICES: Service[] = [
     num: '02',
     title: '3D-печать FDM',
     description:
-      `На ${printerModel} печатаем корпуса, крепления и другие функциональные детали. Подберём пластик под нагрузку и условия эксплуатации.`,
+      'Печатаем корпуса, крепления и другие функциональные детали. Подберём пластик под нагрузку и условия эксплуатации.',
     tags: ['PLA · PETG · TPU', printArea],
     href: '/order',
     cta: 'Заказать печать',
