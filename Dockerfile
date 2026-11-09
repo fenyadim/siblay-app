@@ -61,11 +61,12 @@ COPY --from=builder --chown=nextjs:nodejs /app/app/generated/prisma ./app/genera
 RUN mkdir -p /opt/prisma-runner \
   && cd /opt/prisma-runner \
   && npm init -y > /dev/null \
-  && npm install --no-package-lock prisma@7.6.0 dotenv@17.4.0 \
+  && npm install --no-package-lock prisma@7.6.0 dotenv@17.4.0 pg@8.20.0 better-auth@1.5.6 \
   && chown -R nextjs:nodejs /opt/prisma-runner \
   && npm cache clean --force
 
 # Entrypoint
+COPY --chown=nextjs:nodejs docker/sync-admin.mjs /opt/prisma-runner/sync-admin.mjs
 COPY --chown=nextjs:nodejs docker/entrypoint.sh ./docker/entrypoint.sh
 RUN chmod +x ./docker/entrypoint.sh
 
