@@ -20,14 +20,26 @@ export default function AdminLoginPage() {
     setLoading(true)
     setError('')
 
-    const result = await signIn.email({ email, password })
-
-    if (result.error) {
-      setError('Неверный email или пароль')
-      setLoading(false)
-    } else {
-      router.push('/admin')
+    try {
+      const result = await signIn.email({ email, password })
+      if (!result.error) {
+        router.push('/admin')
+        return
+      }
+      const { status, code } = result.error
+      if (status === 429) {
+        setError('Слишком много попыток входа. Попробуйте через 5 минут.')
+      } else if (code === 'INVALID_ORIGIN') {
+        setError('Сервер отклонил адрес сайта. Проверьте настройки домена для входа.')
+      } else if (code === 'INVALID_EMAIL_OR_PASSWORD') {
+        setError('Неверный email или пароль')
+      } else {
+        setError('Не удалось войти. Попробуйте позже.')
+      }
+    } catch {
+      setError('Не удалось связаться с сервером. Проверьте подключение.')
     }
+    setLoading(false)
   }
 
   return (
