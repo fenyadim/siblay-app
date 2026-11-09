@@ -8,7 +8,7 @@ import { PortfolioPreviewSection } from "@/components/landing/PortfolioPreviewSe
 import { ReviewsSection } from "@/components/landing/ReviewsSection"
 import { ServicesSection } from "@/components/landing/ServicesSection"
 
-export const revalidate = 300
+export const dynamic = "force-dynamic"
 
 export const metadata: Metadata = {
   title: "3D-печать и 3D-моделирование в Иркутске — Siblay",

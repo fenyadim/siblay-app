@@ -32,13 +32,6 @@ export async function getPortfolioItem(id: string, publishedOnly = true) {
   })
 }
 
-export async function getPublishedPortfolioIds() {
-  return prisma.portfolioItem.findMany({
-    where: { published: true },
-    select: { id: true, updatedAt: true },
-  })
-}
-
 export async function createPortfolioItem(data: PortfolioFormData) {
   await requireAdmin()
 

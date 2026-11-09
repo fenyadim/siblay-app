@@ -3,10 +3,7 @@ import type { Metadata } from "next"
 import Link from "next/link"
 import { notFound } from "next/navigation"
 
-import {
-  getPortfolioItem,
-  getPublishedPortfolioIds,
-} from "@/actions/portfolio"
+import { getPortfolioItem } from "@/actions/portfolio"
 import { PortfolioGallery } from "@/components/portfolio/PortfolioGallery"
 import { Button } from "@/components/ui/button"
 import { PORTFOLIO_CATEGORY_LABELS } from "@/lib/validations/portfolio"
@@ -19,13 +16,9 @@ interface Props {
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://siblay.ru"
 
-export async function generateStaticParams() {
-  try {
-    const items = await getPublishedPortfolioIds()
-    return items.map((i) => ({ id: i.id }))
-  } catch {
-    return []
-  }
+export function generateStaticParams() {
+  // Generate each item on first visit, after the container has run migrations.
+  return []
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {

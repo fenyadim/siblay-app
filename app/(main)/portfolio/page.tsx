@@ -4,7 +4,7 @@ import { Suspense } from "react"
 import { PortfolioGrid } from "@/components/portfolio/PortfolioGrid"
 import { getPortfolioItems } from "@/actions/portfolio"
 
-export const revalidate = 300
+export const dynamic = "force-dynamic"
 
 export const metadata: Metadata = {
   title: "Портфолио 3D-печати в Иркутске",
