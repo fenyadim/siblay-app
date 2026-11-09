@@ -7,18 +7,19 @@ import { MaterialsSection } from "@/components/landing/MaterialsSection"
 import { PortfolioPreviewSection } from "@/components/landing/PortfolioPreviewSection"
 import { ReviewsSection } from "@/components/landing/ReviewsSection"
 import { ServicesSection } from "@/components/landing/ServicesSection"
+import { printerModel } from "@/lib/printer"
 
 export const dynamic = "force-dynamic"
 
 export const metadata: Metadata = {
   title: "3D-печать и 3D-моделирование в Иркутске — Siblay",
   description:
-    "3D-печать в Иркутске на заказ: прототипы, детали, фигурки и серийные изделия. PLA, PETG, TPU. Расчёт стоимости онлайн, срок от 24 часов, доставка по России.",
+    `3D-печать на ${printerModel} в Иркутске. Изготавливаем прототипы и партии деталей из PLA, PETG и TPU. Расчёт стоимости онлайн, доставка по России.`,
   alternates: { canonical: "/" },
   openGraph: {
     title: "3D-печать и 3D-моделирование в Иркутске — Siblay",
     description:
-      "3D-печать в Иркутске на заказ: прототипы, детали, фигурки и серийные изделия. PLA, PETG, TPU.",
+      `Печатаем прототипы и партии деталей на ${printerModel} в Иркутске. Работаем с PLA, PETG и TPU.`,
     url: "/",
   },
 }

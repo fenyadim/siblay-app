@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { printArea, printerModel } from '@/lib/printer'
 
 interface Service {
   num: string
@@ -23,8 +24,8 @@ const SERVICES: Service[] = [
     num: '02',
     title: '3D-печать FDM',
     description:
-      'Послойная печать из термопластиков: PLA, PETG, TPU. Оптимально для функциональных деталей и прототипов.',
-    tags: ['PLA · PETG · TPU', 'До 256×256×256 мм'],
+      `На ${printerModel} печатаем корпуса, крепления и другие функциональные детали. Подберём пластик под нагрузку и условия эксплуатации.`,
+    tags: ['PLA · PETG · TPU', printArea],
     href: '/order',
     cta: 'Заказать печать',
   },
