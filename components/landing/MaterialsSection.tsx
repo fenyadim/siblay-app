@@ -11,8 +11,8 @@ export async function MaterialsSection() {
         {/* Asymmetric header */}
         <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-10 sm:mb-16">
           <div>
-            <span className="label-mono mb-3 text-sm block">Чем печатаем</span>
-            <h2 className="text-5xl lg:text-6xl font-black tracking-tight leading-none font-display">
+
+            <h2 className="studio-heading">
               Материалы
             </h2>
           </div>

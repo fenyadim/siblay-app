@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ArrowLeft, ArrowRight, Check, Loader2 } from 'lucide-react'
@@ -105,9 +105,8 @@ export function OrderFormClient({ materials }: Props) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Page header */}
         <div className="mb-8">
-          <span className="label-mono">Оформление заказа</span>
-          <h1 className="mt-2 text-4xl font-black tracking-tight text-foreground font-display">
-            Новый заказ
+          <h1 className="studio-heading">
+            Заказать 3D-печать
           </h1>
         </div>
 
@@ -154,8 +153,7 @@ export function OrderFormClient({ materials }: Props) {
                   <Button
                     type="button"
                     onClick={handleNext}
-                    className="px-6 text-sm font-semibold text-white transition-opacity hover:opacity-90"
-                    style={{ background: 'linear-gradient(135deg, var(--accent), #7c3aed)' }}
+                    className="px-6 bg-accent text-sm font-semibold text-accent-foreground transition-opacity hover:opacity-90"
                   >
                     Далее
                     <ArrowRight className="size-3.5" />
@@ -165,8 +163,7 @@ export function OrderFormClient({ materials }: Props) {
                     type="button"
                     onClick={handleSubmit}
                     disabled={submitting}
-                    className="rounded-xl px-6 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-60"
-                    style={{ background: 'linear-gradient(135deg, var(--accent), #7c3aed)' }}
+                    className="rounded-xl px-6 bg-accent text-sm font-semibold text-accent-foreground transition-opacity hover:opacity-90 disabled:opacity-60"
                   >
                     {submitting ? (
                       <>

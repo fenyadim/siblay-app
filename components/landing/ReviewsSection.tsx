@@ -31,8 +31,8 @@ export async function ReviewsSection() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-end justify-between mb-10 sm:mb-16">
           <div>
-            <span className="label-mono mb-3 text-sm block">Отзывы</span>
-            <h2 className="text-5xl lg:text-6xl font-black tracking-tight leading-none font-display">
+
+            <h2 className="studio-heading">
               Что говорят клиенты
             </h2>
             <p className="mt-4 text-sm text-muted max-w-md">

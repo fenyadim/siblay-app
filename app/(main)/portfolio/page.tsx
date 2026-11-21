@@ -25,10 +25,7 @@ export default async function PortfolioPage() {
     <div className="min-h-screen bg-background py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-10">
-          <span className="label-mono">Работы</span>
-          <h1
-            className="mt-3 text-5xl font-black tracking-tight text-foreground font-display"
-          >
+          <h1 className="studio-heading">
             Портфолио
           </h1>
           <p className="mt-3 text-muted max-w-xl">

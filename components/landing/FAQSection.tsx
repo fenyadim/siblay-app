@@ -1,4 +1,4 @@
-﻿import {
+import {
   Accordion,
   AccordionContent,
   AccordionItem,
@@ -61,8 +61,8 @@ export function FAQSection() {
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_2fr] gap-8 sm:gap-12 lg:gap-20">
           {/* Left: sticky heading */}
           <div className="lg:sticky lg:top-24 lg:self-start">
-            <span className="label-mono mb-3 text-sm block">Вопросы и ответы</span>
-            <h2 className="text-5xl font-black tracking-tight leading-tight mb-5 font-display">
+
+            <h2 className="studio-heading mb-5">
               Частые
               <br />
               вопросы
@@ -81,7 +81,7 @@ export function FAQSection() {
                   value={`item-${i}`}
                   className="border border-border rounded-xl px-5 bg-surface data-[state=open]:border-(--accent-border) data-[state=open]:bg-(--accent-subtle)/40 transition-all duration-200"
                 >
-                  <AccordionTrigger className="text-left font-semibold text-foreground hover:no-underline py-5 text-sm gap-4">
+                  <AccordionTrigger className="text-left font-semibold text-foreground hover:no-underline py-5 text-base gap-4">
                     {item.q}
                   </AccordionTrigger>
                   <AccordionContent className="text-sm text-muted leading-relaxed pb-5">

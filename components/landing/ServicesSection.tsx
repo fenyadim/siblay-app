@@ -1,142 +1,95 @@
+import { Cuboid, Layers3, ScanLine } from 'lucide-react'
+import Image from 'next/image'
 import Link from 'next/link'
-import { printArea } from '@/lib/printer'
 
-interface Service {
-  num: string
-  title: string
-  description: string
-  tags: string[]
-  href?: string
-  cta?: string
-}
-
-const SERVICES: Service[] = [
+const services = [
   {
-    num: '01',
-    title: '3D-моделирование',
-    description:
-      'Создание 3D-модели по вашим эскизам, чертежам или фотографиям. Любая сложность — от простых деталей до органических форм.',
-    tags: ['По эскизу', 'По фото', 'CAD/CAM'],
-    href: '/quote?service=modeling',
-    cta: 'Оставить заявку',
-  },
-  {
-    num: '02',
-    title: '3D-печать FDM',
-    description:
-      'Печатаем корпуса, крепления и другие функциональные детали. Подберём пластик под нагрузку и условия эксплуатации.',
-    tags: ['PLA · PETG · TPU', printArea],
+    title: '3D-печать',
+    Icon: Layers3,
+    image: '/studio/impeller.webp',
     href: '/order',
-    cta: 'Заказать печать',
-  },
-  {
-    num: '03',
-    title: 'Постобработка',
     description:
-      'Шлифовка поверхности и химическое разглаживание растворителями для достижения гладкой фактуры без следов слоёв.',
-    tags: ['Шлифовка', 'Хим. разглаживание'],
+      'Печатаем корпуса, крепления и прототипы. Подбираем пластик под нагрузку и условия работы.',
+    cta: 'Рассчитать печать',
   },
   {
-    num: '04',
+    title: '3D-моделирование',
+    Icon: Cuboid,
+    image: '/studio/model.webp',
+    href: '/quote?service=modeling',
+    description: 'Превращаем эскизы, чертежи и фотографии в цифровую модель для производства.',
+    cta: 'Заказать модель',
+  },
+  {
     title: '3D-сканирование',
-    description:
-      'Точное сканирование физических объектов для создания цифровой копии. Подходит для документирования, доработки и тиражирования изделий.',
-    tags: ['Физ. объект → 3D', 'Высокая точность'],
+    Icon: ScanLine,
+    image: '/studio/scan.webp',
     href: '/quote?service=scanning',
-    cta: 'Оставить заявку',
-  },
-  {
-    num: '05',
-    title: 'Реверс-инжиниринг',
     description:
-      'Восстановление чертежей и 3D-моделей по готовым деталям. Незаменимо для воспроизводства износившихся или снятых с производства компонентов.',
-    tags: ['Восстановление деталей', 'CAD по образцу'],
-    href: '/quote?service=scanning',
-    cta: 'Оставить заявку',
+      'Оцифровываем физический объект, чтобы сохранить его форму, доработать или воспроизвести.',
+    cta: 'Заказать сканирование',
   },
 ]
 
 export function ServicesSection() {
   return (
-    <section id="services" className="py-14 sm:py-24 bg-background overflow-hidden">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-10 sm:mb-16">
-          <div>
-            <span className="label-mono mb-3 text-sm block">Что мы делаем</span>
-            <h2 className="text-5xl lg:text-6xl font-black tracking-tight leading-none font-display">
-              Наши услуги
-            </h2>
-          </div>
-          <p className="text-muted max-w-xs text-sm leading-relaxed lg:text-right">
-            Полный цикл от идеи до готового изделия — моделирование, печать и финишная обработка.
+    <section id="services" className="scroll-mt-16 bg-background py-14 lg:py-20">
+      <div className="studio-container">
+        <div className="mb-8 flex flex-wrap items-end justify-between gap-5">
+          <h2 className="studio-heading">
+            Наши услуги<span>.</span>
+          </h2>
+          <p className="max-w-80 leading-relaxed text-muted">
+            От цифровой модели до готового изделия в одной мастерской.
           </p>
         </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {SERVICES.map((svc) => {
-            const cardClass =
-              'group relative p-7 rounded-2xl border border-border bg-surface hover:border-(--accent-border) transition-all duration-300 overflow-hidden flex flex-col h-full'
-
-            const cardBody = (
-              <>
-                <div className="absolute -top-3 -right-1 text-9xl font-black text-accent opacity-[0.04] select-none pointer-events-none leading-none font-display">
-                  {svc.num}
-                </div>
-
-                <div className="absolute inset-0 bg-linear-to-br from-(--accent-subtle) via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl" />
-
-                <div className="relative flex-1 flex flex-col">
-                  <span className="text-xs font-mono font-semibold text-accent mb-5 block tracking-widest">
-                    {svc.num}
-                  </span>
-                  <h3 className="text-xl font-bold text-foreground mb-3 font-display">
-                    {svc.title}
-                  </h3>
-                  <p className="text-sm text-muted leading-relaxed mb-5">{svc.description}</p>
-                  <div className="flex flex-wrap gap-1.5 mb-5">
-                    {svc.tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="px-2.5 py-1 rounded-lg text-xs font-mono bg-background text-muted border border-border"
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                  {svc.cta && (
-                    <span className="mt-auto inline-flex items-center gap-1.5 text-sm font-semibold text-accent">
-                      {svc.cta}
-                      <svg
-                        width="14"
-                        height="14"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        viewBox="0 0 24 24"
-                        className="transition-transform group-hover:translate-x-1"
-                      >
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14m-7-7l7 7-7 7" />
-                      </svg>
-                    </span>
-                  )}
-                </div>
-              </>
-            )
-
-            if (svc.href) {
-              return (
-                <Link key={svc.title} href={svc.href} className={cardClass}>
-                  {cardBody}
-                </Link>
-              )
-            }
-
-            return (
-              <div key={svc.title} className={cardClass}>
-                {cardBody}
+        <div className="grid gap-4 md:grid-cols-3">
+          {services.map(({ title, Icon, image, href, description, cta }) => (
+            <Link
+              key={title}
+              href={href}
+              className="group flex min-w-0 flex-col overflow-hidden rounded-xl border border-border bg-surface transition-colors hover:border-accent focus-visible:outline-2 focus-visible:outline-accent"
+            >
+              <div className="relative aspect-[1.85] overflow-hidden bg-[#deddd9]">
+                <Image
+                  src={image}
+                  alt=""
+                  fill
+                  sizes="(max-width: 767px) 100vw, (max-width: 1280px) 33vw, 400px"
+                  className="object-cover motion-safe:transition-transform motion-safe:duration-500 group-hover:scale-[1.035]"
+                />
               </div>
-            )
-          })}
+              <div className="flex flex-1 flex-col p-5 lg:p-7">
+                <h3 className="flex items-center gap-2.5 font-display text-xl font-extrabold tracking-tight lg:text-2xl">
+                  <Icon size={21} className="shrink-0 text-accent" aria-hidden="true" />
+                  {title}
+                </h3>
+                <p className="mt-3 grow leading-relaxed text-muted">{description}</p>
+                <span className="mt-6 border-t border-border pt-4 text-sm font-semibold text-accent group-hover:underline">
+                  {cta}
+                </span>
+              </div>
+            </Link>
+          ))}
+        </div>
+        <div className="mt-6 grid gap-6 border-t border-border pt-6 sm:grid-cols-2">
+          <div>
+            <h3 className="mb-1 font-display text-lg font-bold">Постобработка</h3>
+            <p className="leading-relaxed text-muted">
+              Шлифуем и химически разглаживаем поверхность, чтобы убрать следы слоёв.
+            </p>
+          </div>
+          <div>
+            <Link
+              href="/quote?service=scanning"
+              className="mb-1 inline-block font-display text-lg font-bold underline decoration-(--accent-border) underline-offset-4 hover:text-accent"
+            >
+              Реверс-инжиниринг
+            </Link>
+            <p className="leading-relaxed text-muted">
+              Восстанавливаем чертежи и CAD-модели по образцу детали.
+            </p>
+          </div>
         </div>
       </div>
     </section>

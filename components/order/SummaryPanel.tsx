@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import { useFormContext } from "react-hook-form"
 import { formatPrice, formatFileSize } from "@/lib/utils"
@@ -63,8 +63,7 @@ export function SummaryPanel() {
 
       {/* Price block */}
       <div
-        className="rounded-xl p-4"
-        style={{ background: "linear-gradient(135deg, var(--accent-subtle), #7c3aed1a)" }}
+        className="rounded-xl bg-(--accent-subtle) p-4"
       >
         <p className="text-xs text-muted mb-1">Ориентировочная стоимость</p>
         {price !== null ? (
@@ -110,8 +109,7 @@ export function SummaryPanel() {
         >
           <div className="flex items-center gap-2.5">
             <div
-              className="w-2 h-2 rounded-full"
-              style={{ background: "linear-gradient(135deg, var(--accent), #7c3aed)" }}
+              className="w-2 h-2 rounded-full bg-accent"
             />
             <span className="text-sm font-semibold text-foreground">Ваш заказ</span>
             {price !== null && (

@@ -8,12 +8,12 @@ import { business } from '@/lib/seo'
 
 export function Footer() {
   return (
-    <footer className="border-t border-border bg-surface mt-auto">
+    <footer className="studio-footer mt-auto">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand */}
           <div className="md:col-span-2">
-            <Logo className="text-base mb-4" markClassName="h-6" />
+            <Logo className="text-2xl mb-4" markClassName="h-8" />
             <p className="text-sm text-muted max-w-xs leading-relaxed">
               Профессиональные услуги 3D-моделирования и 3D-печати. Точные детали, прототипы и
               серийные изделия под ваш проект.

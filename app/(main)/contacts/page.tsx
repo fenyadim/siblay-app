@@ -73,8 +73,7 @@ export default function ContactsPage() {
       <div className="min-h-screen bg-background">
         <section className="border-b border-border bg-surface">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 lg:py-20">
-            <span className="label-mono">Связь</span>
-            <h1 className="mt-3 text-4xl sm:text-5xl font-black tracking-tight text-foreground font-display">
+            <h1 className="studio-heading">
               Контакты
             </h1>
             <p className="mt-4 max-w-2xl text-base sm:text-lg text-muted leading-relaxed">
@@ -128,7 +127,7 @@ export default function ContactsPage() {
                 </div>
 
                 <div className="grid gap-3 sm:grid-cols-2">
-                  <Button asChild className="h-11 bg-accent text-white hover:bg-(--accent-hover)">
+                  <Button asChild className="h-11 bg-accent text-accent-foreground hover:bg-(--accent-hover)">
                     <Link href="/order">Заказать печать</Link>
                   </Button>
                   <Button asChild variant="outline" className="h-11">

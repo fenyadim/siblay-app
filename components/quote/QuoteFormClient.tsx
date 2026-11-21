@@ -165,8 +165,7 @@ export function QuoteFormClient({ initialType }: Props) {
     <div className="min-h-screen bg-background pb-32 lg:pb-12">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <span className="label-mono">Заявка на услугу</span>
-          <h1 className="mt-2 text-4xl font-black tracking-tight text-foreground font-display">
+          <h1 className="studio-heading">
             Оставить заявку
           </h1>
           <p className="text-sm text-muted mt-2 max-w-xl">
@@ -188,8 +187,7 @@ export function QuoteFormClient({ initialType }: Props) {
             <Button
               type="submit"
               disabled={submitting}
-              className="w-full sm:w-auto rounded-xl px-8 py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-60"
-              style={{ background: 'linear-gradient(135deg, var(--accent), #7c3aed)' }}
+              className="w-full sm:w-auto rounded-xl px-8 py-3 bg-accent text-sm font-semibold text-accent-foreground transition-opacity hover:opacity-90 disabled:opacity-60"
             >
               {submitting ? (
                 <>

@@ -1,4 +1,4 @@
-﻿import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils"
 
 const STEPS = [
   { num: 1, label: "Материал" },
@@ -21,10 +21,9 @@ export function OrderStepper({ current }: OrderStepperProps) {
       {/* Progress bar */}
       <div className="h-1 w-full rounded-full bg-border overflow-hidden">
         <div
-          className="h-full rounded-full transition-all duration-500 ease-out"
+          className="h-full rounded-full bg-accent transition-all duration-500 ease-out"
           style={{
             width: `${progress}%`,
-            background: "linear-gradient(90deg, var(--accent), #7c3aed)",
           }}
         />
       </div>
@@ -40,11 +39,10 @@ export function OrderStepper({ current }: OrderStepperProps) {
                 <div
                   className={cn(
                     "w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300 shrink-0",
-                    done && "bg-accent text-white shadow-sm",
-                    active && "text-white shadow-md ring-4 ring-accent/20",
+                    done && "bg-accent text-accent-foreground shadow-sm",
+                    active && "bg-accent text-accent-foreground shadow-md ring-4 ring-accent/20",
                     !done && !active && "border-2 border-border text-muted bg-surface",
                   )}
-                  style={active ? { background: "linear-gradient(135deg, var(--accent), #7c3aed)" } : undefined}
                 >
                   {done ? (
                     <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
@@ -77,8 +75,7 @@ export function OrderStepper({ current }: OrderStepperProps) {
       <div className="sm:hidden flex items-center justify-between">
         <div className="flex items-center gap-2">
           <div
-            className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white shrink-0"
-            style={{ background: "linear-gradient(135deg, var(--accent), #7c3aed)" }}
+            className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold bg-accent text-accent-foreground shrink-0"
           >
             {current}
           </div>

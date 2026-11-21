@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { Popover } from 'radix-ui'
 import { useState } from 'react'
@@ -172,7 +172,7 @@ function InfillInfo() {
             'text-[10px] font-bold font-mono leading-none',
             'border transition-colors duration-150',
             open
-              ? 'bg-accent border-accent text-white'
+              ? 'bg-accent border-accent text-accent-foreground'
               : 'bg-background border-border text-muted hover:border-accent hover:text-accent'
           )}
           aria-label="Подробнее о заполнении"

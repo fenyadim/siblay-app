@@ -372,8 +372,7 @@ function InquiryForm({ onBack, onDone }: { onBack: () => void; onDone: () => voi
         <Button
           type="submit"
           disabled={submitting}
-          className="w-full rounded-xl px-6 py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-60"
-          style={{ background: 'linear-gradient(135deg, var(--accent), #7c3aed)' }}
+          className="w-full rounded-xl px-6 py-3 bg-accent text-sm font-semibold text-accent-foreground transition-opacity hover:opacity-90 disabled:opacity-60"
         >
           {submitting ? (
             <>

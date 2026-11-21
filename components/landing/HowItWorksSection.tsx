@@ -1,4 +1,4 @@
-﻿const STEPS = [
+const STEPS = [
   {
     num: '01',
     title: 'Заявка',
@@ -25,54 +25,18 @@
 
 export function HowItWorksSection() {
   return (
-    <section
-      id="how-it-works"
-      className="py-14 sm:py-24 bg-surface border-y border-border overflow-hidden"
-    >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-10 sm:mb-16">
-          <span className="label-mono mb-3 text-sm block">Процесс</span>
-          <h2 className="text-4xl sm:text-5xl font-black tracking-tight text-foreground font-display">
-            Как мы работаем
-          </h2>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-          {STEPS.map((step, i) => (
-            <div key={step.num} className="relative">
-              {/* Connector line (desktop only) */}
-              {i < STEPS.length - 1 && (
-                <div
-                  className="hidden lg:block absolute top-8 left-[calc(50%+2.5rem)] -right-4 h-px"
-                  style={{
-                    background: 'linear-gradient(90deg, var(--accent-border) 0%, transparent 100%)',
-                  }}
-                />
-              )}
-
-              <div className="flex flex-col items-center text-center sm:items-start sm:text-left">
-                {/* Step circle */}
-                <div className="relative size-16 mb-6">
-                  {/* Soft glow ring */}
-                  <div
-                    className="absolute inset-0 rounded-full opacity-20"
-                    style={{
-                      background: 'radial-gradient(circle, var(--accent) 0%, transparent 70%)',
-                    }}
-                  />
-                  <div className="absolute inset-0 rounded-full border border-(--accent-border) bg-surface flex items-center justify-center">
-                    <span className="text-sm font-mono font-bold text-accent">{step.num}</span>
-                  </div>
-                </div>
-
-                <h3 className="text-lg font-bold text-foreground mb-2 font-display">
-                  {step.title}
-                </h3>
-                <p className="text-sm text-muted leading-relaxed">{step.description}</p>
-              </div>
-            </div>
+    <section id="how-it-works" className="scroll-mt-16 bg-[#242722] py-14 text-[#f6f5ed] lg:py-20">
+      <div className="studio-container">
+        <h2 className="studio-heading">Как мы работаем</h2>
+        <ol className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          {STEPS.map((step) => (
+            <li key={step.num} className="border-t border-[#5c6057] pt-5">
+              <span className="font-mono text-sm text-[#ffa36d]">{step.num}</span>
+              <h3 className="mb-3 mt-4 font-display text-2xl font-bold">{step.title}</h3>
+              <p className="leading-relaxed text-[#c8ccc2]">{step.description}</p>
+            </li>
           ))}
-        </div>
+        </ol>
       </div>
     </section>
   )

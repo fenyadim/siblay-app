@@ -1,0 +1,308 @@
+/* The public theme also reaches dialogs and menus portalled to the body. */
+body:has(.studio-main) {
+  --background: #f5f5f1;
+  --foreground: #20221f;
+  --surface: #fffefa;
+  --surface-raised: #ffffff;
+  --card: var(--surface);
+  --card-foreground: var(--foreground);
+  --popover: var(--surface-raised);
+  --popover-foreground: var(--foreground);
+  --secondary: #e9e9e3;
+  --secondary-foreground: var(--foreground);
+  --muted: #5d6159;
+  --muted-foreground: var(--muted);
+  --border: #d7d8cf;
+  --border-subtle: #e5e5de;
+  --input: #c4c6bc;
+  --placeholder: #6b6e65;
+  --accent: #aa4114;
+  --accent-foreground: #fff;
+  --accent-hover: #84310d;
+  --accent-subtle: #faeade;
+  --accent-border: #d4a388;
+  --primary: var(--accent);
+  --primary-foreground: var(--accent-foreground);
+  --ring: var(--accent);
+  --signal: #ff874b;
+}
+
+.dark body:has(.studio-main) {
+  --background: #191b19;
+  --foreground: #f5f5ee;
+  --surface: #212421;
+  --surface-raised: #292d29;
+  --secondary: #313531;
+  --muted: #b5b9af;
+  --border: #464a43;
+  --border-subtle: #353931;
+  --input: #64695f;
+  --placeholder: #a3a69f;
+  --accent: #ff9b68;
+  --accent-foreground: #23170f;
+  --accent-hover: #ffb690;
+  --accent-subtle: #402b21;
+  --accent-border: #925b40;
+}
+
+.studio-container {
+  width: 100%;
+  max-width: 80rem;
+  margin-inline: auto;
+  padding-inline: 1rem;
+}
+
+.studio-hero {
+  isolation: isolate;
+  position: relative;
+  overflow: hidden;
+  background: #181a18;
+  color: #fffefa;
+}
+
+.studio-hero-image {
+  position: relative;
+  height: clamp(12.5rem, 60vw, 23rem);
+}
+
+.studio-hero-image img {
+  object-position: 55% 48%;
+}
+
+.studio-hero-image::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, #181a18 0%, transparent 25%);
+}
+
+.studio-caption {
+  position: absolute;
+  z-index: 1;
+  right: 1rem;
+  bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: #fff;
+  font:
+    500 0.75rem/1.5 var(--font-jetbrains-mono),
+    monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  text-shadow: 0 1px 5px #000;
+}
+
+.studio-crosshair {
+  width: 0.85rem;
+  height: 0.85rem;
+  background:
+    linear-gradient(white, white) center / 1px 100% no-repeat,
+    linear-gradient(white, white) center / 100% 1px no-repeat;
+}
+
+.studio-hero-copy {
+  padding: 1rem 0 2.5rem;
+}
+.studio-kicker {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  font:
+    500 0.8125rem/1.4 var(--font-jetbrains-mono),
+    monospace;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #e8e8df;
+}
+
+.studio-kicker span {
+  width: 1.75rem;
+  height: 0.68rem;
+  background: repeating-linear-gradient(120deg, transparent 0 3px, var(--signal) 3px 5px);
+}
+
+.studio-hero h1 {
+  margin: 1.4rem 0;
+  font-family: var(--font-manrope), system-ui, sans-serif;
+  font-size: clamp(3.65rem, 8vw, 6.75rem);
+  font-weight: 800;
+  letter-spacing: -0.055em;
+  line-height: 0.96;
+}
+
+.studio-hero h1 em {
+  color: var(--signal);
+  font-style: normal;
+}
+
+.studio-hero-intro {
+  max-width: 26rem;
+  margin-bottom: 1.75rem;
+  color: #d5d6ce;
+  font-size: 1rem;
+  line-height: 1.55;
+}
+
+.studio-primary-button,
+.studio-secondary-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  min-height: 2.875rem;
+  padding-inline: 1.15rem;
+  border-radius: 0.375rem;
+  font-size: 0.9375rem;
+  font-weight: 650;
+  transition: background-color 0.18s;
+}
+
+.studio-primary-button {
+  background: var(--signal);
+  color: #23180f;
+}
+.studio-primary-button:hover {
+  background: #ffa16b;
+}
+.studio-secondary-button {
+  color: white;
+  border: 1px solid #73756d;
+  background: #181a18;
+}
+.studio-secondary-button:hover {
+  background: #333630;
+}
+
+.studio-specs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.studio-spec {
+  display: grid;
+  align-content: start;
+  gap: 0.25rem;
+  padding: 1.1rem 0.55rem;
+  border-inline-start: 1px solid var(--border);
+}
+.studio-spec:first-child {
+  padding-left: 0;
+  border: 0;
+}
+.studio-spec svg {
+  display: block;
+  margin-bottom: 0.65rem;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+.studio-spec dt {
+  font:
+    500 0.75rem/1.4 var(--font-jetbrains-mono),
+    monospace;
+  color: var(--muted);
+}
+.studio-spec dd {
+  font-size: 0.875rem;
+  line-height: 1.3;
+  font-weight: 650;
+}
+
+.studio-heading {
+  font:
+    800 clamp(2.55rem, 5.2vw, 4rem)/1.02 var(--font-manrope),
+    system-ui,
+    sans-serif;
+  letter-spacing: -0.06em;
+}
+.studio-heading > span {
+  color: var(--accent);
+}
+
+@media (min-width: 40rem) {
+  .studio-container {
+    padding-inline: 1.5rem;
+  }
+  .studio-spec {
+    position: relative;
+    padding: 1.35rem 1.35rem 1.35rem 4rem;
+  }
+  .studio-spec:first-child {
+    padding-left: 2.25rem;
+  }
+  .studio-spec svg {
+    position: absolute;
+    left: 1.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    margin: 0;
+  }
+  .studio-spec:first-child svg {
+    left: 0;
+  }
+  .studio-spec dd {
+    font-size: 1rem;
+  }
+}
+
+@media (min-width: 48rem) {
+  .studio-hero-image {
+    position: absolute;
+    inset: 0 0 0 auto;
+    width: 62%;
+    height: 100%;
+    z-index: -1;
+  }
+  .studio-hero-image::after {
+    background:
+      linear-gradient(to right, #181a18 0%, rgb(24 26 24 / 0.65) 13%, transparent 43%),
+      linear-gradient(to top, rgb(0 0 0 / 0.45), transparent 16%);
+  }
+  .studio-hero-copy {
+    width: 52%;
+    padding: clamp(3rem, 4.5vw, 4.5rem) 0;
+  }
+  .studio-caption {
+    right: max(2rem, calc((100vw - 76rem) / 2));
+    bottom: 1.75rem;
+  }
+}
+
+@media (min-width: 64rem) {
+  .studio-container {
+    padding-inline: 2rem;
+  }
+  .studio-spec {
+    padding-block: 1.5rem;
+  }
+}
+
+@media (max-width: 47.99rem) {
+  .studio-hero {
+    display: flex;
+    flex-direction: column-reverse;
+  }
+  .studio-hero-copy {
+    padding: 2.4rem 0 0.9rem;
+  }
+  .studio-hero-image::after {
+    background: linear-gradient(to bottom, #181a18 0%, transparent 27%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html:has(.studio-main) {
+    scroll-behavior: auto;
+  }
+}
+
+.studio-footer {
+  --background: #20231f;
+  --foreground: #f5f5ee;
+  --muted: #bdc1b7;
+  --accent: #ffa169;
+  --accent-hover: #ffc49c;
+  --accent-border: #a16c4c;
+  --border: #454941;
+  color: var(--foreground);
+  background: var(--background);
+}

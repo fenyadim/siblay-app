@@ -27,7 +27,7 @@ export function ConsentBanner() {
           </Link>
           .
         </p>
-        <div className="flex flex-col sm:flex-row gap-2 shrink-0">
+        <div className="flex flex-wrap gap-2 shrink-0">
           <Button
             variant="outline"
             size="sm"
