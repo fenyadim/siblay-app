@@ -56,7 +56,7 @@ export function ServicesSection() {
                   alt=""
                   fill
                   sizes="(max-width: 767px) 100vw, (max-width: 1280px) 33vw, 400px"
-                  className="object-cover motion-safe:transition-transform motion-safe:duration-500 group-hover:scale-[1.035]"
+                  className="object-cover motion-safe:transition-transform motion-safe:duration-500 motion-safe:group-hover:scale-[1.035] motion-safe:group-focus-visible:scale-[1.035]"
                 />
               </div>
               <div className="flex flex-1 flex-col p-5 lg:p-7">
@@ -65,7 +65,7 @@ export function ServicesSection() {
                   {title}
                 </h3>
                 <p className="mt-3 grow leading-relaxed text-muted">{description}</p>
-                <span className="mt-6 border-t border-border pt-4 text-sm font-semibold text-accent group-hover:underline">
+                <span className="studio-service-cta relative mt-6 border-t border-border pt-4 text-sm font-semibold text-accent group-hover:underline">
                   {cta}
                 </span>
               </div>

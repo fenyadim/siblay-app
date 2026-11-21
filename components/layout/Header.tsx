@@ -3,11 +3,13 @@
 import { MapPin, Menu, X } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import type { ComponentProps } from 'react'
 
 import { OrderCtaButton } from '@/components/order-cta/OrderCtaDialog'
 import { Button } from '@/components/ui/button'
 import { Logo } from '@/components/ui/logo'
 import { Sheet, SheetClose, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
+import { useScroll } from '@/hooks/use-scroll'
 import { business } from '@/lib/seo'
 
 import { ThemeToggle } from './ThemeToggle'
@@ -19,46 +21,63 @@ const links = [
   { href: '/contacts', label: 'Контакты' },
 ]
 
+function NavLink({
+  pathname,
+  href,
+  ...props
+}: ComponentProps<'a'> & { href: string; pathname: string }) {
+  if (pathname === '/' && href.startsWith('/#')) {
+    return <a href={href} {...props} />
+  }
+  return <Link href={href} aria-current={pathname === href ? 'page' : undefined} {...props} />
+}
+
 export function Header() {
   const pathname = usePathname()
+  const compact = useScroll(16)
   return (
-    <header className="sticky top-0 z-40 border-b border-border bg-surface">
-      <div className="studio-container flex h-16 items-center justify-between gap-1 sm:gap-3 lg:h-18">
-        <div className="flex items-center gap-5">
+    <header className="studio-header" data-compact={compact}>
+      <div className="studio-header-bar flex items-center justify-between gap-1 sm:gap-3">
+        <div className="flex items-center gap-3">
           <Link href="/" aria-label="Siblay — на главную">
-            <Logo className="text-xl sm:text-2xl" markClassName="h-7 sm:h-8" />
+            <Logo className="text-lg sm:text-xl" markClassName="h-6 sm:h-7" />
           </Link>
           <Link
             href="/contacts"
-            className="hidden items-center gap-1.5 border-l border-border pl-5 text-sm text-muted hover:text-foreground xl:flex"
+            className="hidden items-center gap-1.5 border-l border-border pl-3 text-sm text-muted hover:text-foreground xl:flex"
           >
             <MapPin size={15} aria-hidden="true" />
             {business.address.city}
           </Link>
         </div>
 
-        <nav aria-label="Основная навигация" className="hidden items-center gap-8 lg:flex">
+        <nav aria-label="Основная навигация" className="hidden items-center gap-0.5 lg:flex">
           {links.map(({ href, label }) => (
-            <Link
+            <NavLink
               key={href}
               href={href}
-              aria-current={pathname === href ? 'page' : undefined}
-              className="py-2 text-sm font-medium text-foreground hover:text-accent aria-[current=page]:text-accent"
+              pathname={pathname}
+              className="whitespace-nowrap rounded-full px-3 py-2 text-sm font-medium text-muted transition-colors hover:bg-(--accent-subtle) hover:text-accent aria-[current=page]:text-accent"
             >
               {label}
-            </Link>
+            </NavLink>
           ))}
         </nav>
 
-        <div className="flex items-center gap-1.5 sm:gap-3">
+        <div className="flex items-center gap-1 sm:gap-2">
           <ThemeToggle />
-          <OrderCtaButton className="h-10 rounded-md bg-foreground px-3 text-background hover:bg-foreground/85 sm:px-5">
+          <OrderCtaButton className="h-9 rounded-full bg-accent px-3 text-accent-foreground hover:bg-(--accent-hover) sm:px-4">
             <span className="sm:hidden">Заказать</span>
             <span className="hidden sm:inline">Оформить заказ</span>
           </OrderCtaButton>
           <Sheet>
             <SheetTrigger asChild>
-              <Button size="icon" variant="ghost" className="lg:hidden" aria-label="Открыть меню">
+              <Button
+                size="icon"
+                variant="ghost"
+                className="rounded-full lg:hidden"
+                aria-label="Открыть меню"
+              >
                 <Menu />
               </Button>
             </SheetTrigger>
@@ -79,13 +98,13 @@ export function Header() {
               <nav aria-label="Мобильная навигация" className="flex flex-col">
                 {links.map(({ href, label }) => (
                   <SheetClose asChild key={href}>
-                    <Link
+                    <NavLink
                       href={href}
-                      aria-current={pathname === href ? 'page' : undefined}
+                      pathname={pathname}
                       className="border-t border-border py-4 font-display text-2xl font-bold hover:text-accent"
                     >
                       {label}
-                    </Link>
+                    </NavLink>
                   </SheetClose>
                 ))}
               </nav>
