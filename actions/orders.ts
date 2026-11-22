@@ -2,115 +2,11 @@
 
 import { revalidatePath } from 'next/cache'
 import { headers } from 'next/headers'
-import { after } from 'next/server'
 
 import { OrderStatus } from '@/app/generated/prisma/client'
 import { auth } from '@/lib/auth'
-import {
-  adminOrderTelegramText,
-  customerOrderEmailTemplate,
-  orderEmailTemplate,
-  sendEmail,
-  sendTelegram,
-} from '@/lib/notifications'
 import { prisma } from '@/lib/prisma'
-import { createRateLimiter, getClientId } from '@/lib/rate-limit'
-import { deleteS3Object } from '@/lib/s3'
-import { fullOrderSchema, type OrderFormData } from '@/lib/validations/order'
-
-const orderLimiter = createRateLimiter({
-  limit: 5,
-  windowMs: 60 * 60 * 1000,
-  name: 'createOrder',
-})
-
-export async function createOrder(data: OrderFormData) {
-  const clientId = getClientId(await headers())
-  const { allowed, retryAfter } = orderLimiter(clientId)
-  if (!allowed) {
-    const minutes = Math.ceil(retryAfter / 60)
-    return {
-      error: `Слишком много заявок. Попробуйте через ${minutes} мин.`,
-    }
-  }
-
-  const parsed = fullOrderSchema.safeParse(data)
-  if (!parsed.success) {
-    return { error: 'Ошибка валидации данных' }
-  }
-
-  const { files, personalDataConsent, ...rest } = parsed.data
-
-  if (!personalDataConsent) {
-    return { error: 'Требуется согласие на обработку персональных данных' }
-  }
-
-  const order = await prisma.order.create({
-    data: {
-      ...rest,
-      estimatedPrice: undefined,
-      files: {
-        create: files.map((file) => ({
-          fileName: file.fileName,
-          fileUrl: file.fileUrl,
-          fileType: file.fileType,
-          fileSize: file.fileSize,
-        })),
-      },
-    },
-    include: { files: true },
-  })
-
-  const notificationEmail = process.env.NOTIFICATION_EMAIL
-  const shortId = order.id.slice(0, 8)
-
-  // Telegram быстрый (<1s) и с собственным 4s таймаутом — отправляем синхронно,
-  // чтобы админ получил пинг до того, как клиент уйдёт со страницы.
-  const telegramResult = await Promise.allSettled([
-    sendTelegram(adminOrderTelegramText(order), {
-      parseMode: 'HTML',
-      disableWebPagePreview: true,
-    }),
-  ])
-  if (telegramResult[0].status === 'rejected') {
-    console.error(`[order:${shortId}] telegram-admin failed:`, telegramResult[0].reason)
-  }
-
-  // Email (SMTP) медленный и может зависнуть — уходит в фон через after(),
-  // чтобы server action отвечал клиенту мгновенно.
-  after(async () => {
-    const channels: Array<[string, Promise<unknown>]> = [
-      [
-        'email-customer',
-        sendEmail({
-          to: order.email,
-          subject: `Ваш заказ #${shortId} принят — Siblay`,
-          html: customerOrderEmailTemplate(order),
-        }),
-      ],
-    ]
-    if (notificationEmail) {
-      channels.push([
-        'email-admin',
-        sendEmail({
-          to: notificationEmail,
-          subject: `Новый заказ #${shortId} — ${order.fullName}`,
-          html: orderEmailTemplate(order),
-        }),
-      ])
-    }
-
-    const results = await Promise.allSettled(channels.map(([, p]) => p))
-    results.forEach((result, idx) => {
-      const [name] = channels[idx]
-      if (result.status === 'rejected') {
-        console.error(`[order:${shortId}] ${name} failed:`, result.reason)
-      }
-    })
-  })
-
-  return { orderId: order.id }
-}
+import { deleteSubmissionAttachments } from '@/lib/s3'
 
 async function requireAdmin() {
   const session = await auth.api.getSession({ headers: await headers() })
@@ -147,14 +43,6 @@ export async function updateOrderStatus(id: string, status: OrderStatus) {
   return order
 }
 
-function s3KeyFromUrl(fileUrl: string): string | null {
-  const region = process.env.AWS_REGION ?? 'ru1'
-  const bucket = process.env.AWS_S3_BUCKET
-  if (!bucket) return null
-  const prefix = `https://s3.${region}.storage.beget.cloud/${bucket}/`
-  return fileUrl.startsWith(prefix) ? fileUrl.slice(prefix.length) : null
-}
-
 export async function deleteOrder(id: string) {
   await requireAdmin()
 
@@ -166,14 +54,7 @@ export async function deleteOrder(id: string) {
     throw new Error('Заказ не найден')
   }
 
-  // Best-effort S3 cleanup; DB deletion proceeds even if some objects fail.
-  await Promise.allSettled(
-    order.files
-      .map((f) => s3KeyFromUrl(f.fileUrl))
-      .filter((key): key is string => key !== null)
-      .map((key) => deleteS3Object(key))
-  )
-
+  await deleteSubmissionAttachments(order.files)
   await prisma.order.delete({ where: { id } })
 
   revalidatePath('/admin/orders')

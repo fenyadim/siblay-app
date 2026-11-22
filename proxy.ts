@@ -43,7 +43,6 @@ export function proxy(req: NextRequest) {
 }
 
 export const config = {
-  // Skip Next internals, the Better Auth handler (which has its own rate
-  // limit), and anything with a file extension (images, fonts, etc.).
-  matcher: ['/((?!_next/|api/auth|.*\\.).*)'],
+  // Upload routes have their own rate limits and read the request body directly.
+  matcher: ['/((?!_next/|api/auth|api/(?:submissions|upload|admin/storage)(?:/|$)|.*\\.).*)'],
 }

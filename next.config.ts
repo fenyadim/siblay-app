@@ -12,6 +12,13 @@ const nextConfig: NextConfig = {
     formats: ['image/avif', 'image/webp'],
     remotePatterns: [
       { protocol: 'https', hostname: '**.storage.beget.cloud' },
+      {
+        protocol: 'https',
+        hostname: 's3.twcstorage.ru',
+        port: '',
+        pathname: '/*/portfolio/**',
+        search: '',
+      },
     ],
   },
 }

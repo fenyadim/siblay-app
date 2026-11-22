@@ -32,21 +32,9 @@ export const step3Schema = z.object({
   infill: z.coerce.number().int().min(10).max(100),
 }).passthrough()
 
-const BEGET_S3_URL = /^https:\/\/s3\.[a-z0-9-]+\.storage\.beget\.cloud\//i
-
 export const step4Schema = z.object({
   hasModel: z.boolean(),
-  files: z.array(
-    z.object({
-      fileName: z.string(),
-      fileUrl: z
-        .string()
-        .url()
-        .refine((u) => BEGET_S3_URL.test(u), "Неверный URL файла"),
-      fileType: z.string(),
-      fileSize: z.number(),
-    }),
-  ),
+  files: z.array(z.file()),
 }).passthrough()
 
 export const step5Schema = z.object({
@@ -78,12 +66,15 @@ export const step6Schema = z.object({
   { message: "Укажите адрес доставки", path: ["address"] },
 )
 
-export const fullOrderSchema = step1Schema
-  .merge(step2Schema)
-  .merge(step3Schema)
-  .merge(step4Schema)
-  .merge(step5Schema)
-  .merge(step6Schema)
+export const orderDetailsSchema = step6Schema.safeExtend({
+  ...step1Schema.shape,
+  ...step2Schema.shape,
+  ...step3Schema.shape,
+  ...step5Schema.shape,
+  hasModel: step4Schema.shape.hasModel,
+}).strip()
+
+export const fullOrderSchema = orderDetailsSchema.safeExtend({ files: step4Schema.shape.files })
 
 export type OrderFormData = z.infer<typeof fullOrderSchema>
 export type Step1Data = z.infer<typeof step1Schema>

@@ -1,4 +1,6 @@
 import nodemailer from 'nodemailer'
+import { setTimeout as delay } from 'node:timers/promises'
+import { fetch as proxyFetch, ProxyAgent } from 'undici'
 
 const SMTP_PORT = Number(process.env.SMTP_PORT ?? 465)
 
@@ -40,25 +42,65 @@ interface TelegramOptions {
   disableWebPagePreview?: boolean
 }
 
-export async function sendTelegram(text: string, options: TelegramOptions = {}) {
-  const token = process.env.TELEGRAM_BOT_TOKEN
-  const chatId = process.env.TELEGRAM_CHAT_ID
-  if (!token || !chatId) return
+const TELEGRAM_TIMEOUT_MS = 10_000
+let telegramProxy: ProxyAgent | undefined
 
-  const response = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      chat_id: chatId,
-      text,
-      ...(options.parseMode ? { parse_mode: options.parseMode } : {}),
-      ...(options.disableWebPagePreview ? { disable_web_page_preview: true } : {}),
-    }),
-    signal: AbortSignal.timeout(4000),
+export async function sendTelegram(text: string, options: TelegramOptions = {}) {
+  const token = process.env.TELEGRAM_BOT_TOKEN?.trim()
+  const chatId = process.env.TELEGRAM_CHAT_ID?.trim()
+  if (!token && !chatId) return
+  if (!token || !chatId) {
+    throw new Error('Telegram requires both TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID')
+  }
+
+  const proxyUrl = process.env.TELEGRAM_HTTPS_PROXY?.trim()
+  if (proxyUrl && !telegramProxy) {
+    try {
+      telegramProxy = new ProxyAgent(proxyUrl)
+    } catch {
+      throw new Error('Invalid TELEGRAM_HTTPS_PROXY configuration')
+    }
+  }
+
+  const body = JSON.stringify({
+    chat_id: chatId,
+    text,
+    ...(options.parseMode ? { parse_mode: options.parseMode } : {}),
+    ...(options.disableWebPagePreview ? { link_preview_options: { is_disabled: true } } : {}),
   })
 
-  if (!response.ok) {
-    throw new Error(`Telegram request failed: ${response.status}`)
+  for (let attempt = 1; attempt <= 2; attempt++) {
+    if (attempt === 2) await delay(750)
+
+    const signal = AbortSignal.timeout(TELEGRAM_TIMEOUT_MS)
+    let response: Response | Awaited<ReturnType<typeof proxyFetch>>
+    try {
+      const url = `https://api.telegram.org/bot${token}/sendMessage`
+      const request = {
+        method: 'POST' as const,
+        headers: { 'Content-Type': 'application/json' },
+        body,
+        redirect: 'error' as const,
+        signal,
+      }
+      response = proxyUrl
+        ? await proxyFetch(url, { ...request, dispatcher: telegramProxy })
+        : await fetch(url, request)
+    } catch {
+      if (attempt === 1) continue
+      // Fetch errors can include the request URL, which contains the bot token.
+      throw new Error(
+        signal.aborted
+          ? `Telegram Bot API timed out after ${TELEGRAM_TIMEOUT_MS} ms on attempt ${attempt}`
+          : `Telegram Bot API could not be reached on attempt ${attempt}`
+      )
+    }
+
+    // The response body is unused. Release the connection without logging it.
+    await response.body?.cancel().catch(() => undefined)
+    if (response.ok) return
+    if (response.status >= 500 && attempt === 1) continue
+    throw new Error(`Telegram Bot API returned HTTP ${response.status} on attempt ${attempt}`)
   }
 }
 

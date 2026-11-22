@@ -2,115 +2,45 @@
 
 import { useFormContext } from "react-hook-form"
 import { useState, useRef } from "react"
+import {
+  MAX_IMAGE_FILES,
+  MAX_IMAGE_SIZE,
+  MAX_MODEL_FILES,
+  MAX_MODEL_SIZE,
+  selectAttachments,
+} from "@/lib/attachments"
 import { cn, formatFileSize } from "@/lib/utils"
 import type { OrderFormData } from "@/lib/validations/order"
 
 const MODEL_FORMATS = [".stl", ".obj", ".3mf", ".step", ".stp"]
 const PHOTO_FORMATS = [".jpg", ".jpeg", ".png", ".heic", ".webp"]
-const MODEL_MAX_SIZE = 100 * 1024 * 1024
-const PHOTO_MAX_SIZE = 20 * 1024 * 1024
-
-interface UploadedFile {
-  fileName: string
-  fileUrl: string
-  fileType: string
-  fileSize: number
-}
 
 export function Step4Files() {
-  const { watch, setValue, getValues, formState: { errors } } = useFormContext<OrderFormData>()
+  const { watch, setValue, getValues } = useFormContext<OrderFormData>()
   const hasModel = watch("hasModel") ?? true
-  const files = (watch("files") ?? []) as UploadedFile[]
-
-  const [uploading, setUploading] = useState<Record<string, { name: string; progress: number }>>({})
-  const [uploadErrors, setUploadErrors] = useState<string[]>([])
+  const files = watch("files") ?? []
+  const [fileErrors, setFileErrors] = useState<string[]>([])
   const inputRef = useRef<HTMLInputElement>(null)
-  const inFlightRef = useRef(0)
-  const uploadIdRef = useRef(0)
-
   const accept = hasModel ? MODEL_FORMATS.join(",") : PHOTO_FORMATS.join(",")
-  const maxSize = hasModel ? MODEL_MAX_SIZE : PHOTO_MAX_SIZE
-  const maxFiles = hasModel ? 3 : 10
+  const maxFiles = hasModel ? MAX_MODEL_FILES : MAX_IMAGE_FILES
 
-  async function uploadFile(file: File) {
-    const currentFiles = (getValues("files") ?? []) as UploadedFile[]
-
-    if (file.size > maxSize) {
-      setUploadErrors((prev) => [...prev, `${file.name}: файл слишком большой`])
-      return
-    }
-    if (currentFiles.length + inFlightRef.current >= maxFiles) {
-      setUploadErrors((prev) => [...prev, `Максимум ${maxFiles} файлов`])
-      return
-    }
-
-    inFlightRef.current += 1
-    const uploadId = `upload-${uploadIdRef.current++}`
-    setUploading((prev) => ({ ...prev, [uploadId]: { name: file.name, progress: 0 } }))
-
-    try {
-      const formData = new FormData()
-      formData.append("file", file)
-      formData.append("folder", "orders")
-
-      const res = await fetch("/api/upload", {
-        method: "POST",
-        body: formData,
-      })
-
-      if (!res.ok) {
-        const data = await res.json()
-        throw new Error(data.error || "Ошибка загрузки")
-      }
-
-      const { fileUrl } = await res.json()
-
-      const newFile: UploadedFile = {
-        fileName: file.name,
-        fileUrl,
-        fileType: file.type,
-        fileSize: file.size,
-      }
-
-      const latestFiles = (getValues("files") ?? []) as UploadedFile[]
-      if (latestFiles.length >= maxFiles) {
-        setUploadErrors((prev) => [...prev, `${file.name}: превышен лимит файлов`])
-        return
-      }
-
-      setValue("files", [...latestFiles, newFile], { shouldValidate: true })
-    } catch {
-      setUploadErrors((prev) => [...prev, `${file.name}: ошибка загрузки`])
-    } finally {
-      inFlightRef.current = Math.max(0, inFlightRef.current - 1)
-      setUploading((prev) => {
-        const next = { ...prev }
-        delete next[uploadId]
-        return next
-      })
-    }
+  function addFiles(selected: FileList) {
+    const result = selectAttachments(getValues("files"), selected, maxFiles, hasModel ? "model" : "image")
+    setValue("files", result.files, { shouldValidate: true })
+    setFileErrors(result.errors)
   }
 
-  function handleDrop(e: React.DragEvent) {
-    e.preventDefault()
-    const dropped = Array.from(e.dataTransfer.files)
-    dropped.forEach(uploadFile)
+  function removeFile(index: number) {
+    setValue("files", getValues("files").filter((_, i) => i !== index), { shouldValidate: true })
   }
-
-  function removeFile(idx: number) {
-    const next = files.filter((_, i) => i !== idx)
-    setValue("files", next, { shouldValidate: true })
-  }
-
-  const isUploading = Object.keys(uploading).length > 0
 
   return (
     <div>
       <h2 className="text-2xl font-black text-foreground mb-1 font-display">
-        Загрузка файлов
+        Файлы
       </h2>
       <p className="text-sm text-muted mb-5">
-        {hasModel ? "Загрузите вашу 3D-модель" : "Загрузите фотографии или эскизы изделия"}
+        {hasModel ? "Выберите вашу 3D-модель" : "Выберите фотографии или эскизы изделия"}
       </p>
 
       {/* Toggle */}
@@ -119,7 +49,8 @@ export function Step4Files() {
           type="button"
           onClick={() => {
             setValue("hasModel", !hasModel)
-            setValue("files", [])
+            setValue("files", [], { shouldValidate: true })
+            setFileErrors([])
           }}
           className={cn(
             "relative w-11 h-6 rounded-full overflow-hidden transition-colors flex-shrink-0",
@@ -141,15 +72,13 @@ export function Step4Files() {
 
       {/* Drop zone */}
       <div
-        onDrop={handleDrop}
+        onDrop={(event) => {
+          event.preventDefault()
+          addFiles(event.dataTransfer.files)
+        }}
         onDragOver={(e) => e.preventDefault()}
         onClick={() => inputRef.current?.click()}
-        className={cn(
-          "border-2 border-dashed rounded-2xl p-8 text-center cursor-pointer transition-colors",
-          isUploading
-            ? "border-accent bg-(--accent-subtle)"
-            : "border-border bg-surface hover:border-(--accent-border) hover:bg-background",
-        )}
+        className="border-2 border-dashed rounded-2xl p-8 text-center cursor-pointer transition-colors border-border bg-surface hover:border-(--accent-border) hover:bg-background"
       >
         <input
           ref={inputRef}
@@ -158,32 +87,23 @@ export function Step4Files() {
           multiple
           className="hidden"
           onChange={(e) => {
-            Array.from(e.target.files ?? []).forEach(uploadFile)
+            if (e.target.files) addFiles(e.target.files)
             e.target.value = ""
           }}
         />
         <div className="text-3xl mb-3 text-muted">
-          {isUploading ? "⏳" : "📎"}
+          📎
         </div>
         <p className="text-sm font-medium text-foreground mb-1">
-          {isUploading ? "Загрузка..." : "Перетащите файлы или нажмите"}
+          Перетащите файлы или нажмите
         </p>
         <p className="text-xs text-muted">
           {hasModel
-            ? `${MODEL_FORMATS.join(", ")} · до ${formatFileSize(MODEL_MAX_SIZE)}`
-            : `${PHOTO_FORMATS.join(", ")} · до ${formatFileSize(PHOTO_MAX_SIZE)} · до ${maxFiles} файлов`}
+            ? `${MODEL_FORMATS.join(", ")} · до ${formatFileSize(MAX_MODEL_SIZE)}`
+            : `${PHOTO_FORMATS.join(", ")} · до ${formatFileSize(MAX_IMAGE_SIZE)} · до ${maxFiles} файлов`}
         </p>
       </div>
 
-      {/* Uploading indicators */}
-      {Object.entries(uploading).map(([id, upload]) => (
-        <div key={id} className="mt-2 flex items-center gap-2 text-sm text-muted">
-          <div className="w-4 h-4 border-2 border-accent border-t-transparent rounded-full animate-spin shrink-0" />
-          {upload.name}
-        </div>
-      ))}
-
-      {/* Uploaded files */}
       {files.length > 0 && (
         <div className="mt-4 space-y-2">
           {files.map((f, i) => (
@@ -192,15 +112,16 @@ export function Step4Files() {
               className="flex items-center gap-3 p-3 rounded-xl border border-border bg-surface"
             >
               <div className="w-8 h-8 rounded-lg bg-(--accent-subtle) flex items-center justify-center text-xs font-mono text-accent shrink-0">
-                {f.fileName.split(".").pop()?.toUpperCase()}
+                {f.name.split(".").pop()?.toUpperCase()}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-foreground truncate">{f.fileName}</p>
-                <p className="text-xs text-muted">{formatFileSize(f.fileSize)}</p>
+                <p className="text-sm font-medium text-foreground truncate">{f.name}</p>
+                <p className="text-xs text-muted">{formatFileSize(f.size)}</p>
               </div>
               <button
                 type="button"
                 onClick={() => removeFile(i)}
+                aria-label={`Убрать файл ${f.name}`}
                 className="text-muted hover:text-destructive transition-colors"
               >
                 <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -213,7 +134,7 @@ export function Step4Files() {
       )}
 
       {/* Errors */}
-      {uploadErrors.map((e, i) => (
+      {fileErrors.map((e, i) => (
         <p key={i} className="mt-2 text-xs text-destructive">{e}</p>
       ))}
     </div>

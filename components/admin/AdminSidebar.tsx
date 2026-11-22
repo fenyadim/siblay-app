@@ -14,6 +14,7 @@ const NAV = [
   { href: '/admin/orders', label: 'Заказы', icon: '◫' },
   { href: '/admin/quotes', label: 'Заявки', icon: '✎' },
   { href: '/admin/portfolio', label: 'Портфолио', icon: '◈' },
+  { href: '/admin/storage', label: 'Хранилище S3', icon: '▤' },
   { href: '/admin/materials', label: 'Материалы', icon: '◉' },
   { href: '/admin/reviews', label: 'Отзывы', icon: '★' },
 ]

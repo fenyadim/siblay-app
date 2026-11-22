@@ -9,11 +9,12 @@ import type { Resolver } from 'react-hook-form'
 import { FormProvider, useForm, useFormContext } from 'react-hook-form'
 import { toast } from 'sonner'
 
-import { createQuote } from '@/actions/quotes'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
+import { MAX_MODEL_SIZE, MAX_QUOTE_FILES, selectAttachments } from '@/lib/attachments'
+import { submitRequest } from '@/lib/submit-request'
 import { cn, formatFileSize } from '@/lib/utils'
 import {
   DESIRED_FORMATS,
@@ -85,9 +86,6 @@ const ACCEPTED_FORMATS = [
   '.webp',
 ].join(',')
 
-const MAX_UPLOAD_SIZE = 100 * 1024 * 1024
-const MAX_FILES = 10
-
 interface Props {
   initialType: QuoteType
 }
@@ -144,15 +142,16 @@ export function QuoteFormClient({ initialType }: Props) {
     mode: 'onBlur',
   })
 
-  async function handleSubmit() {
+  async function handleSubmit(data: QuoteFormData) {
+    if (submitting) return
     setSubmitting(true)
     try {
-      const result = await createQuote(methods.getValues())
+      const result = await submitRequest('quote', data)
       if ('error' in result) {
         toast.error(result.error)
       } else {
         toast.success('Заявка отправлена! Менеджер свяжется в течение 2 часов.')
-        router.push(`/?quote=${result.quoteId}`)
+        router.push(`/?quote=${result.id}`)
       }
     } catch {
       toast.error('Произошла ошибка. Попробуйте ещё раз.')
@@ -181,7 +180,7 @@ export function QuoteFormClient({ initialType }: Props) {
           >
             <ServiceTypeSection />
             <ServiceDetailsSection />
-            <FilesSection />
+            <FilesSection disabled={submitting} />
             <ContactsSection />
 
             <Button
@@ -435,83 +434,23 @@ function ServiceDetailsSection() {
   )
 }
 
-function FilesSection() {
+function FilesSection({ disabled }: { disabled: boolean }) {
   const { setValue, getValues, watch } = useFormContext<QuoteFormData>()
   const files = watch('files') ?? []
-
-  const [uploading, setUploading] = useState<Record<string, { name: string }>>({})
-  const [uploadErrors, setUploadErrors] = useState<string[]>([])
+  const [fileErrors, setFileErrors] = useState<string[]>([])
   const inputRef = useRef<HTMLInputElement>(null)
-  const inFlightRef = useRef(0)
-  const uploadIdRef = useRef(0)
 
-  async function uploadFile(file: File) {
-    const currentFiles = getValues('files') ?? []
-    if (file.size > MAX_UPLOAD_SIZE) {
-      setUploadErrors((prev) => [...prev, `${file.name}: файл слишком большой`])
-      return
-    }
-    if (currentFiles.length + inFlightRef.current >= MAX_FILES) {
-      setUploadErrors((prev) => [...prev, `Максимум ${MAX_FILES} файлов`])
-      return
-    }
+  function addFiles(selected: FileList) {
+    if (disabled) return
 
-    inFlightRef.current += 1
-    const uploadId = `upload-${uploadIdRef.current++}`
-    setUploading((prev) => ({ ...prev, [uploadId]: { name: file.name } }))
-
-    try {
-      const formData = new FormData()
-      formData.append('file', file)
-      formData.append('folder', 'orders')
-
-      const res = await fetch('/api/upload', { method: 'POST', body: formData })
-      if (!res.ok) {
-        const data = await res.json()
-        throw new Error(data.error || 'Ошибка загрузки')
-      }
-      const { fileUrl } = await res.json()
-
-      const latestFiles = getValues('files') ?? []
-      if (latestFiles.length >= MAX_FILES) {
-        setUploadErrors((prev) => [...prev, `${file.name}: превышен лимит файлов`])
-        return
-      }
-
-      setValue(
-        'files',
-        [
-          ...latestFiles,
-          {
-            fileName: file.name,
-            fileUrl,
-            fileType: file.type,
-            fileSize: file.size,
-          },
-        ],
-        { shouldValidate: true },
-      )
-    } catch {
-      setUploadErrors((prev) => [...prev, `${file.name}: ошибка загрузки`])
-    } finally {
-      inFlightRef.current = Math.max(0, inFlightRef.current - 1)
-      setUploading((prev) => {
-        const next = { ...prev }
-        delete next[uploadId]
-        return next
-      })
-    }
+    const result = selectAttachments(getValues('files'), selected, MAX_QUOTE_FILES)
+    setValue('files', result.files, { shouldValidate: true })
+    setFileErrors(result.errors)
   }
 
-  function removeFile(idx: number) {
-    setValue(
-      'files',
-      files.filter((_, i) => i !== idx),
-      { shouldValidate: true },
-    )
+  function removeFile(index: number) {
+    setValue('files', getValues('files').filter((_, i) => i !== index), { shouldValidate: true })
   }
-
-  const isUploading = Object.keys(uploading).length > 0
 
   return (
     <section>
@@ -519,43 +458,32 @@ function FilesSection() {
       <div
         onDrop={(e) => {
           e.preventDefault()
-          Array.from(e.dataTransfer.files).forEach(uploadFile)
+          addFiles(e.dataTransfer.files)
         }}
         onDragOver={(e) => e.preventDefault()}
         onClick={() => inputRef.current?.click()}
-        className={cn(
-          'border-2 border-dashed rounded-2xl p-6 text-center cursor-pointer transition-colors',
-          isUploading
-            ? 'border-accent bg-(--accent-subtle)'
-            : 'border-border bg-background hover:border-(--accent-border)',
-        )}
+        className="border-2 border-dashed rounded-2xl p-6 text-center cursor-pointer transition-colors border-border bg-background hover:border-(--accent-border)"
       >
         <input
           ref={inputRef}
           type="file"
           accept={ACCEPTED_FORMATS}
+          disabled={disabled}
           multiple
           className="hidden"
           onChange={(e) => {
-            Array.from(e.target.files ?? []).forEach(uploadFile)
+            if (e.target.files) addFiles(e.target.files)
             e.target.value = ''
           }}
         />
-        <div className="text-2xl mb-2 text-muted">{isUploading ? '⏳' : '📎'}</div>
+        <div className="text-2xl mb-2 text-muted">📎</div>
         <p className="text-sm font-medium text-foreground mb-1">
-          {isUploading ? 'Загрузка...' : 'Перетащите файлы или нажмите'}
+          Перетащите файлы или нажмите
         </p>
         <p className="text-xs text-muted">
-          Эскизы, фото, чертежи или 3D-модели · до {formatFileSize(MAX_UPLOAD_SIZE)} · до {MAX_FILES} файлов
+          Эскизы, фото, чертежи или 3D-модели · до {formatFileSize(MAX_MODEL_SIZE)} · до {MAX_QUOTE_FILES} файлов
         </p>
       </div>
-
-      {Object.entries(uploading).map(([id, upload]) => (
-        <div key={id} className="mt-2 flex items-center gap-2 text-sm text-muted">
-          <div className="w-4 h-4 border-2 border-accent border-t-transparent rounded-full animate-spin shrink-0" />
-          {upload.name}
-        </div>
-      ))}
 
       {files.length > 0 && (
         <div className="mt-4 space-y-2">
@@ -565,15 +493,17 @@ function FilesSection() {
               className="flex items-center gap-3 p-3 rounded-xl border border-border bg-background"
             >
               <div className="w-8 h-8 rounded-lg bg-(--accent-subtle) flex items-center justify-center text-xs font-mono text-accent shrink-0">
-                {f.fileName.split('.').pop()?.toUpperCase()}
+                {f.name.split('.').pop()?.toUpperCase()}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-foreground truncate">{f.fileName}</p>
-                <p className="text-xs text-muted">{formatFileSize(f.fileSize)}</p>
+                <p className="text-sm font-medium text-foreground truncate">{f.name}</p>
+                <p className="text-xs text-muted">{formatFileSize(f.size)}</p>
               </div>
               <button
                 type="button"
                 onClick={() => removeFile(i)}
+                disabled={disabled}
+                aria-label={`Убрать файл ${f.name}`}
                 className="text-muted hover:text-destructive transition-colors"
               >
                 <svg
@@ -592,7 +522,7 @@ function FilesSection() {
         </div>
       )}
 
-      {uploadErrors.map((e, i) => (
+      {fileErrors.map((e, i) => (
         <p key={i} className="mt-2 text-xs text-destructive">
           {e}
         </p>

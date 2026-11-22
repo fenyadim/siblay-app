@@ -9,7 +9,7 @@
 - **Tailwind v4** + shadcn/ui + Radix
 - **Prisma 7** + PostgreSQL
 - **Better Auth** — почта/пароль, один админ
-- **S3** (Beget Cloud) для пользовательских файлов
+- **S3** (Timeweb Cloud) для пользовательских файлов
 - **Nodemailer + Telegram bot** — уведомления о заказах
 - **Yandex Metrika** + Webvisor 2.0
 
@@ -87,8 +87,8 @@ In-memory лимитер ([lib/rate-limit.ts](lib/rate-limit.ts)), действ�
 | Глобально на публичных роутах | 120 req/мин на IP | [proxy.ts](proxy.ts) |
 | Брутфорс логина (`/api/auth/sign-in/email`) | 5 / 5 мин | [lib/auth.ts](lib/auth.ts) (встроенный Better Auth) |
 | Прочие `/api/auth/*` | 60 / мин | там же |
-| Создание заказа (`createOrder`) | 5 / час | [actions/orders.ts](actions/orders.ts) |
-| Загрузка файлов (`/api/upload`) | 20 / час | [app/api/upload/route.ts](app/api/upload/route.ts) |
+| Отправка заказа или заявки с вложениями (`/api/submissions`) | 5 / час для каждого типа | [app/api/submissions/route.ts](app/api/submissions/route.ts) |
+| Загрузка изображений портфолио (`/api/upload`) | 20 / час | [app/api/upload/route.ts](app/api/upload/route.ts) |
 
 ## Деплой
 

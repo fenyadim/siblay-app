@@ -9,7 +9,6 @@ import { FormProvider, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 
 import type { MaterialWithColors } from '@/actions/materials'
-import { createOrder } from '@/actions/orders'
 import { OrderStepper } from '@/components/order/OrderStepper'
 import { Step1Material } from '@/components/order/steps/Step1Material'
 import { Step2Color } from '@/components/order/steps/Step2Color'
@@ -19,6 +18,7 @@ import { Step5Comment } from '@/components/order/steps/Step5Comment'
 import { Step6Contacts } from '@/components/order/steps/Step6Contacts'
 import { SummaryPanel } from '@/components/order/SummaryPanel'
 import { Button } from '@/components/ui/button'
+import { submitRequest } from '@/lib/submit-request'
 import {
   fullOrderSchema,
   type OrderFormData,
@@ -84,14 +84,24 @@ export function OrderFormClient({ materials }: Props) {
   }
 
   async function handleSubmit() {
+    if (submitting) return
+
+    const details = fullOrderSchema.safeParse(methods.getValues())
+    if (!details.success) {
+      for (const issue of details.error.issues) {
+        methods.setError(issue.path[0] as keyof OrderFormData, { message: issue.message })
+      }
+      return
+    }
+
     setSubmitting(true)
     try {
-      const result = await createOrder(methods.getValues())
+      const result = await submitRequest('order', details.data)
       if ('error' in result) {
         toast.error(result.error)
       } else {
         toast.success('Заказ отправлен! Свяжемся с вами в течение 2 часов.')
-        router.push(`/?order=${result.orderId}`)
+        router.push(`/?order=${result.id}`)
       }
     } catch {
       toast.error('Произошла ошибка. Попробуйте ещё раз.')
@@ -128,7 +138,7 @@ export function OrderFormClient({ materials }: Props) {
                   type="button"
                   variant="outline"
                   onClick={() => setStep((s) => s - 1)}
-                  disabled={step === 1}
+                  disabled={step === 1 || submitting}
                 >
                   <ArrowLeft className="size-3.5" />
                   Назад

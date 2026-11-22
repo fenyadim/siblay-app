@@ -1,16 +1,13 @@
 ﻿import { redirect } from "next/navigation"
-import { headers } from "next/headers"
-import { auth } from "@/lib/auth"
 import { AdminSidebar } from "@/components/admin/AdminSidebar"
+import { hasCurrentAdminSession } from "@/lib/admin-session"
 
 export default async function AdminProtectedLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  const session = await auth.api.getSession({ headers: await headers() })
-
-  if (!session || session.user.email !== process.env.ADMIN_EMAIL) {
+  if (!await hasCurrentAdminSession()) {
     redirect("/admin/login")
   }
 

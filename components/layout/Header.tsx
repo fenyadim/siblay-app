@@ -39,7 +39,7 @@ export function Header() {
     <header className="studio-header" data-compact={compact}>
       <div className="studio-header-bar flex items-center justify-between gap-1 sm:gap-3">
         <div className="flex items-center gap-3">
-          <Link href="/" aria-label="Siblay — на главную">
+          <Link href="/" className="flex shrink-0" aria-label="Siblay — на главную">
             <Logo className="text-lg sm:text-xl" markClassName="h-6 sm:h-7" />
           </Link>
           <Link

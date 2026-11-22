@@ -48,18 +48,15 @@ export async function createInquiry(data: InquiryFormData) {
   const notificationEmail = process.env.NOTIFICATION_EMAIL
   const shortId = inquiry.id.slice(0, 8)
 
-  const telegramResult = await Promise.allSettled([
-    sendTelegram(adminInquiryTelegramText(inquiry), {
-      parseMode: 'HTML',
-      disableWebPagePreview: true,
-    }),
-  ])
-  if (telegramResult[0].status === 'rejected') {
-    console.error(`[inquiry:${shortId}] telegram-admin failed:`, telegramResult[0].reason)
-  }
-
   after(async () => {
     const channels: Array<[string, Promise<unknown>]> = [
+      [
+        'telegram-admin',
+        sendTelegram(adminInquiryTelegramText(inquiry), {
+          parseMode: 'HTML',
+          disableWebPagePreview: true,
+        }),
+      ],
       [
         'email-customer',
         sendEmail({
